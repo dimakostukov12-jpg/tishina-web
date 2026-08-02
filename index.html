@@ -24,18 +24,24 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .h-title{font-family:'Forum',Georgia,serif;font-size:30px;color:#F3DCA0;margin:0;letter-spacing:.02em;text-shadow:0 0 16px rgba(233,197,131,.35);}
 .h-sub{font-size:13.5px;color:#B9A9BE;margin:7px 0 0;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 16px 0;}
-.tile,.banner{position:relative;overflow:hidden;background-size:cover;background-position:center;cursor:pointer;border:1px solid rgba(255,255,255,.05);will-change:transform;transition:transform .24s cubic-bezier(.34,1.56,.64,1),box-shadow .22s,filter .18s;}
-.tile{aspect-ratio:1168/880;border-radius:20px;box-shadow:0 0 10px rgba(233,201,131,.5),0 0 24px rgba(233,201,131,.28),0 10px 26px rgba(0,0,0,.42);}
-.banner{grid-column:1/-1;aspect-ratio:2688/1152;border-radius:20px;box-shadow:0 0 12px rgba(233,201,131,.5),0 0 28px rgba(233,201,131,.28),0 12px 30px rgba(0,0,0,.5);margin-top:2px;}
-.tile::after,.banner::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-shadow:inset 0 0 22px 6px rgba(14,7,22,.5);background:radial-gradient(125% 125% at 50% 42%,transparent 56%,rgba(12,6,18,.52) 100%);}
-.tile.press,.banner.press{transform:scale(.93);filter:brightness(.86) saturate(.97);box-shadow:0 4px 12px rgba(0,0,0,.5);}
-.tile.pop,.banner.pop{box-shadow:0 0 0 2px rgba(243,220,160,.5),0 16px 36px rgba(0,0,0,.5);}
-/* вариант 4 — живой ЗОЛОТОЙ контур: растушёвка + свечение, без стыка цветов */
-@property --ga{syntax:"<angle>";inherits:false;initial-value:0deg;}
-.tile::before,.banner::before,.cov::before,.p-cover::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:2;pointer-events:none;padding:1.5px;background:conic-gradient(from var(--ga),#9a7a38,#F3E1AC,#E7C983,#FFF7DD,#E7C983,#C9A24B,#F3E1AC,#9a7a38);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;filter:blur(.9px);opacity:.92;animation:gspin 6.5s linear infinite;}
-.cov::before{padding:1.1px;filter:blur(.7px);}
-@keyframes gspin{to{--ga:360deg;}}
-@media(prefers-reduced-motion:reduce){.tile::before,.banner::before,.cov::before,.p-cover::before{animation:none;}}
+/* ЖИВОЙ ЗОЛОТОЙ КОНТУР — обёртка-рамка: внутри крутится золотой конус (transform:rotate,
+   Safari анимирует всегда и плавно); overflow:hidden обрезает ровно по форме; свечение — box-shadow. */
+.frame{position:relative;border-radius:21px;padding:2.5px;overflow:hidden;isolation:isolate;transform:translateZ(0);cursor:pointer;will-change:transform;
+  box-shadow:0 0 12px rgba(233,201,131,.55),0 0 30px rgba(233,201,131,.3),0 10px 26px rgba(0,0,0,.44);
+  transition:transform .24s cubic-bezier(.34,1.56,.64,1),box-shadow .22s,filter .18s;}
+.frame::before{content:"";position:absolute;inset:-65%;z-index:0;pointer-events:none;
+  background:conic-gradient(#6f4f18,#E7C983,#FFF6D8,#E7C983,#B98F3C,#F3E1AC,#FFF6D8,#C9A24B,#6f4f18);
+  animation:gspin 6s linear infinite;}
+.frame.bframe{grid-column:1/-1;margin-top:2px;border-radius:22px;}
+.frame.press{transform:scale(.94);filter:brightness(.9);box-shadow:0 4px 12px rgba(0,0,0,.5);}
+.frame.pop{box-shadow:0 0 0 2px rgba(255,241,196,.6),0 0 22px rgba(233,201,131,.6),0 16px 36px rgba(0,0,0,.5);}
+@keyframes gspin{to{transform:rotate(360deg);}}
+@media(prefers-reduced-motion:reduce){.frame::before{animation:none;background:conic-gradient(#B98F3C,#F3E1AC,#E7C983,#B98F3C);}}
+
+.tile,.banner{position:relative;z-index:1;display:block;overflow:hidden;background-size:cover;background-position:center;}
+.tile{aspect-ratio:1168/880;border-radius:18.5px;}
+.banner{aspect-ratio:2688/1152;border-radius:19.5px;}
+.tile::after,.banner::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-shadow:inset 0 0 20px 5px rgba(14,7,22,.4);background:radial-gradient(125% 125% at 50% 42%,transparent 62%,rgba(12,6,18,.4) 100%);}
 
 /* section */
 .topbar{display:flex;align-items:center;gap:10px;padding:16px 16px 6px;}
@@ -46,8 +52,9 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .lrow{display:flex;gap:12px;align-items:center;padding:10px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);margin-bottom:11px;cursor:pointer;will-change:transform;transition:transform .24s cubic-bezier(.34,1.56,.64,1),background .2s,box-shadow .2s;}
 .lrow.press{transform:scale(.965);background:rgba(255,255,255,.085);}
 .lrow.pop{box-shadow:0 0 0 1.5px rgba(243,220,160,.35),0 10px 24px rgba(0,0,0,.4);}
-.cov{position:relative;overflow:hidden;flex:0 0 43%;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:12px;box-shadow:0 0 8px rgba(233,201,131,.45),0 0 16px rgba(233,201,131,.2);}
-.cov::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-shadow:inset 0 0 14px 3px rgba(14,7,22,.45);}
+.cframe{flex:0 0 43%;border-radius:13px;padding:1.9px;box-shadow:0 0 8px rgba(233,201,131,.5),0 0 16px rgba(233,201,131,.22),0 6px 16px rgba(0,0,0,.35);}
+.cov{position:relative;z-index:1;overflow:hidden;width:100%;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:11px;}
+.cov::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-shadow:inset 0 0 12px 3px rgba(14,7,22,.38);}
 .rt{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;}
 .rdesc{font-size:13.5px;color:#EAE0E6;line-height:1.42;}
 .rbot{display:flex;align-items:center;justify-content:space-between;}
@@ -86,8 +93,9 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .p-top{position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 6px;}
 .p-crumb{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(246,238,221,.55);}
 .p-scroll{position:relative;z-index:2;flex:1;overflow-y:auto;padding:4px 20px 6px;-webkit-overflow-scrolling:touch;}
-.p-cover{position:relative;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:18px;box-shadow:0 0 16px rgba(233,201,131,.42),0 0 34px rgba(233,201,131,.24),0 18px 50px rgba(0,0,0,.55);margin-top:6px;}
-.p-cover::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-shadow:inset 0 0 34px 8px rgba(10,5,16,.4);}
+.pframe{margin-top:6px;border-radius:20px;padding:2.5px;box-shadow:0 0 16px rgba(233,201,131,.5),0 0 36px rgba(233,201,131,.26),0 18px 50px rgba(0,0,0,.55);}
+.p-cover{position:relative;z-index:1;overflow:hidden;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:17.5px;}
+.p-cover::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-shadow:inset 0 0 30px 8px rgba(10,5,16,.35);}
 .mtitle{font-family:'Forum',Georgia,serif;font-size:30px;color:#F3DCA0;text-transform:uppercase;letter-spacing:.03em;text-shadow:0 0 16px rgba(233,197,131,.4);margin:18px 0 4px;}
 .meta{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,238,221,.6);margin-bottom:14px;}
 .desc{font-size:14.5px;color:#EAE0E6;line-height:1.55;}
@@ -159,7 +167,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
   <div class="bgfx"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
   <div class="p-top"><span class="back" data-back>‹</span><span class="p-crumb" id="p-crumb"></span></div>
   <div class="p-scroll">
-    <div class="p-cover" id="p-cover"></div>
+    <div class="frame pframe"><div class="p-cover" id="p-cover"></div></div>
     <div class="mtitle" id="p-title"></div>
     <div class="meta" id="p-meta"></div>
     <div class="desc" id="p-desc"></div>
@@ -237,20 +245,22 @@ function setTab(tab){
 function renderHome(){
   const g=$("home-grid"); g.innerHTML="";
   SECTIONS.forEach(sec=>{
-    const d=document.createElement("div");
-    d.className="tile cov-"+sec.cover;
-    press(d,()=>openSection(sec.id));
-    g.appendChild(d);
+    const fr=document.createElement("div"); fr.className="frame";
+    const d=document.createElement("div"); d.className="tile cov-"+sec.cover;
+    fr.appendChild(d);
+    press(fr,()=>openSection(sec.id));
+    g.appendChild(fr);
   });
-  const b=document.createElement("div");
-  b.className="banner cov-emerg";
-  press(b,()=>openSection("emergency"));
-  g.appendChild(b);
+  const bf=document.createElement("div"); bf.className="frame bframe";
+  const b=document.createElement("div"); b.className="banner cov-emerg";
+  bf.appendChild(b);
+  press(bf,()=>openSection("emergency"));
+  g.appendChild(bf);
 }
 
 /* ---------- render section ---------- */
 function rowHTML(it){
-  return '<div class="cov cov-'+it.cover+'"></div>'+
+  return '<div class="frame cframe"><div class="cov cov-'+it.cover+'"></div></div>'+
     '<div class="rt"><div class="rdesc">'+it.desc+'</div>'+
     '<div class="rbot"><span class="dur">'+it.dur+'</span><span class="plc"></span></div></div>';
 }
