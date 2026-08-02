@@ -24,10 +24,12 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .h-title{font-family:'Forum',Georgia,serif;font-size:30px;color:#F3DCA0;margin:0;letter-spacing:.02em;text-shadow:0 0 16px rgba(233,197,131,.35);}
 .h-sub{font-size:13.5px;color:#B9A9BE;margin:7px 0 0;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 16px 0;}
-.tile{aspect-ratio:1168/880;border-radius:16px;background-size:cover;background-position:center;box-shadow:0 10px 26px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:transform .15s;}
-.tile:active{transform:scale(.97);}
-.banner{grid-column:1/-1;aspect-ratio:2688/1152;border-radius:16px;background-size:cover;background-position:center;box-shadow:0 12px 30px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.09);cursor:pointer;margin-top:2px;transition:transform .15s;}
-.banner:active{transform:scale(.98);}
+.tile,.banner{position:relative;overflow:hidden;background-size:cover;background-position:center;cursor:pointer;border:1px solid rgba(255,255,255,.05);will-change:transform;transition:transform .24s cubic-bezier(.34,1.56,.64,1),box-shadow .22s,filter .18s;}
+.tile{aspect-ratio:1168/880;border-radius:20px;box-shadow:0 10px 26px rgba(0,0,0,.4);}
+.banner{grid-column:1/-1;aspect-ratio:2688/1152;border-radius:20px;box-shadow:0 12px 30px rgba(0,0,0,.5);margin-top:2px;}
+.tile::after,.banner::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 22px 6px rgba(14,7,22,.5),inset 0 0 0 1px rgba(255,255,255,.05);background:radial-gradient(125% 125% at 50% 42%,transparent 56%,rgba(12,6,18,.52) 100%);}
+.tile.press,.banner.press{transform:scale(.93);filter:brightness(.86) saturate(.97);box-shadow:0 4px 12px rgba(0,0,0,.5);}
+.tile.pop,.banner.pop{box-shadow:0 0 0 2px rgba(243,220,160,.5),0 16px 36px rgba(0,0,0,.5);}
 
 /* section */
 .topbar{display:flex;align-items:center;gap:10px;padding:16px 16px 6px;}
@@ -35,9 +37,11 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .tb-title{font-family:'Forum',Georgia,serif;font-size:24px;color:#F3DCA0;letter-spacing:.02em;}
 .sec-sub{padding:0 20px 14px;color:#B9A9BE;font-size:13.5px;}
 .sec-list{padding:0 16px;}
-.lrow{display:flex;gap:12px;align-items:center;padding:10px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);margin-bottom:11px;cursor:pointer;transition:transform .12s,background .2s;}
-.lrow:active{transform:scale(.985);background:rgba(255,255,255,.075);}
-.cov{flex:0 0 43%;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:10px;}
+.lrow{display:flex;gap:12px;align-items:center;padding:10px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);margin-bottom:11px;cursor:pointer;will-change:transform;transition:transform .24s cubic-bezier(.34,1.56,.64,1),background .2s,box-shadow .2s;}
+.lrow.press{transform:scale(.965);background:rgba(255,255,255,.085);}
+.lrow.pop{box-shadow:0 0 0 1.5px rgba(243,220,160,.35),0 10px 24px rgba(0,0,0,.4);}
+.cov{position:relative;overflow:hidden;flex:0 0 43%;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:12px;}
+.cov::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 14px 3px rgba(14,7,22,.45),inset 0 0 0 1px rgba(255,255,255,.05);}
 .rt{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;}
 .rdesc{font-size:13.5px;color:#EAE0E6;line-height:1.42;}
 .rbot{display:flex;align-items:center;justify-content:space-between;}
@@ -76,7 +80,8 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .p-top{position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 6px;}
 .p-crumb{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(246,238,221,.55);}
 .p-scroll{position:relative;z-index:2;flex:1;overflow-y:auto;padding:4px 20px 6px;-webkit-overflow-scrolling:touch;}
-.p-cover{aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.55);margin-top:6px;}
+.p-cover{position:relative;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.55);margin-top:6px;}
+.p-cover::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 34px 8px rgba(10,5,16,.4),inset 0 0 0 1px rgba(255,255,255,.05);}
 .mtitle{font-family:'Forum',Georgia,serif;font-size:30px;color:#F3DCA0;text-transform:uppercase;letter-spacing:.03em;text-shadow:0 0 16px rgba(233,197,131,.4);margin:18px 0 4px;}
 .meta{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,238,221,.6);margin-bottom:14px;}
 .desc{font-size:14.5px;color:#EAE0E6;line-height:1.55;}
@@ -179,6 +184,17 @@ const $ = s => document.getElementById(s);
 const byId = {}; SECTIONS.forEach(s=>s.items.forEach(it=>byId[it.id]={...it, secTitle:s.title}));
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 function haptic(t){ try{ tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(t||'light'); }catch(e){} }
+/* tactile press: down = вдавить, release = пружина + золотой блик */
+function press(el,onTap){
+  let on=false;
+  const down=()=>{on=true;el.classList.add('press');haptic('light');};
+  const up=()=>{if(!on)return;on=false;el.classList.remove('press');};
+  el.addEventListener('pointerdown',down);
+  el.addEventListener('pointerup',up);
+  el.addEventListener('pointerleave',up);
+  el.addEventListener('pointercancel',up);
+  el.addEventListener('click',()=>{el.classList.add('pop');setTimeout(()=>el.classList.remove('pop'),280);haptic('medium');onTap();});
+}
 
 /* ---------- favorites ---------- */
 function favs(){ try{return JSON.parse(localStorage.getItem(FAVKEY)||"[]");}catch(e){return[];} }
@@ -217,12 +233,12 @@ function renderHome(){
   SECTIONS.forEach(sec=>{
     const d=document.createElement("div");
     d.className="tile cov-"+sec.cover;
-    d.onclick=()=>{haptic();openSection(sec.id);};
+    press(d,()=>openSection(sec.id));
     g.appendChild(d);
   });
   const b=document.createElement("div");
   b.className="banner cov-emerg";
-  b.onclick=()=>{haptic();openSection("emergency");};
+  press(b,()=>openSection("emergency"));
   g.appendChild(b);
 }
 
@@ -248,7 +264,7 @@ function openSection(id){
   } else {
     sec.items.forEach(it=>{
       const r=document.createElement("div"); r.className="lrow"; r.innerHTML=rowHTML(it);
-      r.onclick=()=>{haptic();openPlayer(it.id);};
+      press(r,()=>openPlayer(it.id));
       list.appendChild(r);
     });
   }
@@ -349,7 +365,7 @@ function renderFav(){
   if(!ids.length){ list.innerHTML='<div class="empty"><div class="big">Пока пусто</div>Открой любую медитацию и нажми ♡ — она появится здесь.</div>'; return; }
   ids.forEach(id=>{ const it=byId[id]; if(!it)return;
     const r=document.createElement("div"); r.className="lrow"; r.innerHTML=rowHTML(it);
-    r.onclick=()=>{haptic();openPlayer(id);}; list.appendChild(r);
+    press(r,()=>openPlayer(id)); list.appendChild(r);
   });
 }
 /* ---------- profile ---------- */
