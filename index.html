@@ -100,9 +100,14 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .meta{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,238,221,.6);margin-bottom:14px;}
 .desc{font-size:14.5px;color:#EAE0E6;line-height:1.55;}
 .player{position:relative;z-index:3;padding:14px 22px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(16,8,20,.5) 20%,rgba(16,8,20,.78));border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);}
-.bar{position:relative;height:6px;border-radius:4px;background:rgba(255,255,255,.16);cursor:pointer;touch-action:none;}
-.fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#E7C983,#F3DCA0);border-radius:4px;}
-.thumb{position:absolute;top:50%;left:0;width:15px;height:15px;border-radius:50%;background:#F6E3B0;transform:translate(-50%,-50%);box-shadow:0 0 10px rgba(243,220,160,.8),0 2px 5px rgba(0,0,0,.5);}
+.bar{position:relative;height:8px;border-radius:5px;background:rgba(255,255,255,.16);cursor:pointer;touch-action:none;}
+.bar::before{content:"";position:absolute;left:0;right:0;top:-18px;bottom:-18px;}/* большая зона захвата пальцем */
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#E7C983,#F3DCA0);border-radius:5px;}
+.thumb{position:absolute;top:50%;left:0;width:18px;height:18px;border-radius:50%;background:#F6E3B0;transform:translate(-50%,-50%);box-shadow:0 0 10px rgba(243,220,160,.8),0 2px 5px rgba(0,0,0,.5);transition:width .12s,height .12s,box-shadow .12s;z-index:2;}
+.bar.dragging .thumb{width:24px;height:24px;box-shadow:0 0 18px rgba(243,220,160,1),0 2px 8px rgba(0,0,0,.6);}
+.bubble{position:absolute;bottom:24px;left:0;transform:translateX(-50%);padding:5px 11px;border-radius:11px;background:radial-gradient(circle at 40% 30%,#FBEBBE,#E7C983 60%,#C89E4C);color:#2a1640;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;box-shadow:0 6px 16px rgba(0,0,0,.5),0 0 14px rgba(243,220,160,.5);opacity:0;pointer-events:none;transition:opacity .12s;white-space:nowrap;z-index:3;}
+.bubble::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #E7C983;}
+.bar.dragging .bubble{opacity:1;}
 .times{display:flex;justify-content:space-between;font-size:11px;color:rgba(246,238,221,.7);margin-top:7px;font-variant-numeric:tabular-nums;}
 .controls{display:flex;align-items:center;justify-content:space-between;margin-top:12px;}
 .sp{width:52px;}
@@ -173,7 +178,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
     <div class="desc" id="p-desc"></div>
   </div>
   <div class="player">
-    <div class="bar" id="bar"><div class="fill" id="fill"></div><div class="thumb" id="thumb"></div></div>
+    <div class="bar" id="bar"><div class="fill" id="fill"></div><div class="thumb" id="thumb"></div><div class="bubble" id="bubble">0:00</div></div>
     <div class="times"><span id="cur">0:00</span><span id="tot">0:00</span></div>
     <div class="controls">
       <span class="sp"></span>
@@ -347,12 +352,12 @@ au.addEventListener("timeupdate",()=>{
   if('mediaSession' in navigator && dur){ try{navigator.mediaSession.setPositionState({duration:dur,position:Math.min(au.currentTime,dur),playbackRate:au.playbackRate});}catch(e){} }
 });
 
-const bar=$("bar");
-const seekTo=x=>{const r=bar.getBoundingClientRect();const p=Math.max(0,Math.min(1,(x-r.left)/r.width));if(dur){try{au.currentTime=p*dur;}catch(e){}}$("fill").style.width=(p*100)+"%";$("thumb").style.left=(p*100)+"%";$("cur").textContent=fmt(p*dur);};
-bar.addEventListener("pointerdown",e=>{if(!hasAudio)return;dragging=true;bar.setPointerCapture(e.pointerId);seekTo(e.clientX);});
+const bar=$("bar"), bubble=$("bubble");
+const seekTo=x=>{const r=bar.getBoundingClientRect();const p=Math.max(0,Math.min(1,(x-r.left)/r.width));const t=p*(dur||0);if(dur){try{au.currentTime=t;}catch(e){}}$("fill").style.width=(p*100)+"%";$("thumb").style.left=(p*100)+"%";$("cur").textContent=fmt(t);bubble.style.left=(p*100)+"%";bubble.textContent=fmt(t);};
+bar.addEventListener("pointerdown",e=>{if(!hasAudio)return;dragging=true;bar.classList.add("dragging");bar.setPointerCapture(e.pointerId);haptic("light");seekTo(e.clientX);});
 bar.addEventListener("pointermove",e=>{if(dragging)seekTo(e.clientX);});
-bar.addEventListener("pointerup",()=>{if(dragging){dragging=false;savePos();}});
-bar.addEventListener("pointercancel",()=>{dragging=false;});
+bar.addEventListener("pointerup",()=>{if(dragging){dragging=false;bar.classList.remove("dragging");savePos();}});
+bar.addEventListener("pointercancel",()=>{dragging=false;bar.classList.remove("dragging");});
 
 $("heart").onclick=()=>{
   if(!curId)return; const on=toggleFav(curId);
