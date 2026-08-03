@@ -149,6 +149,13 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .skip .a{font-size:26px;line-height:1;}
 .skip .n{font-size:12px;font-weight:600;}
 @media(prefers-reduced-motion:reduce){.pz.playing,.halo{animation:none!important;}}
+/* --- страница медитации (детали) --- */
+.d-topbar{display:flex;align-items:center;gap:10px;padding:16px 16px 6px;}
+.d-crumb{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(246,238,221,.55);}
+.d-body{padding:2px 20px 124px;}
+.dbottom{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px 24px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(16,8,20,.5) 30%,rgba(16,8,20,.82));backdrop-filter:blur(8px);}
+.dbottom .playbtn{width:72px;height:72px;}
+.dbottom .heart{position:absolute;right:22px;width:52px;height:52px;}
 
 /* profile */
 .prof-hd{display:flex;flex-direction:column;align-items:center;padding:34px 20px 10px;text-align:center;}
@@ -220,6 +227,21 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
   <div class="sec-sub" style="padding-top:8px">Здесь появятся твой прогресс, минуты практики и любимые медитации. Пока это первая версия — самое важное впереди.</div>
 </section>
 
+<section class="screen" id="s-detail">
+  <div class="safetop"></div>
+  <div class="d-topbar"><span class="back" data-back>‹</span><span class="d-crumb" id="d-crumb"></span></div>
+  <div class="d-body">
+    <div class="frame pframe"><div class="cov" id="d-cover"></div></div>
+    <div class="mtitle" id="d-title"></div>
+    <div class="meta" id="d-meta"></div>
+    <div class="desc" id="d-desc"></div>
+  </div>
+  <div class="dbottom">
+    <button class="playbtn" id="d-play" aria-label="Слушать"></button>
+    <button class="heart" id="d-heart" aria-label="В избранное"><svg viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.1C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></button>
+  </div>
+</section>
+
 <div id="s-player">
   <canvas class="pcv" id="pcv"></canvas>
   <div class="p-top"><span class="back" data-back>‹</span><span class="p-crumb" id="p-crumb"></span>
@@ -275,11 +297,12 @@ function toggleFav(id){ let a=favs(); const i=a.indexOf(id); if(i>=0)a.splice(i,
 let stack=[]; let curTab="home";
 const TAB_SCREEN={home:"s-home",fav:"s-fav",profile:"s-profile"};
 function showScreen(id){
-  ["s-home","s-section","s-fav","s-profile"].forEach(s=>$(s).classList.toggle("active",s===id));
+  ["s-home","s-section","s-fav","s-profile","s-detail"].forEach(s=>$(s).classList.toggle("active",s===id));
   $("s-player").classList.toggle("active", id==="s-player");
-  const deep = (id==="s-player"||id==="s-section");
-  $("tabbar").classList.toggle("hide", id==="s-player");
+  const deep = (id==="s-player"||id==="s-section"||id==="s-detail");
+  $("tabbar").classList.toggle("hide", id==="s-player"||id==="s-detail");
   if(id==="s-player"){ PFX.start(); } else { PFX.stop(); }
+  if(id==="s-detail" && curId){ $("d-heart").classList.toggle("on",isFav(curId)); }
   window.scrollTo(0,0);
   if(tg && tg.BackButton){ if(deep){tg.BackButton.show();} else {tg.BackButton.hide();} }
 }
@@ -331,7 +354,7 @@ function openSection(id){
   } else {
     sec.items.forEach(it=>{
       const r=document.createElement("div"); r.className="lrow"; r.innerHTML=rowHTML(it);
-      press(r,()=>openPlayer(it.id));
+      press(r,()=>openDetail(it.id));
       list.appendChild(r);
     });
   }
@@ -345,6 +368,19 @@ const fmt=s=>{s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+":"+String(
 function posKey(id){return "tishina_pos_"+id;}
 function playerUI(){const cur=au.currentTime||0;const p=dur?Math.min(1,cur/dur):0;$("fill").style.width=(p*100)+"%";$("thumb").style.left=(p*100)+"%";$("cur").textContent=fmt(cur);}
 function savePos(){ if(hasAudio && au.currentTime>0) localStorage.setItem(posKey(curId),String(au.currentTime)); }
+
+/* ---------- страница медитации (детали) ---------- */
+function openDetail(id){
+  const it=byId[id]; if(!it) return; curId=id;
+  $("d-cover").className="cov cov-"+it.cover;
+  $("d-title").textContent=it.title;
+  $("d-meta").textContent=it.secTitle+" · "+it.dur+" · голос ♀";
+  $("d-desc").textContent=it.long||it.desc;
+  $("d-crumb").textContent=it.secTitle;
+  $("d-heart").classList.toggle("on",isFav(id));
+  go("s-detail",true);
+}
+$("d-play").onclick=()=>{ if(!curId)return; haptic("medium"); openPlayer(curId); };
 
 /* ---------- сфера из частиц (экран медитации) ---------- */
 const PFX=(function(){
@@ -402,6 +438,7 @@ function openPlayer(id){
     $("tot").textContent=it.dur.replace(" мин",":00");
   }
   go("s-player",true);
+  if(hasAudio){ au.play().catch(()=>{}); }  // играет сразу при входе
 }
 function pausePlayer(){ try{au.pause();}catch(e){} }
 
@@ -437,12 +474,14 @@ bar.addEventListener("pointermove",e=>{if(dragging)seekTo(e.clientX);});
 bar.addEventListener("pointerup",()=>{if(dragging){dragging=false;bar.classList.remove("dragging");savePos();}});
 bar.addEventListener("pointercancel",()=>{dragging=false;bar.classList.remove("dragging");});
 
-$("heart").onclick=()=>{
-  if(!curId)return; const on=toggleFav(curId); const h=$("heart");
-  h.classList.toggle("on",on);
-  h.classList.remove("pop"); void h.offsetWidth; h.classList.add("pop");  // рестарт анимации даже при быстрых тапах
-  setTimeout(()=>h.classList.remove("pop"),560); haptic();
-};
+function toggleHeart(clicked){
+  if(!curId)return; const on=toggleFav(curId);
+  $("heart").classList.toggle("on",on); $("d-heart").classList.toggle("on",on);
+  clicked.classList.remove("pop"); void clicked.offsetWidth; clicked.classList.add("pop");
+  setTimeout(()=>clicked.classList.remove("pop"),560); haptic();
+}
+$("heart").onclick=()=>toggleHeart($("heart"));
+$("d-heart").onclick=()=>toggleHeart($("d-heart"));
 
 document.addEventListener("visibilitychange",savePos);
 window.addEventListener("pagehide",savePos);
@@ -465,7 +504,7 @@ function renderFav(){
   if(!ids.length){ list.innerHTML='<div class="empty"><div class="big">Пока пусто</div>Открой любую медитацию и нажми ♡ — она появится здесь.</div>'; return; }
   ids.forEach(id=>{ const it=byId[id]; if(!it)return;
     const r=document.createElement("div"); r.className="lrow"; r.innerHTML=rowHTML(it);
-    press(r,()=>openPlayer(id)); list.appendChild(r);
+    press(r,()=>openDetail(id)); list.appendChild(r);
   });
 }
 /* ---------- profile ---------- */
