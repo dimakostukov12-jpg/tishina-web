@@ -125,6 +125,30 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 @keyframes heartbeat{0%{transform:scale(1)}22%{transform:scale(.82)}52%{transform:scale(1.22)}100%{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.heart.pop svg{animation:none;}}
 .soonpill{text-align:center;font-size:12px;color:#E6C079;letter-spacing:.04em;margin-top:10px;min-height:14px;}
+/* --- экран медитации со сферой из частиц --- */
+#s-player{background:linear-gradient(158deg,#180d28,#0e0716);}
+.pcv{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;}
+.p-top{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 18px 6px;}
+.p-top .back{font-size:30px;color:#F3DCA0;cursor:pointer;line-height:1;}
+.p-top .heart{margin-left:auto;width:44px;height:44px;}
+.p-titlewrap{position:absolute;top:calc(56px + env(safe-area-inset-top));left:0;right:0;z-index:3;text-align:center;pointer-events:none;padding:0 22px;}
+.pt-eyebrow{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(230,192,121,.85);}
+.pt-title{font-family:'Forum',Georgia,serif;font-size:26px;color:#F3DCA0;margin-top:4px;letter-spacing:.02em;text-shadow:0 0 16px rgba(233,197,131,.4);}
+.core{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:3;display:flex;align-items:center;justify-content:center;}
+.halo{position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(243,220,160,.42),rgba(231,201,131,.12) 45%,transparent 68%);animation:haloB 8s ease-in-out infinite;}
+.pz{position:relative;z-index:4;width:60px;height:60px;border-radius:50%;border:0;cursor:pointer;background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 55%,#C89E4C);display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 0 20px rgba(243,220,160,.6),0 4px 16px rgba(0,0,0,.5);-webkit-tap-highlight-color:transparent;-webkit-appearance:none;appearance:none;outline:none;}
+.pz::before,.pz::after{content:"";width:6px;height:20px;background:#3a1f52;border-radius:2px;}
+.pz:not(.playing)::before{width:0;height:0;background:transparent;border-left:19px solid #3a1f52;border-top:12px solid transparent;border-bottom:12px solid transparent;border-radius:0;margin-left:5px;}
+.pz:not(.playing)::after{display:none;}
+.pz.playing{animation:pulsePause 2.6s ease-in-out infinite;}
+@keyframes pulsePause{0%,100%{transform:scale(1);box-shadow:0 0 20px rgba(243,220,160,.55),0 4px 16px rgba(0,0,0,.5)}50%{transform:scale(1.1);box-shadow:0 0 36px rgba(243,220,160,1),0 4px 16px rgba(0,0,0,.5)}}
+@keyframes haloB{0%,100%{transform:scale(.86);opacity:.5}50%{transform:scale(1.16);opacity:.85}}
+.pbottom{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:0 26px calc(24px + env(safe-area-inset-bottom));}
+.ctrls{display:flex;align-items:center;justify-content:center;gap:58px;margin-top:16px;}
+.skip{display:flex;align-items:center;gap:3px;color:#F3DCA0;opacity:.92;cursor:pointer;background:none;border:0;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;appearance:none;}
+.skip .a{font-size:26px;line-height:1;}
+.skip .n{font-size:12px;font-weight:600;}
+@media(prefers-reduced-motion:reduce){.pz.playing,.halo{animation:none!important;}}
 
 /* profile */
 .prof-hd{display:flex;flex-direction:column;align-items:center;padding:34px 20px 10px;text-align:center;}
@@ -197,24 +221,21 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 </section>
 
 <div id="s-player">
-  <div class="bgfx"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
-  <div class="p-top"><span class="back" data-back>‹</span><span class="p-crumb" id="p-crumb"></span></div>
-  <div class="p-scroll">
-    <div class="frame pframe"><div class="p-cover" id="p-cover"></div></div>
-    <div class="mtitle" id="p-title"></div>
-    <div class="meta" id="p-meta"></div>
-    <div class="desc" id="p-desc"></div>
+  <canvas class="pcv" id="pcv"></canvas>
+  <div class="p-top"><span class="back" data-back>‹</span><span class="p-crumb" id="p-crumb"></span>
+    <button class="heart" id="heart" aria-label="В избранное"><svg viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.1C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></button>
   </div>
-  <div class="player">
+  <div class="p-titlewrap"><div class="pt-eyebrow" id="p-meta"></div><div class="pt-title" id="p-title"></div></div>
+  <div class="core"><div class="halo"></div><button class="pz" id="play" aria-label="Пауза"></button></div>
+  <div class="pbottom">
     <div class="bar" id="bar"><div class="fill" id="fill"></div><div class="thumb" id="thumb"></div><div class="bubble" id="bubble">0:00</div></div>
     <div class="times"><span id="cur">0:00</span><span id="tot">0:00</span></div>
-    <div class="controls">
-      <span class="sp"></span>
-      <button class="playbtn" id="play" aria-label="Играть"></button>
-      <button class="heart" id="heart" aria-label="В избранное"><svg viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.1C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></button>
+    <div class="ctrls">
+      <button class="skip" id="back15"><span class="a">&#8634;</span><span class="n">15</span></button>
+      <button class="skip" id="fwd15"><span class="n">15</span><span class="a">&#8635;</span></button>
     </div>
-    <div class="soonpill" id="soonpill"></div>
   </div>
+  <div class="cov" id="p-cover" style="display:none"></div>
   <audio id="au" preload="metadata" playsinline></audio>
 </div>
 
@@ -258,6 +279,7 @@ function showScreen(id){
   $("s-player").classList.toggle("active", id==="s-player");
   const deep = (id==="s-player"||id==="s-section");
   $("tabbar").classList.toggle("hide", id==="s-player");
+  if(id==="s-player"){ PFX.start(); } else { PFX.stop(); }
   window.scrollTo(0,0);
   if(tg && tg.BackButton){ if(deep){tg.BackButton.show();} else {tg.BackButton.hide();} }
 }
@@ -324,29 +346,58 @@ function posKey(id){return "tishina_pos_"+id;}
 function playerUI(){const cur=au.currentTime||0;const p=dur?Math.min(1,cur/dur):0;$("fill").style.width=(p*100)+"%";$("thumb").style.left=(p*100)+"%";$("cur").textContent=fmt(cur);}
 function savePos(){ if(hasAudio && au.currentTime>0) localStorage.setItem(posKey(curId),String(au.currentTime)); }
 
+/* ---------- сфера из частиц (экран медитации) ---------- */
+const PFX=(function(){
+  let cv,ctx,DPR,W=1,H=1,P=[],A=[],rot=0,t=0,last=0,run=false,raf=0;
+  const cols=[[231,201,131],[247,227,150],[210,90,160],[138,74,208]];
+  const acols=[[247,227,150],[231,201,131],[224,120,170],[168,110,220]];
+  function build(){
+    const r=cv.getBoundingClientRect();
+    W=cv.width=Math.max(2,(r.width*DPR)|0); H=cv.height=Math.max(2,(r.height*DPR)|0);
+    P=[]; for(let i=0;i<700;i++){ const u=Math.random(),v=Math.random(),th=Math.acos(2*u-1),ph=6.283185*v,jr=0.84+Math.random()*0.22;
+      P.push({x:Math.sin(th)*Math.cos(ph)*jr,y:Math.cos(th)*jr,z:Math.sin(th)*Math.sin(ph)*jr,c:cols[(Math.random()*4)|0],sz:1.5*(0.65+Math.random()*0.95),ph:Math.random()*6.283,tw:Math.random()*6.283,drift:Math.random()<0.12,dr:0}); }
+    A=[]; const AN=Math.round(W*H/(DPR*DPR)/2600);
+    for(let i=0;i<AN;i++){ const sp=0.006+Math.random()*0.016,ang=Math.random()*6.283;
+      A.push({x:Math.random()*W,y:Math.random()*H,vx:Math.cos(ang)*sp*DPR,vy:Math.sin(ang)*sp*DPR,c:acols[(Math.random()*4)|0],sz:(0.6+Math.random()*1.5)*DPR,tw:Math.random()*6.283,ba:0.25+Math.random()*0.55}); }
+  }
+  function frame(ts){
+    if(!run)return; let dt=ts-last; if(!last)dt=16; last=ts; if(dt>60)dt=60; t+=dt; rot+=0.00055*dt;
+    ctx.globalCompositeOperation='source-over'; ctx.fillStyle='rgba(14,7,22,0.30)'; ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+    for(let i=0;i<A.length;i++){ const a=A[i]; a.x+=a.vx*dt;a.y+=a.vy*dt; if(a.x<0)a.x+=W;else if(a.x>W)a.x-=W; if(a.y<0)a.y+=H;else if(a.y>H)a.y-=H;
+      const al=a.ba*(0.35+0.65*(0.5+0.5*Math.sin(t*0.004+a.tw))); ctx.fillStyle='rgba('+a.c[0]+','+a.c[1]+','+a.c[2]+','+al.toFixed(3)+')'; ctx.fillRect(a.x-a.sz*0.5,a.y-a.sz*0.5,a.sz,a.sz); }
+    const cx=W/2, cy=H*0.42, R=Math.min(W,H)*0.30, breath=1+0.19*Math.sin(t*6.283185/8000);
+    const cR=Math.cos(rot),sR=Math.sin(rot),ct=Math.cos(0.30),st=Math.sin(0.30);
+    for(let i=0;i<P.length;i++){ const p=P[i]; const rr=1+0.03*Math.sin(t*0.002+p.ph); let dx=p.x*rr,dy=p.y*rr,dz=p.z*rr;
+      if(p.drift){p.dr+=dt*0.00006;const g=1+p.dr;dx*=g;dy*=g;dz*=g;if(p.dr>0.95)p.dr=0;}
+      let X=dx*cR-dz*sR,Z=dx*sR+dz*cR,Y=dy; let Y2=Y*ct-Z*st,Z2=Y*st+Z*ct; X*=breath;Y2*=breath;Z2*=breath;
+      const persp=1/(1.9-Z2*0.5), sx=cx+X*R*persp, sy=cy+Y2*R*persp; let al=(Z2+1.25)/2.5; al=al<0?0:al>1?1:al; al*=(0.7+0.3*(0.5+0.5*Math.sin(t*0.005+p.tw)))*0.95;
+      const s=Math.max(0.7,p.sz*persp*DPR); ctx.fillStyle='rgba('+p.c[0]+','+p.c[1]+','+p.c[2]+','+al.toFixed(3)+')'; ctx.fillRect(sx-s*0.5,sy-s*0.5,s,s); }
+    raf=requestAnimationFrame(frame);
+  }
+  return {
+    start(){ if(!cv){cv=document.getElementById('pcv'); if(!cv)return; ctx=cv.getContext('2d'); DPR=Math.min(2,window.devicePixelRatio||1);} if(run)return; build(); run=true; last=0; raf=requestAnimationFrame(frame); },
+    stop(){ run=false; cancelAnimationFrame(raf); },
+    resize(){ if(cv&&run) build(); }
+  };
+})();
+window.addEventListener('resize',()=>PFX.resize());
+
 function openPlayer(id){
   const it=byId[id]; if(!it) return;
   curId=id; dur=0; acc=0;
-  $("p-cover").className="p-cover cov-"+it.cover;
+  $("p-cover").className="cov cov-"+it.cover;   // скрытый — только для обложки в Media Session
   $("p-title").textContent=it.title;
   $("p-meta").textContent=it.secTitle+" · "+it.dur+" · голос ♀";
-  $("p-desc").textContent=it.long||it.desc;
   $("p-crumb").textContent=it.secTitle;
   $("cur").textContent="0:00"; $("fill").style.width="0"; $("thumb").style.left="0";
-  // heart
   $("heart").classList.toggle("on",isFav(id));
-  // audio
   hasAudio=!!it.audio;
   $("play").classList.remove("playing");
-  $("s-player").classList.remove("living");
   if(hasAudio){
-    $("play").classList.remove("locked");
-    $("soonpill").textContent="";
     if(au.src!==it.audio){ au.src=it.audio; au.load(); }
     $("tot").textContent="…";
   } else {
-    $("play").classList.add("locked");
-    $("soonpill").textContent="Аудио скоро появится";
     au.removeAttribute("src"); try{au.load();}catch(e){}
     $("tot").textContent=it.dur.replace(" мин",":00");
   }
@@ -360,14 +411,17 @@ au.addEventListener("loadedmetadata",()=>{
   if(saved>1 && saved<dur-2){ try{au.currentTime=saved;}catch(e){} }
   playerUI(); setupMediaSession();
 });
-au.addEventListener("play",()=>{$("play").classList.add("playing");$("s-player").classList.add("living");$("play").setAttribute("aria-label","Пауза");markToday();});
-au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("s-player").classList.remove("living");$("play").setAttribute("aria-label","Играть");savePos();});
+au.addEventListener("play",()=>{$("play").classList.add("playing");$("play").setAttribute("aria-label","Пауза");markToday();});
+au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("play").setAttribute("aria-label","Играть");savePos();});
 au.addEventListener("ended",()=>{ if(curId) localStorage.removeItem(posKey(curId)); });
 
 $("play").onclick=()=>{
-  if(!hasAudio){ $("soonpill").textContent="Эта медитация скоро появится 💛"; haptic('rigid'); return; }
+  if(!hasAudio){ haptic('rigid'); return; }
   haptic(); if(au.paused){au.play().catch(()=>{});} else {au.pause();}
 };
+function skipBy(sec){ if(!hasAudio)return; const d=dur||au.duration||0; au.currentTime=Math.max(0,Math.min(d?d-0.3:1e9, (au.currentTime||0)+sec)); playerUI(); savePos(); haptic("light"); }
+$("back15").onclick=()=>skipBy(-15);
+$("fwd15").onclick=()=>skipBy(15);
 
 function raf(){ if(!dragging && $("s-player").classList.contains("active")) playerUI(); requestAnimationFrame(raf); }
 requestAnimationFrame(raf);
