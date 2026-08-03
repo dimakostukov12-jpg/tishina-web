@@ -136,6 +136,23 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .stat b{display:block;font-family:'Forum',Georgia,serif;font-size:26px;color:#F3DCA0;}
 .stat span{font-size:11px;color:#B9A9BE;letter-spacing:.03em;}
 .sect-title{font-family:'Forum',Georgia,serif;font-size:20px;color:#F3DCA0;padding:6px 20px 2px;}
+/* календарь практики */
+.cal{margin:8px 16px 4px;padding:14px 14px 12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:18px;}
+.cal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-title{font-family:'Forum',Georgia,serif;font-size:19px;color:#F3DCA0;letter-spacing:.02em;}
+.cal-nav{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;color:#F3DCA0;cursor:pointer;border-radius:50%;user-select:none;-webkit-tap-highlight-color:transparent;}
+.cal-nav:active{background:rgba(255,255,255,.1);}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:7px;}
+.cal-week span{text-align:center;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:rgba(246,238,221,.4);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:13px;font-variant-numeric:tabular-nums;color:rgba(246,238,221,.7);}
+.cell.blank{visibility:hidden;}
+.cell.pastempty{border:1px solid rgba(255,255,255,.11);color:rgba(246,238,221,.5);}
+.cell.future{color:rgba(246,238,221,.2);}
+.cell.done{background:radial-gradient(circle at 40% 32%,#FBEBBE,#E7C983 58%,#C89E4C);color:#2a1640;font-weight:700;box-shadow:0 0 10px rgba(243,220,160,.45);}
+.cell.today{box-shadow:0 0 0 1.7px #E7C983,0 0 9px rgba(243,220,160,.5);color:#F6E9C4;}
+.cell.today.done{box-shadow:0 0 0 1.7px #FFF6D8,0 0 12px rgba(243,220,160,.75);color:#2a1640;}
+.cal-cap{text-align:center;margin-top:13px;font-size:12.5px;color:#E6C079;letter-spacing:.02em;}
 </style></head>
 <body>
 <div class="bg"></div><div class="grain"></div>
@@ -163,10 +180,17 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 <section class="screen" id="s-profile">
   <div class="safetop"></div>
   <div class="prof-hd"><div class="ava" id="ava">Т</div><div class="p-name" id="p-name">Гостья</div><div class="p-role">practitioner · Тишина</div></div>
+  <div class="sect-title">Календарь практики</div>
+  <div class="cal">
+    <div class="cal-hd"><span class="cal-nav" id="cal-prev">‹</span><span class="cal-title" id="cal-title"></span><span class="cal-nav" id="cal-next">›</span></div>
+    <div class="cal-week"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-cap" id="cal-cap"></div>
+  </div>
   <div class="stats">
     <div class="stat"><b id="st-fav">0</b><span>в избранном</span></div>
-    <div class="stat"><b id="st-med">9</b><span>медитаций</span></div>
-    <div class="stat"><b>6</b><span>разделов</span></div>
+    <div class="stat"><b id="st-med">18</b><span>медитаций</span></div>
+    <div class="stat"><b>7</b><span>разделов</span></div>
   </div>
   <div class="sect-title">О тебе</div>
   <div class="sec-sub" style="padding-top:8px">Здесь появятся твой прогресс, минуты практики и любимые медитации. Пока это первая версия — самое важное впереди.</div>
@@ -336,7 +360,7 @@ au.addEventListener("loadedmetadata",()=>{
   if(saved>1 && saved<dur-2){ try{au.currentTime=saved;}catch(e){} }
   playerUI(); setupMediaSession();
 });
-au.addEventListener("play",()=>{$("play").classList.add("playing");$("s-player").classList.add("living");$("play").setAttribute("aria-label","Пауза");});
+au.addEventListener("play",()=>{$("play").classList.add("playing");$("s-player").classList.add("living");$("play").setAttribute("aria-label","Пауза");markToday();});
 au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("s-player").classList.remove("living");$("play").setAttribute("aria-label","Играть");savePos();});
 au.addEventListener("ended",()=>{ if(curId) localStorage.removeItem(posKey(curId)); });
 
@@ -393,6 +417,8 @@ function renderFav(){
 /* ---------- profile ---------- */
 function renderProfile(){
   $("st-fav").textContent=favs().length;
+  $("st-med").textContent=Object.keys(byId).length;
+  const n=new Date(); calCur=new Date(n.getFullYear(),n.getMonth(),1); renderCalendar();
   if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user){
     const u=tg.initDataUnsafe.user;
     $("p-name").textContent=u.first_name||"Гостья";
@@ -400,6 +426,38 @@ function renderProfile(){
     else { $("ava").textContent=(u.first_name||"Т").slice(0,1); }
   }
 }
+
+/* ---------- календарь практики (синхронно с реальной датой) ---------- */
+const DAYSKEY="tishina_days";
+function practiceDays(){ try{return JSON.parse(localStorage.getItem(DAYSKEY)||"[]");}catch(e){return[];} }
+function pad2(n){return String(n).padStart(2,"0");}
+function ymdOf(d){return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());}
+function markToday(){ const t=ymdOf(new Date()); const a=practiceDays(); if(a.indexOf(t)<0){a.push(t);localStorage.setItem(DAYSKEY,JSON.stringify(a));} if($("cal-grid"))renderCalendar(); }
+const MONTHS=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+function plural(n,a,b,c){const m=n%100,d=n%10;if(m>=11&&m<=14)return c;if(d===1)return a;if(d>=2&&d<=4)return b;return c;}
+let calCur=null;
+function renderCalendar(){
+  const now=new Date();
+  if(!calCur) calCur=new Date(now.getFullYear(),now.getMonth(),1);
+  const y=calCur.getFullYear(), m=calCur.getMonth(), set=new Set(practiceDays());
+  $("cal-title").textContent=MONTHS[m]+" "+y;
+  const startW=(new Date(y,m,1).getDay()+6)%7, dim=new Date(y,m+1,0).getDate(), today=ymdOf(now);
+  let html="";
+  for(let i=0;i<startW;i++) html+='<div class="cell blank"></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=y+"-"+pad2(m+1)+"-"+pad2(d), isToday=ds===today, done=set.has(ds);
+    const future=(new Date(y,m,d)>now)&&!isToday;
+    let cls="cell"; if(done)cls+=" done";
+    if(isToday)cls+=" today"; else if(future)cls+=" future"; else if(!done)cls+=" pastempty";
+    html+='<div class="'+cls+'">'+d+'</div>';
+  }
+  $("cal-grid").innerHTML=html;
+  let cnt=0; set.forEach(x=>{ if(x.indexOf(y+"-"+pad2(m+1))===0) cnt++; });
+  $("cal-cap").textContent=cnt?(cnt+" "+plural(cnt,"день","дня","дней")+" практики в этом месяце"):"Начни практику — и закрась первый день ✨";
+  $("cal-next").style.visibility=(y===now.getFullYear()&&m===now.getMonth())?"hidden":"visible";
+}
+$("cal-prev").onclick=()=>{ calCur=new Date(calCur.getFullYear(),calCur.getMonth()-1,1); renderCalendar(); haptic(); };
+$("cal-next").onclick=()=>{ const now=new Date(), nx=new Date(calCur.getFullYear(),calCur.getMonth()+1,1); if(nx<=new Date(now.getFullYear(),now.getMonth(),1)){calCur=nx;renderCalendar();haptic();} };
 
 /* ---------- wire ---------- */
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{haptic();back();});
