@@ -448,9 +448,10 @@ function openPlayer(id){
     $("tot").textContent=it.dur.replace(" мин",":00");
   }
   go("s-player",true);
-  if(hasAudio){ au.play().catch(()=>{}); }  // играет сразу при входе
+  if(hasAudio){ wantPlay=true; au.play().catch(()=>{}); }  // играет сразу при входе
 }
-function pausePlayer(){ try{au.pause();}catch(e){} }
+let wantPlay=false;  // намерение пользователя слушать — чтобы продолжить после сворачивания
+function pausePlayer(){ wantPlay=false; try{au.pause();}catch(e){} }
 
 au.addEventListener("loadedmetadata",()=>{
   dur=au.duration||0; $("tot").textContent=fmt(dur);
@@ -458,13 +459,13 @@ au.addEventListener("loadedmetadata",()=>{
   if(saved>1 && saved<dur-2){ try{au.currentTime=saved;}catch(e){} }
   playerUI(); setupMediaSession();
 });
-au.addEventListener("play",()=>{$("play").classList.add("playing");$("play").setAttribute("aria-label","Пауза");markToday();});
-au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("play").setAttribute("aria-label","Играть");savePos();});
-au.addEventListener("ended",()=>{ if(curId) localStorage.removeItem(posKey(curId)); });
+au.addEventListener("play",()=>{wantPlay=true;$("play").classList.add("playing");$("play").setAttribute("aria-label","Пауза");markToday();});
+au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("play").setAttribute("aria-label","Играть");savePos();});  // не трогаем wantPlay: пауза может быть от фона
+au.addEventListener("ended",()=>{ wantPlay=false; if(curId) localStorage.removeItem(posKey(curId)); });
 
 $("play").onclick=()=>{
   if(!hasAudio){ haptic('rigid'); return; }
-  haptic(); if(au.paused){au.play().catch(()=>{});} else {au.pause();}
+  haptic(); if(au.paused){wantPlay=true;au.play().catch(()=>{});} else {wantPlay=false;au.pause();}
 };
 function skipBy(sec){ if(!hasAudio)return; const d=dur||au.duration||0; au.currentTime=Math.max(0,Math.min(d?d-0.3:1e9, (au.currentTime||0)+sec)); playerUI(); savePos(); haptic("light"); }
 $("back15").onclick=()=>skipBy(-15);
@@ -493,7 +494,16 @@ function toggleHeart(clicked){
 $("heart").onclick=()=>toggleHeart($("heart"));
 $("d-heart").onclick=()=>toggleHeart($("d-heart"));
 
-document.addEventListener("visibilitychange",savePos);
+document.addEventListener("visibilitychange",()=>{
+  savePos();
+  // вернулись в приложение после сворачивания — бесшовно продолжаем с той же секунды
+  if(document.visibilityState==="visible" && wantPlay && hasAudio && au.paused){
+    const saved=parseFloat(localStorage.getItem(posKey(curId))||"0")||0;
+    if(saved>1 && Math.abs((au.currentTime||0)-saved)>2 && (!dur||saved<dur-2)){ try{au.currentTime=saved;}catch(e){} }
+    au.play().catch(()=>{});
+  }
+});
+window.addEventListener("pageshow",()=>{ if(wantPlay && hasAudio && au.paused) au.play().catch(()=>{}); });
 window.addEventListener("pagehide",savePos);
 
 function setupMediaSession(){
@@ -502,7 +512,7 @@ function setupMediaSession(){
   let art=[]; try{const bg=getComputedStyle($("p-cover")).backgroundImage;const m=bg&&bg.match(/url\(["']?(data:[^"')]+)["']?\)/);if(m)art=[{src:m[1],sizes:"512x512",type:"image/jpeg"}];}catch(e){}
   try{navigator.mediaSession.metadata=new MediaMetadata({title:it.title,artist:"Тишина · "+it.secTitle,album:"Тишина",artwork:art});}catch(e){}
   const H=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f);}catch(e){}};
-  H("play",()=>au.play().catch(()=>{})); H("pause",()=>au.pause());
+  H("play",()=>{wantPlay=true;au.play().catch(()=>{});}); H("pause",()=>{wantPlay=false;au.pause();});
   H("seekto",d=>{if(d.seekTime!=null){try{au.currentTime=d.seekTime;}catch(e){}}});
   H("seekbackward",d=>{au.currentTime=Math.max(0,au.currentTime-(d.seekOffset||15));});
   H("seekforward",d=>{au.currentTime=Math.min(dur||au.currentTime,au.currentTime+(d.seekOffset||15));});
