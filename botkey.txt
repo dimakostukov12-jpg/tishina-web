@@ -1,0 +1,1 @@
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDigi+ZmIpup8L1OhofJzeiUZ0t0g4HlTvb9Cb86K8E tishina-bot
