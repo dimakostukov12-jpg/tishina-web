@@ -161,7 +161,42 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 #s-detail .d-topbar,#s-detail .d-body{position:relative;z-index:1;}
 .d-topbar{display:flex;align-items:center;gap:10px;padding:16px 16px 6px;}
 .d-crumb{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(246,238,221,.55);}
-.d-body{padding:2px 20px 124px;}
+.d-body{padding:6px 16px 42px;display:flex;flex-direction:column;gap:13px;}
+.d-topbar .heart{margin-left:auto;width:40px;height:40px;}
+.dp-panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:14px 15px;}
+.dp-panel.gold{border-color:rgba(233,201,131,.34);background:linear-gradient(180deg,rgba(233,201,131,.10),rgba(233,201,131,.03));box-shadow:inset 0 0 0 1px rgba(233,201,131,.05),0 8px 22px rgba(0,0,0,.28);}
+.dp-eb{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.dp-ic{font-size:13px;filter:drop-shadow(0 0 6px rgba(243,220,160,.4));}
+.dp-lb{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:#E7C983;}
+.dp-txt{font-size:14px;line-height:1.6;color:#ECE2E9;}
+.dp-playrow{display:flex;align-items:center;gap:13px;}
+.dp-play{width:48px;height:48px;border-radius:50%;border:0;cursor:pointer;flex:0 0 auto;background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 55%,#C89E4C);box-shadow:0 0 16px rgba(243,220,160,.5);position:relative;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-appearance:none;appearance:none;}
+.dp-play::after{content:"";position:absolute;left:19px;top:14px;border-left:15px solid #2a1640;border-top:9px solid transparent;border-bottom:9px solid transparent;}
+.dp-pr b{display:block;font-family:'Forum',Georgia,serif;font-size:17px;color:#F7ECC6;}
+.dp-pr span{font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;color:rgba(246,238,221,.7);}
+.dp-track{display:flex;align-items:center;gap:10px;}
+.dp-tk{flex:1;font-size:12.5px;color:#EDE4EA;line-height:1.4;}
+.dp-dots{display:flex;gap:5px;flex:0 0 auto;}
+.dp-dot{width:11px;height:11px;border-radius:50%;border:1.4px solid #C89E4C;}
+.dp-dot.on{background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 60%,#C89E4C);border-color:transparent;box-shadow:0 0 8px rgba(243,220,160,.6);}
+.dp-progress{margin-top:8px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:rgba(246,238,221,.55);}
+.dp-tasklead{font-size:12.5px;color:#F7ECC6;font-weight:600;margin-bottom:8px;}
+.dp-quote{font-family:'Forum',Georgia,serif;font-size:19px;color:#F7ECC6;line-height:1.3;margin-top:11px;padding:11px 14px;border-left:2px solid #E7C983;background:rgba(233,201,131,.06);border-radius:0 12px 12px 0;}
+.dp-write{font-size:12.5px;color:#ECE2E9;line-height:1.55;margin-bottom:10px;}
+.dp-ta{width:100%;min-height:104px;border-radius:14px;border:1px solid rgba(233,201,131,.34);background:rgba(20,12,26,.5);color:#F3ECE2;font-family:inherit;font-size:13.5px;line-height:1.55;padding:12px 13px;resize:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+.dp-ta::placeholder{color:#9C8AA0;}
+.dp-ta:focus{outline:none;border-color:#E7C983;box-shadow:0 0 0 3px rgba(233,201,131,.14);}
+.dp-savebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;}
+.dp-savehint{font-size:11px;color:#9C8AA0;}
+.dp-btn{border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:13px;color:#2a1640;background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 60%,#C89E4C);border-radius:12px;padding:9px 22px;box-shadow:0 6px 16px rgba(0,0,0,.4),0 0 14px rgba(243,220,160,.4);-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-appearance:none;appearance:none;}
+.dp-rep{border-top:1px solid rgba(255,255,255,.10);padding-top:11px;margin-top:11px;}
+.dp-rep:first-child{border-top:0;padding-top:0;margin-top:0;}
+.dp-rep.me{background:rgba(233,201,131,.06);border:1px solid rgba(233,201,131,.24);border-radius:13px;padding:11px 12px;margin-top:0;margin-bottom:6px;}
+.dp-rep-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.dp-ava{width:26px;height:26px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-family:'Forum',Georgia,serif;font-size:12px;color:#241233;background:radial-gradient(circle at 38% 32%,#F3DCA0,#C07A46);}
+.dp-rep-name{font-size:12.5px;font-weight:600;color:#F7ECC6;}
+.dp-rep-txt{font-size:12.5px;line-height:1.5;color:#E6DCE3;}
+.dp-more{align-items:center;justify-content:center;gap:7px;font-size:12px;color:#E7C983;border:1px dashed rgba(233,201,131,.34);border-radius:12px;padding:11px;background:rgba(233,201,131,.04);cursor:pointer;margin-top:13px;display:flex;}
 .dbottom{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px 24px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(16,8,20,.5) 30%,rgba(16,8,20,.82));backdrop-filter:blur(8px);}
 .dbottom .playbtn{width:72px;height:72px;}
 .dbottom .heart{position:absolute;right:22px;width:52px;height:52px;}
@@ -239,16 +274,41 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 <section class="screen" id="s-detail">
   <div class="d-iri" id="d-iri" style="display:none"></div>
   <div class="safetop"></div>
-  <div class="d-topbar"><span class="back" data-back>‹</span><span class="d-crumb" id="d-crumb"></span></div>
+  <div class="d-topbar"><span class="back" data-back>‹</span><span class="d-crumb" id="d-crumb"></span>
+    <button class="heart" id="d-heart" aria-label="В избранное"><svg viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.1C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></button>
+  </div>
   <div class="d-body">
     <div class="frame pframe"><div class="cov" id="d-cover"></div></div>
-    <div class="mtitle" id="d-title"></div>
-    <div class="meta" id="d-meta"></div>
-    <div class="desc" id="d-desc"></div>
-  </div>
-  <div class="dbottom">
-    <button class="playbtn" id="d-play" aria-label="Слушать"></button>
-    <button class="heart" id="d-heart" aria-label="В избранное"><svg viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.1C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></button>
+
+    <div class="dp-panel"><div class="dp-eb"><span class="dp-ic">❦</span><span class="dp-lb">Описание</span></div><div class="dp-txt" id="d-desc"></div></div>
+
+    <div class="dp-panel gold" id="d-result-panel"><div class="dp-eb"><span class="dp-ic">✦</span><span class="dp-lb">Результат</span></div><div class="dp-txt" id="d-result"></div></div>
+
+    <div class="dp-panel"><div class="dp-eb"><span class="dp-ic">▶</span><span class="dp-lb">Слушать</span></div>
+      <div class="dp-playrow"><button class="dp-play" id="d-play" aria-label="Слушать"></button><div class="dp-pr"><b>Слушать практику</b><span id="d-dur"></span></div></div>
+    </div>
+
+    <div class="dp-panel"><div class="dp-eb"><span class="dp-ic">⏳</span><span class="dp-lb">Практика курса</span></div>
+      <div class="dp-track"><span class="dp-tk" id="d-track"></span><span class="dp-dots" id="d-dots"></span></div>
+      <div class="dp-progress" id="d-progress"></div>
+    </div>
+
+    <div class="dp-panel gold"><div class="dp-eb"><span class="dp-ic">🕯</span><span class="dp-lb">Задание</span></div>
+      <div class="dp-tasklead" id="d-tasklead"></div>
+      <div class="dp-txt" id="d-task"></div>
+      <div class="dp-quote" id="d-quote"></div>
+    </div>
+
+    <div class="dp-panel"><div class="dp-eb"><span class="dp-ic">✎</span><span class="dp-lb">Твои инсайты</span></div>
+      <div class="dp-write">Напиши всё, что сейчас у тебя на душе — чувства, осознания, инсайты.</div>
+      <textarea class="dp-ta" id="d-note" placeholder="Пиши свободно, здесь только ты и практика…"></textarea>
+      <div class="dp-savebar"><span class="dp-savehint" id="d-savehint"></span><button class="dp-btn" id="d-save">Сохранить</button></div>
+    </div>
+
+    <div class="dp-panel"><div class="dp-eb"><span class="dp-ic">❤</span><span class="dp-lb">Ответы участниц</span></div>
+      <div id="d-replies"></div>
+      <div class="dp-more" id="d-more" style="display:none"></div>
+    </div>
   </div>
 </section>
 
@@ -282,6 +342,8 @@ const SECTIONS = [{"id": "och", "title": "Очищение", "sub": "Отпус�
 const EMERGENCY = {"id": "emergency", "title": "Экстренные медитации", "sub": "Быстрая помощь в моменте — когда накрыло", "cover": "emerg", "items": [{"id": "em-osvobozhdenie", "title": "Освобождение от обид", "dur": "13 мин", "desc": "Отпустить обиду и снова дышать легко.", "cover": "em-0", "long": "Быстро отпустить обиду, которая держит и отравляет. Мягкое прощение — чтобы снова дышать легко.", "section": "Экстренные медитации", "durSec": 780, "audio": "https://botrtmarhpvqdozhouli.supabase.co/storage/v1/object/public/audio/em-osvobozhdenie.mp3"}, {"id": "em-dialog", "title": "Диалог с душой", "dur": "11 мин", "desc": "Тёплый разговор с собой настоящей.", "cover": "em-1", "long": "Тёплый внутренний диалог с собой настоящей. Услышать свою душу и вернуть себе поддержку изнутри.", "section": "Экстренные медитации", "durSec": 660, "audio": "https://botrtmarhpvqdozhouli.supabase.co/storage/v1/object/public/audio/em-dialog.mp3"}, {"id": "em-ya-otpuskayu", "title": "Я отпускаю", "dur": "11 мин", "desc": "Отпустить то, что держит и тянет вниз.", "cover": "em-2", "long": "Отпустить то, что тянет вниз и не отпускает. Практика на облегчение прямо здесь и сейчас.", "section": "Экстренные медитации", "durSec": 660, "audio": "https://botrtmarhpvqdozhouli.supabase.co/storage/v1/object/public/audio/em-ya-otpuskayu.mp3"}, {"id": "em-samotsennost", "title": "Самоценность", "dur": "13 мин", "desc": "Быстро вернуть опору и ценность себя.", "cover": "em-3", "long": "Экспресс-практика вернуть себе опору и ценность, когда пошатнулась вера в себя.", "section": "Экстренные медитации", "durSec": 780, "audio": "https://botrtmarhpvqdozhouli.supabase.co/storage/v1/object/public/audio/em-samotsennost.mp3"}, {"id": "em-svyaz", "title": "Связь с Высшим Я", "dur": "21 мин", "desc": "Соединиться со своей глубиной и опорой.", "cover": "em-4", "long": "Соединиться со своим Высшим Я — глубиной, которая знает ответ и держит тебя.", "section": "Экстренные медитации", "durSec": 1260, "audio": "https://botrtmarhpvqdozhouli.supabase.co/storage/v1/object/public/audio/em-svyaz.mp3"}, {"id": "em-nochnoy", "title": "Ночной нейрогипноз", "dur": "26 мин", "desc": "Мягко провалиться в глубокий сон.", "cover": "em-5", "long": "Ночной нейрогипноз: мягко провалиться в глубокий восстанавливающий сон.", "section": "Экстренные медитации", "durSec": 1560, "audio": "https://botrtmarhpvqdozhouli.supabase.co/storage/v1/object/public/audio/em-nochnoy.mp3"}]};
 const GRAD = {"och-0": "radial-gradient(at 82% 6%,rgba(70,206,198,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(150,150,236,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(240,214,150,0.5),transparent 56%),linear-gradient(160deg,rgb(38,72,92),rgb(16,20,36))", "och-1": "radial-gradient(at 82% 6%,rgba(185,109,45,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(140,67,29,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(140,26,35,0.5),transparent 56%),linear-gradient(160deg,rgb(44,26,10),rgb(2,1,2))", "och-2": "radial-gradient(at 82% 6%,rgba(160,93,33,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(140,74,25,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(217,154,83,0.5),transparent 56%),linear-gradient(160deg,rgb(38,22,7),rgb(2,2,3))", "sam-0": "radial-gradient(at 82% 6%,rgba(140,72,43,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(140,11,70,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(166,108,71,0.5),transparent 56%),linear-gradient(160deg,rgb(33,17,10),rgb(1,0,1))", "sam-1": "radial-gradient(at 82% 6%,rgba(193,103,16,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(159,74,13,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(226,151,45,0.5),transparent 56%),linear-gradient(160deg,rgb(46,24,3),rgb(3,1,1))", "mag-0": "radial-gradient(at 82% 6%,rgba(233,98,172,0.53),transparent 46%),radial-gradient(at 14% 16%,rgba(150,92,214,0.53),transparent 50%),radial-gradient(at 62% 98%,rgba(240,214,150,0.53),transparent 56%),linear-gradient(160deg,rgb(62,32,76),rgb(20,12,30))", "mag-1": "radial-gradient(at 82% 6%,rgba(240,110,164,0.56),transparent 46%),radial-gradient(at 14% 16%,rgba(246,152,188,0.56),transparent 50%),radial-gradient(at 62% 98%,rgba(240,214,150,0.56),transparent 56%),linear-gradient(160deg,rgb(76,36,62),rgb(28,15,28))", "den-0": "radial-gradient(at 82% 6%,rgba(250,218,130,0.58),transparent 46%),radial-gradient(at 14% 16%,rgba(240,188,86,0.58),transparent 50%),radial-gradient(at 62% 98%,rgba(150,96,196,0.58),transparent 56%),linear-gradient(160deg,rgb(72,52,24),rgb(28,20,14))", "den-1": "radial-gradient(at 82% 6%,rgba(238,196,96,0.53),transparent 46%),radial-gradient(at 14% 16%,rgba(216,150,70,0.53),transparent 50%),radial-gradient(at 62% 98%,rgba(130,82,182,0.53),transparent 56%),linear-gradient(160deg,rgb(56,42,32),rgb(24,16,28))", "bog-0": "radial-gradient(at 82% 6%,rgba(218,52,46,0.56),transparent 46%),radial-gradient(at 14% 16%,rgba(154,44,150,0.56),transparent 50%),radial-gradient(at 62% 98%,rgba(232,122,52,0.56),transparent 56%),linear-gradient(160deg,rgb(60,16,22),rgb(16,8,14))", "bog-1": "radial-gradient(at 82% 6%,rgba(162,103,55,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(140,65,44,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(140,41,92,0.5),transparent 56%),linear-gradient(160deg,rgb(38,24,13),rgb(1,1,2))", "em-0": "radial-gradient(at 82% 6%,rgba(242,192,112,0.53),transparent 46%),radial-gradient(at 14% 16%,rgba(232,120,150,0.53),transparent 50%),radial-gradient(at 62% 98%,rgba(246,216,152,0.53),transparent 56%),linear-gradient(160deg,rgb(58,34,42),rgb(24,15,24))", "em-1": "radial-gradient(at 82% 6%,rgba(233,166,98,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(240,182,132,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(236,150,120,0.5),transparent 56%),linear-gradient(160deg,rgb(66,42,34),rgb(30,20,22))", "em-2": "radial-gradient(at 82% 6%,rgba(228,92,62,0.54),transparent 46%),radial-gradient(at 14% 16%,rgba(152,82,192,0.54),transparent 50%),radial-gradient(at 62% 98%,rgba(232,120,150,0.54),transparent 56%),linear-gradient(160deg,rgb(58,26,46),rgb(22,12,26))", "em-3": "radial-gradient(at 82% 6%,rgba(240,204,118,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(224,116,168,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(140,100,200,0.5),transparent 56%),linear-gradient(160deg,rgb(48,30,44),rgb(20,12,24))", "em-4": "radial-gradient(at 82% 6%,rgba(152,112,222,0.5),transparent 46%),radial-gradient(at 14% 16%,rgba(240,214,150,0.5),transparent 50%),radial-gradient(at 62% 98%,rgba(208,192,238,0.5),transparent 56%),linear-gradient(160deg,rgb(54,42,78),rgb(26,20,42))", "em-5": "radial-gradient(at 82% 6%,rgba(120,64,196,0.52),transparent 46%),radial-gradient(at 14% 16%,rgba(170,84,214,0.52),transparent 50%),radial-gradient(at 62% 98%,rgba(232,196,110,0.52),transparent 56%),linear-gradient(160deg,rgb(38,20,66),rgb(12,8,26))"};      // фон под каждую медитацию (ключ обложки -> css градиент)
 const IRIG = {"och-0": "conic-gradient(from 0deg,rgb(70,206,198),rgb(150,150,236),rgb(240,214,150),rgb(192,240,237),rgb(240,214,150),rgb(150,150,236),rgb(70,206,198))", "och-1": "conic-gradient(from 0deg,rgb(185,109,45),rgb(140,67,29),rgb(140,26,35),rgb(232,206,183),rgb(140,26,35),rgb(140,67,29),rgb(185,109,45))", "och-2": "conic-gradient(from 0deg,rgb(160,93,33),rgb(140,74,25),rgb(217,154,83),rgb(224,200,179),rgb(217,154,83),rgb(140,74,25),rgb(160,93,33))", "sam-0": "conic-gradient(from 0deg,rgb(140,72,43),rgb(140,11,70),rgb(166,108,71),rgb(217,193,183),rgb(166,108,71),rgb(140,11,70),rgb(140,72,43))", "sam-1": "conic-gradient(from 0deg,rgb(193,103,16),rgb(159,74,13),rgb(226,151,45),rgb(235,204,173),rgb(226,151,45),rgb(159,74,13),rgb(193,103,16))", "mag-0": "conic-gradient(from 0deg,rgb(233,98,172),rgb(150,92,214),rgb(240,214,150),rgb(249,202,228),rgb(240,214,150),rgb(150,92,214),rgb(233,98,172))", "mag-1": "conic-gradient(from 0deg,rgb(240,110,164),rgb(246,152,188),rgb(240,214,150),rgb(252,206,225),rgb(240,214,150),rgb(246,152,188),rgb(240,110,164))", "den-0": "conic-gradient(from 0deg,rgb(250,218,130),rgb(240,188,86),rgb(150,96,196),rgb(255,244,213),rgb(150,96,196),rgb(240,188,86),rgb(250,218,130))", "den-1": "conic-gradient(from 0deg,rgb(238,196,96),rgb(216,150,70),rgb(130,82,182),rgb(251,236,201),rgb(130,82,182),rgb(216,150,70),rgb(238,196,96))", "bog-0": "conic-gradient(from 0deg,rgb(218,52,46),rgb(154,44,150),rgb(232,122,52),rgb(244,186,184),rgb(232,122,52),rgb(154,44,150),rgb(218,52,46))", "bog-1": "conic-gradient(from 0deg,rgb(162,103,55),rgb(140,65,44),rgb(140,41,92),rgb(224,204,187),rgb(140,41,92),rgb(140,65,44),rgb(162,103,55))", "em-0": "conic-gradient(from 0deg,rgb(242,192,112),rgb(232,120,150),rgb(246,216,152),rgb(252,235,207),rgb(246,216,152),rgb(232,120,150),rgb(242,192,112))", "em-1": "conic-gradient(from 0deg,rgb(233,166,98),rgb(240,182,132),rgb(236,150,120),rgb(249,226,202),rgb(236,150,120),rgb(240,182,132),rgb(233,166,98))", "em-2": "conic-gradient(from 0deg,rgb(228,92,62),rgb(152,82,192),rgb(232,120,150),rgb(247,200,189),rgb(232,120,150),rgb(152,82,192),rgb(228,92,62))", "em-3": "conic-gradient(from 0deg,rgb(240,204,118),rgb(224,116,168),rgb(140,100,200),rgb(252,239,209),rgb(140,100,200),rgb(224,116,168),rgb(240,204,118))", "em-4": "conic-gradient(from 0deg,rgb(152,112,222),rgb(240,214,150),rgb(208,192,238),rgb(221,207,245),rgb(208,192,238),rgb(240,214,150),rgb(152,112,222))", "em-5": "conic-gradient(from 0deg,rgb(120,64,196),rgb(170,84,214),rgb(232,196,110),rgb(210,190,236),rgb(232,196,110),rgb(170,84,214),rgb(120,64,196))"};      // перелив в цветах каждой медитации (ключ обложки -> conic-gradient)
+const MED = {"vozvrat-sily": {"result": "Возвращается ощущение внутренней наполненности и сил. Ты снова чувствуешь себя целой и опираешься на себя.", "lead": "После практики восстанови связь с телом:", "task": "Налей себе тёплой воды, сделай несколько медленных вдохов и положи обе ладони на живот — туда, где живёт сила. Побудь так, ощущая, как энергия возвращается.", "quote": "Я снова наполнена, моя сила со мной", "times": 2}, "roditelskiy-uzel": {"result": "Связь с родителями становится легче, уходит груз чужих ожиданий. Ты возвращаешь себе право быть собой.", "lead": "Ритуал отпускания:", "task": "Напиши на бумаге то, что хочешь вернуть родителям — обиды, ожидания, чужие сценарии. Затем аккуратно сложи лист и убери его со словами благодарности за жизнь.", "quote": "Я беру от рода силу и оставляю ему тяжесть", "times": 2}, "sud-vnutri": {"result": "Внутренний критик стихает. Появляется мягкость к себе и разрешение быть неидеальной.", "lead": "Практика примирения с собой:", "task": "Встань перед зеркалом, посмотри себе в глаза и скажи фразу ниже. Затем положи руку на сердце и побудь в тишине, принимая себя такой, какая есть.", "quote": "Я больше не сужу себя, я на своей стороне", "times": 2}, "komnata-teney": {"result": "Отвергнутые части возвращаются как сила. Ты становишься целостнее и увереннее.", "lead": "Работа с тенью:", "task": "Зажги свечу в затемнённой комнате. Назови вслух ту часть себя, которую обычно прячешь, и скажи ей: «Я вижу тебя и принимаю». Запиши, что откликнулось.", "quote": "Моя тень — это моя сила, я принимаю себя целиком", "times": 2}, "golos-otca": {"result": "Уходит потребность искать подтверждение своей ценности в мужчинах. Появляется спокойная уверенность, чувство опоры и покоя внутри.", "lead": "После прослушивания выполни ритуал дома:", "task": "Зажги свечу, положи руку на грудь и скажи фразу ниже. Можно повесить крестик или амулет — как символ опоры и внутреннего покровительства.", "quote": "Я принята, я под защитой", "times": 2}, "magiya-prityazheniya": {"result": "Ты входишь в состояние притяжения — нужное начинает приходить само, без борьбы.", "lead": "Закрепи состояние:", "task": "Представь желаемое уже исполнившимся и почувствуй благодарность, будто это уже есть. Запиши три вещи, которые притягиваешь в свою жизнь, в настоящем времени.", "quote": "Я магнит для всего, что предназначено мне", "times": 3}, "zhenskaya-iniciaciya": {"result": "Раскрывается зрелая женственность — мягкая и сильная одновременно. Ты принимаешь свою природу.", "lead": "Ритуал женственности:", "task": "Сделай что-то бережное для себя телесно — тёплая ванна, масло, уход за собой. Во время этого повторяй фразу ниже, чувствуя благодарность своему телу.", "quote": "Я принимаю свою женскую силу и красоту", "times": 2}, "izobilie": {"result": "Уходят блоки на деньги, появляется лёгкость и доверие к потоку изобилия.", "lead": "Практика изобилия:", "task": "Возьми любую купюру в руки и почувствуй благодарность за всё, что деньги уже принесли в твою жизнь. Запиши, в чём ты уже богата прямо сейчас.", "quote": "Я открыта изобилию, достаток приходит легко", "times": 3}, "realizaciya": {"result": "Появляется энергия действия. Уходит то, что тормозило движение к цели.", "lead": "Заякори намерение:", "task": "Сразу после практики запиши один конкретный шаг к своей цели — и сделай его сегодня же, пока энергия высокая.", "quote": "Я наполнена энергией и двигаюсь к своей цели", "times": 2}, "temnaya-storona": {"result": "Возвращается целостность и внутренняя власть. Ты перестаёшь бояться своей силы.", "lead": "Смелая встреча с собой:", "task": "В уединении позволь себе почувствовать то, что обычно запрещаешь — злость, страсть, желание. Не подавляй, а признай. Запиши, какая сила спрятана в этом.", "quote": "Я принимаю всю себя — и свет, и тьму", "times": 2}, "koroleva-nochi": {"result": "Раскрывается чувственность и внутренняя власть. Ты чувствуешь себя желанной и свободной.", "lead": "Ритуал королевы:", "task": "Затемни комнату, зажги свечу и побудь наедине с собой без спешки — почувствуй своё тело как источник силы и удовольствия. Двигайся так, как хочется.", "quote": "Я — королева, я желанна и свободна", "times": 2}, "em-osvobozhdenie": {"result": "Обида отпускает, дышать становится легче. Внутри — прощение и облегчение.", "lead": "Отпусти обиду:", "task": "Мысленно представь того, на кого держишь обиду, и скажи: «Я отпускаю тебя и возвращаю себе свой покой». Сделай глубокий выдох, отпуская тяжесть.", "quote": "Я отпускаю обиду и выбираю свой покой", "times": 1}, "em-dialog": {"result": "Ты снова слышишь свою душу и чувствуешь поддержку изнутри.", "lead": "Продолжи диалог:", "task": "Задай себе вопрос «Что мне сейчас важно услышать?» и запиши первый ответ, который придёт, — не оценивая, просто честно.", "quote": "Я слышу себя, я на связи со своей душой", "times": 1}, "em-ya-otpuskayu": {"result": "То, что тянуло вниз, отпускает. Приходит облегчение здесь и сейчас.", "lead": "Практика отпускания:", "task": "Сожми кулаки, набери воздух — и на выдохе резко раскрой ладони, отпуская всё лишнее. Повтори три раза, произнося фразу ниже.", "quote": "Я отпускаю, мне становится легче", "times": 1}, "em-samotsennost": {"result": "Возвращается опора и ощущение собственной ценности.", "lead": "Верни себе ценность:", "task": "Положи руку на сердце и назови три своих качества, за которые ты себя ценишь. Скажи фразу ниже вслух.", "quote": "Я ценна просто потому, что я есть", "times": 1}, "em-svyaz": {"result": "Ты соединяешься с глубиной, которая знает ответ и держит тебя.", "lead": "Углуби связь:", "task": "Побудь в тишине ещё пару минут после практики и задай своему Высшему Я вопрос, который волнует. Запиши ответ-ощущение, даже если он без слов.", "quote": "Я доверяю своей глубине, ответ уже во мне", "times": 2}, "em-nochnoy": {"result": "Тело и нервная система расслабляются, ты мягко проваливаешься в глубокий восстанавливающий сон.", "lead": "Перед сном:", "task": "Выключи свет и экраны, ляг удобно и просто позволь голосу вести тебя. Ничего не нужно делать — только дышать и отпускать день.", "quote": "Я отпускаю день, мой сон глубок и целителен", "times": 0, "track": "Слушай перед сном, сколько нужно"}};        // результат/задание/фраза под каждую медитацию (ключ = id)
+const DEMO = [["Марина", "М", "Впервые за долгое время почувствовала, что можно просто выдохнуть. Свеча горела, а я плакала — но это были слёзы облегчения."], ["Аня", "А", "Поняла, что искала опору снаружи, а она всё это время была во мне."], ["Вероника", "В", "Сказала фразу вслух — и вздрогнула. Как будто кто-то правда стоит рядом."], ["Лена", "Л", "Делала перед сном. Впервые уснула без привычной тревоги в груди."], ["Оля", "О", "Записала всё, что накипело, — и стало легче, будто выгрузила тяжёлый рюкзак."], ["Ксюша", "К", "Не верила, что подействует. А наутро проснулась с непривычным спокойствием."]];      // демо-ответы участниц
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
 const $ = s => document.getElementById(s);
@@ -383,20 +445,69 @@ function playerUI(){const D=curDur();const cur=(pendingSeek!=null)?pendingSeek:(
 function savePos(){ if(hasAudio && au.currentTime>0) localStorage.setItem(posKey(curId),String(au.currentTime)); }
 
 /* ---------- страница медитации (детали) ---------- */
+const NOTEKEY=id=>"tishina_note_"+id, DONEKEY=id=>"tishina_done_"+id;
+function loadNote(id){return localStorage.getItem(NOTEKEY(id))||"";}
+function doneCount(id){return parseInt(localStorage.getItem(DONEKEY(id))||"0",10)||0;}
+function escHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function plRaz(n){return n===1?"раз":(n>=2&&n<=4?"раза":"раз");}
+function plOtvet(n){const a=n%10,b=n%100;return (a===1&&b!==11)?"ответ":((a>=2&&a<=4)&&!(b>=12&&b<=14))?"ответа":"ответов";}
+
+function renderTracker(it){
+  const m=MED[it.id]||{}, times=(m.times==null)?2:m.times, done=Math.min(doneCount(it.id),times), dotsEl=$("d-dots");
+  dotsEl.innerHTML="";
+  if(times>0){
+    for(let i=0;i<times;i++){const d=document.createElement("span");d.className="dp-dot"+(i<done?" on":"");dotsEl.appendChild(d);}
+    $("d-track").textContent=m.track||("Пройди "+times+" "+plRaz(times)+" за цикл — пока состояние не закрепится");
+    $("d-progress").textContent="Пройдено "+done+" из "+times; $("d-progress").style.display="";
+  } else {
+    $("d-track").textContent=m.track||"Слушай перед сном, сколько нужно"; $("d-progress").style.display="none";
+  }
+}
+function replyCard(name,letter,text,me){
+  return '<div class="dp-rep'+(me?' me':'')+'"><div class="dp-rep-hd"><span class="dp-ava">'+letter+
+    '</span><span class="dp-rep-name">'+escHtml(name)+(me?' · ты':'')+'</span></div><p class="dp-rep-txt">'+escHtml(text)+'</p></div>';
+}
+let repliesOpen=false;
+function renderReplies(it){
+  let html=""; const my=loadNote(it.id);
+  if(my) html+=replyCard("Ты","Т",my,true);
+  const shown=repliesOpen?DEMO.length:3;
+  for(let i=0;i<Math.min(shown,DEMO.length);i++){const r=DEMO[i];html+=replyCard(r[0],r[1],r[2],false);}
+  $("d-replies").innerHTML=html;
+  const rest=DEMO.length-3, more=$("d-more");
+  if(!repliesOpen && rest>0){more.style.display="";more.textContent="↓ Показать ещё "+rest+" "+plOtvet(rest);}
+  else more.style.display="none";
+}
+
 function openDetail(id){
-  const it=byId[id]; if(!it) return; curId=id;
+  const it=byId[id]; if(!it) return; curId=id; const m=MED[id]||{};
   $("d-cover").className="cov cov-"+it.cover;
-  $("d-title").textContent=it.title;
-  $("d-meta").textContent=it.secTitle+" · "+it.dur+" · голос ♀";
-  $("d-desc").textContent=it.long||it.desc;
   $("d-crumb").textContent=it.secTitle;
   $("d-heart").classList.toggle("on",isFav(id));
   $("s-detail").style.backgroundImage = GRAD[it.cover] || "";   // персональный фон из обложки
-  $("d-iri").style.backgroundImage = IRIG[it.cover] || "";      // перелив в её же цветах — на всех
+  $("d-iri").style.backgroundImage = IRIG[it.cover] || "";      // перелив в её же цветах
   $("d-iri").style.display = "block";
-  go("s-detail",true);
+  $("d-desc").textContent = it.long||it.desc;
+  $("d-result").textContent = m.result||"";
+  $("d-result-panel").style.display = m.result?"":"none";
+  $("d-dur").textContent = it.dur+" · голос ♀";
+  $("d-tasklead").textContent = m.lead||"После практики:";
+  $("d-task").textContent = m.task||"";
+  const q=$("d-quote"); if(m.quote){q.textContent="«"+m.quote+"»";q.style.display="";}else{q.style.display="none";}
+  renderTracker(it);
+  repliesOpen=false; renderReplies(it);
+  $("d-note").value=loadNote(id);
+  $("d-savehint").textContent=loadNote(id)?"Сохранено на этом устройстве":"Сохранится только у тебя на устройстве";
+  go("s-detail",true); window.scrollTo(0,0);
 }
 $("d-play").onclick=()=>{ if(!curId)return; haptic("medium"); openPlayer(curId); };
+$("d-save").onclick=()=>{ if(!curId)return; const t=$("d-note").value, had=!!loadNote(curId);
+  if(t.trim()){localStorage.setItem(NOTEKEY(curId),t);} else {localStorage.removeItem(NOTEKEY(curId));}
+  if(t.trim() && !had){const tm=(MED[curId]&&MED[curId].times)||99; localStorage.setItem(DONEKEY(curId),String(Math.min(doneCount(curId)+1,tm)));}
+  $("d-savehint").textContent="Сохранено ✓"; haptic("medium");
+  renderTracker(byId[curId]); renderReplies(byId[curId]);
+};
+$("d-more").onclick=()=>{ repliesOpen=true; renderReplies(byId[curId]); haptic("light"); };
 
 /* ---------- сфера из частиц (экран медитации) ---------- */
 const PFX=(function(){
