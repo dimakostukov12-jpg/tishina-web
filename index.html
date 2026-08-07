@@ -74,6 +74,40 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 
 /* tabbar */
 /* онбординг — тёплый диалог */
+/* ===== ЗАСТАВКА ПРИ ЗАПУСКЕ (видео + логотип «Проявление» + кнопка) ===== */
+#s-splash{position:fixed;inset:0;z-index:120;display:none;background:#05040a;overflow:hidden;}
+#s-splash.on{display:block;}
+#sp-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.sp-vign{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 42%,transparent 32%,rgba(5,4,10,.5) 74%,#05040a 100%);}
+.sp-center{position:absolute;inset:0;display:grid;place-items:center;padding:0 22px;}
+.sp-logo{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;color:#F7ECC6;
+  letter-spacing:.34em;padding-left:.34em;white-space:nowrap;line-height:1;
+  font-size:clamp(26px,8.4vw,46px);text-shadow:0 0 30px rgba(233,201,131,.55),0 0 70px rgba(233,201,131,.25);
+  opacity:0;filter:blur(14px);animation:spLogo 2.6s 2.9s cubic-bezier(.2,.7,.3,1) forwards;}
+@keyframes spLogo{to{opacity:1;filter:blur(0);}}
+.sp-tag{position:absolute;left:0;right:0;top:calc(50% + 44px);text-align:center;font-size:11px;
+  letter-spacing:.26em;text-transform:uppercase;color:rgba(246,238,221,.5);opacity:0;animation:spFade 1.6s 4.4s forwards;}
+@keyframes spFade{to{opacity:1;}}
+.sp-ui{position:absolute;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));text-align:center;}
+.sp-hint{font-size:13px;color:rgba(246,238,221,.5);margin-bottom:20px;opacity:0;animation:spFade 1.4s 5s forwards;}
+.sp-enter{position:relative;width:88px;height:88px;border:0;border-radius:50%;cursor:pointer;
+  background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 55%,#C89E4C);
+  box-shadow:0 0 30px rgba(243,220,160,.5),0 8px 26px rgba(0,0,0,.55);display:grid;place-items:center;
+  opacity:0;animation:spFade 1.4s 4.8s forwards;-webkit-appearance:none;appearance:none;
+  -webkit-tap-highlight-color:rgba(0,0,0,0);transition:transform .18s cubic-bezier(.2,.8,.3,1);}
+.sp-enter.press{transform:scale(.93);}
+.sp-enter svg{width:24px;height:24px;fill:none;stroke:#2a1640;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.sp-halo{position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(233,201,131,.4);
+  animation:spHalo 3.2s ease-in-out infinite;pointer-events:none;}
+@keyframes spHalo{0%,100%{transform:scale(.9);opacity:.5}50%{transform:scale(1.13);opacity:.14}}
+.sp-skip{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;z-index:3;
+  background:rgba(20,14,32,.6);border:1px solid rgba(216,184,120,.16);color:rgba(246,238,221,.65);
+  border-radius:20px;padding:8px 15px;font-size:12.5px;cursor:pointer;backdrop-filter:blur(10px);
+  -webkit-tap-highlight-color:rgba(0,0,0,0);opacity:0;animation:spFade 1s 1.4s forwards;}
+#s-splash.fade{animation:spOut .55s ease forwards;}
+@keyframes spOut{to{opacity:0;}}
+@media(prefers-reduced-motion:reduce){.sp-logo,.sp-tag,.sp-hint,.sp-enter,.sp-skip{animation-duration:.01s!important;}.sp-halo{animation:none;}}
+
 #s-onboard{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;background:linear-gradient(160deg,#241436,#100713);}
 .ob-inner{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:calc(20px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));}
 .ob-brand{font-family:'Baskerville','Forum',Georgia,serif;font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:#E7C983;text-align:center;margin-bottom:16px;}
@@ -348,6 +382,19 @@ body.ob-open .tabbar{display:none;}
   </div>
   <div class="cov" id="p-cover" style="display:none"></div>
   <audio id="au" preload="metadata" playsinline></audio>
+</div>
+
+<div id="s-splash">
+  <video id="sp-vid" muted playsinline loop preload="auto" src="splash.mp4"></video>
+  <div class="sp-vign"></div>
+  <div class="sp-center"><div class="sp-logo">ИММЕРСИЯ</div></div>
+  <div class="sp-tag">погружение в себя</div>
+  <div class="sp-ui">
+    <div class="sp-hint">нажми, чтобы войти</div>
+    <button class="sp-enter" id="sp-enter" aria-label="Войти"><span class="sp-halo"></span>
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </div>
+  <button class="sp-skip" id="sp-skip">пропустить</button>
 </div>
 
 <div id="s-onboard">
@@ -779,6 +826,27 @@ if(tg){ try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor('#160a22
   if(tg.BackButton){ tg.BackButton.onClick(()=>back()); } }
 
 renderHome(); renderProfile(); setTab("home");
-if(!localStorage.getItem(PROFKEY)){ startOnboarding(); }
+
+/* ---------- заставка при запуске ---------- */
+function afterSplash(){
+  if(!localStorage.getItem(PROFKEY)){ startOnboarding(); }
+}
+function closeSplash(){
+  const s=$("s-splash"); if(!s.classList.contains("on")) return;
+  haptic("success");
+  s.classList.add("fade");
+  setTimeout(()=>{ s.classList.remove("on","fade"); try{$("sp-vid").pause();}catch(e){} afterSplash(); },520);
+}
+function startSplash(){
+  const s=$("s-splash"); s.classList.add("on");
+  const v=$("sp-vid");
+  try{ v.currentTime=0; const p=v.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){}
+  const btn=$("sp-enter");
+  btn.addEventListener("pointerdown",()=>{ btn.classList.add("press"); haptic("light"); });
+  ["pointerup","pointerleave","pointercancel"].forEach(ev=>btn.addEventListener(ev,()=>btn.classList.remove("press")));
+  btn.addEventListener("click",closeSplash);
+  $("sp-skip").addEventListener("click",closeSplash);
+}
+startSplash();
 </script>
 </body></html>
