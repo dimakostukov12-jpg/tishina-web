@@ -895,7 +895,7 @@ function closeSplash(){
 }
 function startSplash(){
   const s=$("s-splash"), vi=$("sp-intro");
-  const LOOP_FROM=9.7, LOOP_TO=13.35;   /* хвост крутится бесконечно */
+  const LOOP_FROM=10.20, LOOP_TO=14.80;  /* конец плавно перетекает в эту точку */
   s.classList.add("on");
 
   let ok=false, tries=0;
@@ -918,9 +918,15 @@ function startSplash(){
   ["touchstart","pointerdown"].forEach(ev=>
     s.addEventListener(ev,()=>{ if(vi.paused) kick(); },{passive:true}));
 
-  /* бесшовный возврат на начало перелива */
-  const rewind=()=>{ try{ vi.currentTime=LOOP_FROM; }catch(e){} kick(); };
-  vi.addEventListener("timeupdate",()=>{ if(vi.currentTime>=LOOP_TO) rewind(); });
+  /* бесшовный возврат: следим покадрово, чтобы поймать точку точно */
+  const rewind=()=>{ try{ vi.currentTime=LOOP_FROM; }catch(e){} if(vi.paused) kick(); };
+  let raf=0;
+  const watch=()=>{
+    if(!s.classList.contains("on")){ cancelAnimationFrame(raf); return; }
+    if(vi.currentTime>=LOOP_TO) rewind();
+    raf=requestAnimationFrame(watch);
+  };
+  raf=requestAnimationFrame(watch);
   vi.addEventListener("ended",rewind);
 }
 startSplash();
