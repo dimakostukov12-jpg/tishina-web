@@ -82,8 +82,10 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 #s-splash.on{display:block;}
 .sp-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .sp-poster{position:absolute;inset:0;background:#000 url(splash-poster.jpg) center/cover no-repeat;
-  opacity:0;transition:opacity .6s ease;}
-#s-splash.novideo .sp-poster{opacity:1;}
+  opacity:0;transition:opacity .8s ease;}
+#s-splash.novideo .sp-poster{opacity:1;animation:spBreathe 7s ease-in-out infinite;}
+@keyframes spBreathe{0%,100%{transform:scale(1);filter:brightness(.92)}
+  50%{transform:scale(1.06);filter:brightness(1.12)}}
 .sp-vign{position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(120% 78% at 50% 40%,transparent 30%,rgba(5,4,10,.5) 72%,#05040a 100%);}
 .sp-center{position:absolute;inset:0;display:grid;place-items:center;padding:0 22px;pointer-events:none;}
@@ -893,38 +895,33 @@ function closeSplash(){
 }
 function startSplash(){
   const s=$("s-splash"), vi=$("sp-intro");
-  const LOOP_FROM=9.7, LOOP_TO=13.40;   /* хвост крутится бесконечно */
+  const LOOP_FROM=9.7, LOOP_TO=13.35;   /* хвост крутится бесконечно */
   s.classList.add("on");
-  const kick=()=>{ try{ const p=vi.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} };
-  try{ vi.currentTime=0; }catch(e){}
+
+  let ok=false, tries=0;
+  const kick=()=>{ try{ const p=vi.play(); if(p&&p.then) p.then(()=>{ok=true;}).catch(()=>{}); }catch(e){} };
+
+  /* пробуем завести на каждом удобном событии */
+  ["loadeddata","canplay","canplaythrough","loadedmetadata"].forEach(ev=>vi.addEventListener(ev,kick));
+  vi.addEventListener("playing",()=>{ ok=true; s.classList.remove("novideo"); });
   kick();
-  /* если браузер не дал автозапуск — показываем постер и заводим по первому касанию */
-  setTimeout(()=>{ if(vi.paused||vi.currentTime<0.05){ s.classList.add("novideo"); kick(); } }, 900);
-  vi.addEventListener("playing",()=>s.classList.remove("novideo"));
+
+  /* и настойчиво повторяем, пока реально не пойдёт */
+  const iv=setInterval(()=>{
+    tries++;
+    if((!vi.paused && vi.currentTime>0.05) || tries>25){ clearInterval(iv); return; }
+    kick();
+    if(tries===5 && vi.currentTime<0.05) s.classList.add("novideo");  /* пока грузится — красивый кадр */
+  },400);
+
+  /* любое касание экрана — ещё попытка (на случай строгих правил автозапуска) */
   ["touchstart","pointerdown"].forEach(ev=>
     s.addEventListener(ev,()=>{ if(vi.paused) kick(); },{passive:true}));
+
   /* бесшовный возврат на начало перелива */
-  vi.addEventListener("timeupdate",()=>{
-    if(vi.currentTime>=LOOP_TO){ try{ vi.currentTime=LOOP_FROM; }catch(e){} }
-  });
-  vi.addEventListener("ended",()=>{ try{ vi.currentTime=LOOP_FROM; }catch(e){} kick(); });
-  const btn=$("sp-enter"), lit=$("sp-lit");
-  btn.addEventListener("pointerdown",e=>{
-    e.preventDefault(); haptic("light"); spHeld=0;
-    btn.classList.add("hold","press");
-    spTimer=setInterval(()=>{ spHeld+=50; const k=Math.min(1,spHeld/SP_HOLD);
-      if(lit) lit.style.clipPath="inset("+((1-k)*100).toFixed(1)+"% 0 0 0)";
-      if(k>=1) closeSplash();
-    },50);
-  });
-  btn.addEventListener("pointerup",()=>{
-    if(spTimer){ clearInterval(spTimer); spTimer=null;
-      if(spHeld<SP_HOLD){ closeSplash(); } }
-  });
-  btn.addEventListener("pointercancel",()=>{
-    if(spTimer){clearInterval(spTimer);spTimer=null;}
-    spReset();
-  });
+  const rewind=()=>{ try{ vi.currentTime=LOOP_FROM; }catch(e){} kick(); };
+  vi.addEventListener("timeupdate",()=>{ if(vi.currentTime>=LOOP_TO) rewind(); });
+  vi.addEventListener("ended",rewind);
 }
 startSplash();
 </script>
