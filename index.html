@@ -2,6 +2,9 @@
 <html lang="ru"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Иммерсия</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
@@ -100,14 +103,21 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .sp-btn{position:relative;border:0;padding:6px;background:none;cursor:pointer;
   -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(0,0,0,0);
   opacity:0;filter:blur(8px);transform:scale(.86);
-  animation:spFpIn 1.8s 5s cubic-bezier(.2,.7,.3,1) forwards;
+  animation:spFpIn 1.8s 5s cubic-bezier(.2,.7,.3,1) forwards,
+            spBeat 3.8s 6.8s ease-in-out infinite;
   transition:transform .2s cubic-bezier(.2,.8,.3,1);}
 @keyframes spFpIn{to{opacity:1;filter:blur(0);transform:scale(1);}}
+/* медленное «дыхание» — зовёт коснуться */
+@keyframes spBeat{0%,100%{transform:scale(1);}50%{transform:scale(1.075);}}
+.sp-btn.hold{animation:spFpIn 1.8s 5s cubic-bezier(.2,.7,.3,1) forwards;}
 .sp-btn.press{transform:scale(.93);}
 .sp-fpwrap{position:relative;width:66px;height:66px;display:block;}
 .sp-fpwrap svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .sp-fpwrap svg path{fill:none;stroke:#E7C983;stroke-width:.72;stroke-linecap:round;stroke-linejoin:round;
   filter:drop-shadow(0 0 4px rgba(233,201,131,.55));transition:stroke .3s,filter .3s;}
+.sp-fp-base{animation:spBeatGlow 3.8s 6.8s ease-in-out infinite;}
+@keyframes spBeatGlow{0%,100%{opacity:.82;}50%{opacity:1;}}
+.sp-btn.hold .sp-fp-base{animation:none;opacity:1;}
 /* яркий слой — «заливается» снизу вверх при удержании */
 .sp-fp-lit{clip-path:inset(100% 0 0 0);transition:clip-path .08s linear;}
 .sp-fp-lit path{stroke:#FFF7E2;stroke-width:.95;filter:drop-shadow(0 0 7px rgba(255,246,220,.95));}
@@ -116,13 +126,13 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .sp-glow{position:absolute;left:50%;top:50%;width:118px;height:118px;transform:translate(-50%,-50%);
   border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,rgba(233,201,131,.16),rgba(233,201,131,0) 68%);
-  animation:spGlow 3.6s ease-in-out infinite;}
+  animation:spGlow 3.8s 6.8s ease-in-out infinite;}
 @keyframes spGlow{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(.94)}
   50%{opacity:.95;transform:translate(-50%,-50%) scale(1.08)}}
 .sp-btn.hold .sp-glow{opacity:1;background:radial-gradient(circle,rgba(255,246,220,.3),rgba(233,201,131,0) 70%);}
 
-.sp-calls{font-family:'Baskerville','Forum',Georgia,serif;font-size:16px;letter-spacing:.07em;
-  color:rgba(246,238,221,.85);text-shadow:0 0 18px rgba(0,0,0,.85);
+.sp-calls{font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(246,238,221,.62);text-shadow:0 0 14px rgba(0,0,0,.85);
   opacity:0;filter:blur(6px);animation:spCalls 1.8s 5.6s cubic-bezier(.2,.7,.3,1) forwards;}
 @keyframes spCalls{to{opacity:1;filter:blur(0);}}
 
