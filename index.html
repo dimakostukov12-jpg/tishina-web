@@ -80,10 +80,10 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 /* ===== ЗАСТАВКА ПРИ ЗАПУСКЕ: видео-взрыв → бесшовный перелив + отпечаток ===== */
 #s-splash{position:fixed;inset:0;z-index:120;display:none;background:#000;overflow:hidden;}
 #s-splash.on{display:block;}
-.sp-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .9s ease;}
-#sp-loop{opacity:0;}
-#s-splash.looping #sp-intro{opacity:0;}
-#s-splash.looping #sp-loop{opacity:1;}
+.sp-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.sp-poster{position:absolute;inset:0;background:#000 url(splash-poster.jpg) center/cover no-repeat;
+  opacity:0;transition:opacity .6s ease;}
+#s-splash.novideo .sp-poster{opacity:1;}
 .sp-vign{position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(120% 78% at 50% 40%,transparent 30%,rgba(5,4,10,.5) 72%,#05040a 100%);}
 .sp-center{position:absolute;inset:0;display:grid;place-items:center;padding:0 22px;pointer-events:none;}
@@ -421,8 +421,9 @@ body.ob-open .tabbar{display:none;}
 </div>
 
 <div id="s-splash">
-  <video class="sp-vid" id="sp-intro" muted playsinline preload="auto" src="splash.mp4"></video>
-  <video class="sp-vid" id="sp-loop" muted playsinline loop preload="auto" src="splash-loop.mp4"></video>
+  <div class="sp-poster"></div>
+  <video class="sp-vid" id="sp-intro" muted playsinline autoplay preload="auto"
+         poster="splash-poster.jpg" src="splash.mp4"></video>
   <div class="sp-vign"></div>
   <div class="sp-center"><div class="sp-logo">ИММЕРСИЯ</div></div>
   <div class="sp-tag">погружение в себя</div>
@@ -886,15 +887,27 @@ function closeSplash(){
   const f=$("sp-flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
   setTimeout(()=>{ s.classList.add("fade");
     setTimeout(()=>{ s.classList.remove("on","fade","looping");
-      try{$("sp-intro").pause();$("sp-loop").pause();}catch(e){}
+      try{$("sp-intro").pause();}catch(e){}
       afterSplash(); },560);
   },320);
 }
 function startSplash(){
-  const s=$("s-splash"), vi=$("sp-intro"), vl=$("sp-loop");
+  const s=$("s-splash"), vi=$("sp-intro");
+  const LOOP_FROM=9.7, LOOP_TO=13.40;   /* хвост крутится бесконечно */
   s.classList.add("on");
-  try{ vi.currentTime=0; const p=vi.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){}
-  vi.addEventListener("ended",()=>{ try{vl.play().catch(()=>{});}catch(e){} s.classList.add("looping"); });
+  const kick=()=>{ try{ const p=vi.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} };
+  try{ vi.currentTime=0; }catch(e){}
+  kick();
+  /* если браузер не дал автозапуск — показываем постер и заводим по первому касанию */
+  setTimeout(()=>{ if(vi.paused||vi.currentTime<0.05){ s.classList.add("novideo"); kick(); } }, 900);
+  vi.addEventListener("playing",()=>s.classList.remove("novideo"));
+  ["touchstart","pointerdown"].forEach(ev=>
+    s.addEventListener(ev,()=>{ if(vi.paused) kick(); },{passive:true}));
+  /* бесшовный возврат на начало перелива */
+  vi.addEventListener("timeupdate",()=>{
+    if(vi.currentTime>=LOOP_TO){ try{ vi.currentTime=LOOP_FROM; }catch(e){} }
+  });
+  vi.addEventListener("ended",()=>{ try{ vi.currentTime=LOOP_FROM; }catch(e){} kick(); });
   const btn=$("sp-enter"), lit=$("sp-lit");
   btn.addEventListener("pointerdown",e=>{
     e.preventDefault(); haptic("light"); spHeld=0;
