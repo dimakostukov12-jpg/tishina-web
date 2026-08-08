@@ -471,7 +471,21 @@ const FAVKEY = "tishina_favs";
 const $ = s => document.getElementById(s);
 const byId = {}; ALL_SECS.forEach(s=>s.items.forEach(it=>byId[it.id]={...it, secTitle:s.title}));
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-function haptic(t){ try{ tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(t||'light'); }catch(e){} }
+function haptic(t){
+  t=t||'light';
+  try{ const H=tg&&tg.HapticFeedback;
+    if(H){
+      /* success/error/warning — это notificationOccurred, impactOccurred их не понимает */
+      if(t==='success'||t==='error'||t==='warning'){ H.notificationOccurred(t); }
+      else if(t==='select'){ H.selectionChanged(); }
+      else { H.impactOccurred(t); }
+      return;
+    }
+  }catch(e){}
+  /* вне Telegram (Android-браузер) — обычная вибрация */
+  try{ if(navigator.vibrate) navigator.vibrate(
+    t==='success'?[12,50,20]:t==='heavy'?26:t==='medium'?16:9); }catch(e){}
+}
 /* tactile press: down = вдавить, release = пружина + золотой блик */
 function press(el,onTap){
   let on=false;
@@ -898,12 +912,14 @@ let spGoing=false;
 function spEnter(){
   if(spGoing) return; spGoing=true;
   const btn=$("sp-enter"), lit=$("sp-lit");
-  btn.classList.add("hold","press"); haptic("light");
+  btn.classList.add("hold","press");
+  haptic("medium");            /* сразу под пальцем — «нажалось» */
   /* одно касание: отпечаток быстро заливается снизу вверх — и пускаем дальше */
-  let k=0;
+  let k=0, tick=0;
   spTimer=setInterval(()=>{
-    k+=0.09;
+    k+=0.09; tick++;
     if(lit) lit.style.clipPath="inset("+Math.max(0,(1-k)*100).toFixed(1)+"% 0 0 0)";
+    if(k<1 && tick%4===0) haptic("light");   /* тихие щелчки — сканер считывает */
     if(k>=1){ clearInterval(spTimer); spTimer=null; closeSplash(); }
   },30);
 }
