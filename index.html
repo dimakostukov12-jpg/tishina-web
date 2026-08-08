@@ -893,6 +893,27 @@ function closeSplash(){
       afterSplash(); },560);
   },320);
 }
+/* ---------- вход по нажатию на отпечаток ---------- */
+let spGoing=false;
+function spEnter(){
+  if(spGoing) return; spGoing=true;
+  const btn=$("sp-enter"), lit=$("sp-lit");
+  btn.classList.add("hold","press"); haptic("light");
+  /* одно касание: отпечаток быстро заливается снизу вверх — и пускаем дальше */
+  let k=0;
+  spTimer=setInterval(()=>{
+    k+=0.09;
+    if(lit) lit.style.clipPath="inset("+Math.max(0,(1-k)*100).toFixed(1)+"% 0 0 0)";
+    if(k>=1){ clearInterval(spTimer); spTimer=null; closeSplash(); }
+  },30);
+}
+(function bindEnter(){
+  const ui=document.querySelector(".sp-ui");
+  if(!ui) return;
+  const fire=e=>{ if(e&&e.cancelable) e.preventDefault(); spEnter(); };
+  /* несколько путей — чтобы сработало в любом WebView Telegram */
+  ["pointerdown","touchstart","click"].forEach(ev=>ui.addEventListener(ev,fire));
+})();
 function startSplash(){
   const s=$("s-splash"), vi=$("sp-intro");
   const LOOP_FROM=10.20, LOOP_TO=14.80;  /* конец плавно перетекает в эту точку */
