@@ -87,6 +87,15 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
   opacity:.3;filter:grayscale(.65);transition:opacity .3s,filter .3s;}
 .st-th.on{opacity:1;filter:none;box-shadow:0 0 0 2px #F3E1AC;}
 .st-th.past{opacity:.7;filter:grayscale(.2);}
+.st-tiles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px;}
+.st-tile{border-radius:15px;padding:13px 13px 14px;background:rgba(255,246,232,.05);
+  border:1px solid rgba(233,214,194,.1);cursor:pointer;
+  transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s;}
+.st-tile:active{transform:scale(.965);background:rgba(255,246,232,.09);}
+.st-ic{display:block;width:22px;color:#E0AE72;}
+.st-ic svg{width:100%;display:block;}
+.st-tn{display:block;font-size:13px;color:#EFE5DA;margin-top:9px;}
+.st-tv{display:block;font-size:10px;color:#A8917C;margin-top:2px;}
 #s-section .topbar{padding:16px 14px 0;}
 .pill{position:relative;display:inline-block;border-radius:26px;padding:2px;overflow:hidden;
   isolation:isolate;transform:translateZ(0);
@@ -393,32 +402,28 @@ body.ob-open .tabbar{display:none;}
   <div class="st-body">
     <div class="st-eb" id="st-eb"></div>
     <div class="st-name" id="st-name"></div>
-    <div class="p-name" id="p-name" style="display:none"></div>
     <div class="st-desc" id="st-desc"></div>
     <div class="st-stats">
-      <div class="st-cell"><b id="st-days">0</b><span>дней</span></div>
-      <div class="st-cell"><b id="st-streak">0</b><span>серия</span></div>
-      <div class="st-cell"><b id="st-tasks">0</b><span>заданий</span></div>
+      <div class="st-cell"><b id="st-days">0</b><span>дней в пути</span></div>
+      <div class="st-cell"><b id="st-mins">0</b><span>минут любви к себе</span></div>
+      <div class="st-cell"><b id="st-tasks">0</b><span>прожитых ритуалов</span></div>
     </div>
     <div class="st-bar"><i id="st-fill" style="width:0%"></i></div>
     <div class="st-upto" id="st-upto"></div>
     <div class="st-lb">Все ступени</div>
     <div class="st-strip" id="st-strip"></div>
+    <div class="st-lb">Разделы</div>
+    <div class="st-tiles">
+      <div class="st-tile" id="tile-diary"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a2 2 0 0 1 2 2v13"/><path d="M5 4v16h11"/><path d="M8 8h6M8 11h6"/><path d="M19.5 13.5l2 2-4.5 4.5H15v-2z"/></svg></span>
+        <span class="st-tn">Мой дневник</span><span class="st-tv" id="tv-diary"></span></div>
+      <div class="st-tile" id="tile-fav"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.2C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></span>
+        <span class="st-tn">Избранное</span><span class="st-tv" id="tv-fav"></span></div>
+      <div class="st-tile" id="tile-sub"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.1 5.5.5-4.2 3.7 1.3 5.4L12 14.8 7.2 17.7l1.3-5.4-4.2-3.7 5.5-.5z"/></svg></span>
+        <span class="st-tn">Подписка</span><span class="st-tv">активна</span></div>
+      <div class="st-tile" id="tile-help"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 1 1-3.2-6.4"/><path d="M4 20l1.6-3.6"/><path d="M21 4v5h-5"/></svg></span>
+        <span class="st-tn">Поддержка</span><span class="st-tv">написать Дмитрию</span></div>
+    </div>
   </div>
-  <div class="sect-title">Календарь практики</div>
-  <div class="cal">
-    <div class="cal-hd"><span class="cal-nav" id="cal-prev">‹</span><span class="cal-title" id="cal-title"></span><span class="cal-nav" id="cal-next">›</span></div>
-    <div class="cal-week"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-cap" id="cal-cap"></div>
-  </div>
-  <div class="stats">
-    <div class="stat"><b id="st-fav">0</b><span>в избранном</span></div>
-    <div class="stat"><b id="st-med">18</b><span>медитаций</span></div>
-    <div class="stat"><b>7</b><span>разделов</span></div>
-  </div>
-  <div class="sect-title">О тебе</div>
-  <div class="sec-sub" style="padding-top:8px">Здесь появятся твой прогресс, минуты практики и любимые медитации. Пока это первая версия — самое важное впереди.</div>
 </section>
 
 <section class="screen" id="s-detail">
@@ -517,7 +522,6 @@ body.ob-open .tabbar{display:none;}
 
 <nav class="tabbar" id="tabbar">
   <div class="tab on" data-tab="home"><svg viewBox="0 0 24 24"><path d="M12 20c5-2 7-7 7-13-6 0-11 2-13 7"/><path d="M5 20c0-5 3-9 7-11"/></svg>Медитации</div>
-  <div class="tab" data-tab="fav"><svg viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.1C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg>Избранное</div>
   <div class="tab" data-tab="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Профиль</div>
 </nav>
 
@@ -593,9 +597,11 @@ function back(){
 function setTab(tab){
   curTab=tab; stack=[TAB_SCREEN[tab]];
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
-  if(tab==="fav") renderFav();
-  if(tab==="profile") renderProfile();
-  showScreen(TAB_SCREEN[tab]);
+  showScreen(TAB_SCREEN[tab]);                 /* экран открываем ПЕРВЫМ */
+  try{                                          /* сбой отрисовки больше не блокирует переход */
+    if(tab==="fav") renderFav();
+    if(tab==="profile") renderProfile();
+  }catch(e){}
 }
 
 /* ---------- render home ---------- */
@@ -790,6 +796,8 @@ au.addEventListener("durationchange",()=>{ dur=curDur(); if(isFinite(au.duration
 au.addEventListener("seeked",()=>{ pendingSeek=null; });
 au.addEventListener("play",()=>{wantPlay=true;$("play").classList.add("playing");$("play").setAttribute("aria-label","Пауза");markToday();});
 au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("play").setAttribute("aria-label","Играть");savePos();});  // не трогаем wantPlay: пауза может быть от фона
+au.addEventListener("timeupdate",trackTime);
+au.addEventListener("play",()=>{ _lastT=au.currentTime; });
 au.addEventListener("ended",()=>{ wantPlay=false; if(curId) localStorage.removeItem(posKey(curId)); });
 
 $("play").onclick=()=>{
@@ -859,49 +867,34 @@ function renderFav(){
   });
 }
 /* ---------- profile ---------- */
-function renderProfile(){ try{renderStage();}catch(e){}
-  $("st-fav").textContent=favs().length;
-  $("st-med").textContent=Object.keys(byId).length;
-  const n=new Date(); calCur=new Date(n.getFullYear(),n.getMonth(),1); renderCalendar();
-  if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user){
-    const u=tg.initDataUnsafe.user;
-    $("p-name").textContent=u.first_name||"Гостья";
-    if(u.photo_url){ $("ava").style.backgroundImage="url("+u.photo_url+")"; $("ava").textContent=""; }
-    else { $("ava").textContent=(u.first_name||"Т").slice(0,1); }
-  }
-}
+function renderProfile(){ try{ renderStage(); }catch(e){} }
 
 /* ---------- календарь практики (синхронно с реальной датой) ---------- */
 const DAYSKEY="tishina_days";
+const SINCEKEY="tishina_since", MINKEY="tishina_seconds";
+function sinceDays(){
+  let d=localStorage.getItem(SINCEKEY);
+  if(!d){ d=ymdOf(new Date()); localStorage.setItem(SINCEKEY,d); }
+  const a=new Date(d+"T00:00:00"), b=new Date();
+  return Math.max(1, Math.round((b-a)/86400000)+1);
+}
+function listenedMin(){ return Math.floor((parseFloat(localStorage.getItem(MINKEY)||"0")||0)/60); }
+let _lastT=0, _acc=0;
+function trackTime(){
+  const t=au.currentTime, d=t-_lastT; _lastT=t;
+  if(d>0 && d<2){                                  /* перемотку не засчитываем */
+    _acc+=d;
+    if(_acc>=15){ const v=(parseFloat(localStorage.getItem(MINKEY)||"0")||0)+_acc;
+      localStorage.setItem(MINKEY,String(v)); _acc=0; }
+  }
+}
 function practiceDays(){ try{return JSON.parse(localStorage.getItem(DAYSKEY)||"[]");}catch(e){return[];} }
 function pad2(n){return String(n).padStart(2,"0");}
 function ymdOf(d){return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());}
-function markToday(){ const t=ymdOf(new Date()); const a=practiceDays(); if(a.indexOf(t)<0){a.push(t);localStorage.setItem(DAYSKEY,JSON.stringify(a));} if($("cal-grid"))renderCalendar(); }
+function markToday(){ const t=ymdOf(new Date()); const a=practiceDays(); if(a.indexOf(t)<0){a.push(t);localStorage.setItem(DAYSKEY,JSON.stringify(a));}  }
 const MONTHS=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
 function plural(n,a,b,c){const m=n%100,d=n%10;if(m>=11&&m<=14)return c;if(d===1)return a;if(d>=2&&d<=4)return b;return c;}
-let calCur=null;
-function renderCalendar(){
-  const now=new Date();
-  if(!calCur) calCur=new Date(now.getFullYear(),now.getMonth(),1);
-  const y=calCur.getFullYear(), m=calCur.getMonth(), set=new Set(practiceDays());
-  $("cal-title").textContent=MONTHS[m]+" "+y;
-  const startW=(new Date(y,m,1).getDay()+6)%7, dim=new Date(y,m+1,0).getDate(), today=ymdOf(now);
-  let html="";
-  for(let i=0;i<startW;i++) html+='<div class="cell blank"></div>';
-  for(let d=1;d<=dim;d++){
-    const ds=y+"-"+pad2(m+1)+"-"+pad2(d), isToday=ds===today, done=set.has(ds);
-    const future=(new Date(y,m,d)>now)&&!isToday;
-    let cls="cell"; if(done)cls+=" done";
-    if(isToday)cls+=" today"; else if(future)cls+=" future"; else if(!done)cls+=" pastempty";
-    html+='<div class="'+cls+'">'+d+'</div>';
-  }
-  $("cal-grid").innerHTML=html;
-  let cnt=0; set.forEach(x=>{ if(x.indexOf(y+"-"+pad2(m+1))===0) cnt++; });
-  $("cal-cap").textContent=cnt?(cnt+" "+plural(cnt,"день","дня","дней")+" практики в этом месяце"):"Начни практику — и закрась первый день ✨";
-  $("cal-next").style.visibility=(y===now.getFullYear()&&m===now.getMonth())?"hidden":"visible";
-}
-$("cal-prev").onclick=()=>{ calCur=new Date(calCur.getFullYear(),calCur.getMonth()-1,1); renderCalendar(); haptic(); };
-$("cal-next").onclick=()=>{ const now=new Date(), nx=new Date(calCur.getFullYear(),calCur.getMonth()+1,1); if(nx<=new Date(now.getFullYear(),now.getMonth(),1)){calCur=nx;renderCalendar();haptic();} };
+/* календарь убран с профиля — вместо него ступень, цифры и плитки */
 
 /* ---------- wire ---------- */
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{haptic();back();});
@@ -970,13 +963,19 @@ function renderStage(){
   const days=practiceDays().length;
   const idx=Math.min(STAGES.length, Math.floor(days/DAYS_PER_STAGE)+1);
   const st=STAGES[idx-1];
-  $("st-art").style.backgroundImage="url(stage-"+idx+".jpg)";
+  const src="stage-"+idx+".jpg";
+  if($("st-art").dataset.src!==src){ $("st-art").dataset.src=src;
+    const pre=new Image(); pre.onload=()=>{ $("st-art").style.backgroundImage="url("+src+")"; };
+    pre.src=src; if(pre.complete) $("st-art").style.backgroundImage="url("+src+")"; }
   $("st-eb").textContent="Ступень "+idx;
   $("st-name").textContent=st.name;
   $("st-desc").textContent=st.desc;
-  $("st-days").textContent=days;
-  $("st-streak").textContent=streakDays();
+  $("st-days").textContent=sinceDays();
+  $("st-mins").textContent=listenedMin();
   $("st-tasks").textContent=tasksDone();
+  $("tv-fav").textContent=favs().length+" "+plural(favs().length,"медитация","медитации","медитаций");
+  const notes=ALL_SECS.reduce((k,s)=>k+s.items.filter(it=>loadNote(it.id)).length,0);
+  $("tv-diary").textContent=notes+" "+plural(notes,"запись","записи","записей");
   const inStage=days%DAYS_PER_STAGE, last=idx>=STAGES.length;
   $("st-fill").style.width=(last?100:Math.round(inStage/DAYS_PER_STAGE*100))+"%";
   const left=DAYS_PER_STAGE-inStage;
@@ -986,6 +985,11 @@ function renderStage(){
     '<div class="st-th'+(s.n===idx?' on':(s.n<idx?' past':''))+
     '" style="background-image:url('+s.th+')"></div>').join("");
 }
+press($("tile-fav"), ()=>setTab("fav"));
+press($("tile-diary"), ()=>setTab("fav"));
+press($("tile-sub"), ()=>{});
+press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
+
 renderHome(); renderProfile(); renderStage(); setTab("home");
 
 /* ---------- заставка при запуске ---------- */
