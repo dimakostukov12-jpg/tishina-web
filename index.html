@@ -720,7 +720,7 @@ $("d-play").onclick=()=>{ if(!curId)return; haptic("medium"); openPlayer(curId);
 $("d-save").onclick=()=>{ if(!curId)return; const t=$("d-note").value, had=!!loadNote(curId);
   if(t.trim()){localStorage.setItem(NOTEKEY(curId),t);} else {localStorage.removeItem(NOTEKEY(curId));}
   if(t.trim() && !had){const tm=(MED[curId]&&MED[curId].times)||99; localStorage.setItem(DONEKEY(curId),String(Math.min(doneCount(curId)+1,tm)));}
-  $("d-savehint").textContent="Сохранено ✓"; haptic("medium");
+  $("d-note").value=""; $("d-savehint").textContent="Сохранено ✓"; haptic("medium");
   renderTracker(byId[curId]); renderReplies(byId[curId]);
 };
 $("d-more").onclick=()=>{ repliesOpen=true; renderReplies(byId[curId]); haptic("light"); };
