@@ -148,13 +148,18 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .st-tn{display:block;font-size:13px;color:#EFE5DA;margin-top:9px;}
 .st-tv{display:block;font-size:10px;color:#A8917C;margin-top:2px;}
 /* ——— КАРТА ДНЯ ——— */
-/* экран тянется флексом, а не 100vh: у Telegram высота окна своя и меняется,
-   так содержимое центрируется само и скролл не появляется */
+/* экран тянется флексом, а не 100vh: у Telegram высота окна своя и меняется.
+   Центрируем через margin:auto у внутреннего блока, а НЕ через justify-content:
+   при переполнении justify-content:center прячет верх и низ без возможности
+   доскроллить, а margin:auto оставляет содержимое достижимым. */
 #s-card.active{display:flex;flex-direction:column;}
 .cd-wrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
-  justify-content:center;padding:4px 18px 26px;}
-.cd-stage{position:relative;width:70%;max-width:252px;margin:0 auto;
+  padding:4px 18px 8px;}
+.cd-inner{margin:auto 0;width:100%;}
+.cd-stage{position:relative;width:62%;max-width:228px;margin:0 auto;
   aspect-ratio:831/1256;perspective:900px;cursor:pointer;}
+/* короткий экран (SE и подобные): карта ещё меньше, иначе абзац не помещается */
+@media(max-height:740px){.cd-stage{width:47%;}}
 .cd-deck,.cd-res{position:absolute;inset:0;}
 /* 7.7% ширины — настоящий радиус углов карты; вторая цифра даёт ту же величину
    в пикселях по вертикали (7.7 * 831/1256), иначе углы выйдут овальными */
@@ -176,18 +181,18 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 @keyframes cdSpark{0%{transform:translate(var(--sx),var(--sy)) scale(.4);opacity:0;}
   25%{opacity:1;}100%{transform:translate(0,0) scale(1.6);opacity:0;}}
 @media(prefers-reduced-motion:reduce){.cd-stage.run .cd-dc,.cd-stage.run .cd-sp{animation:none;}}
-.cd-hint{text-align:center;font-size:11px;color:#A8917C;margin-top:16px;transition:opacity .3s;}
+.cd-hint{text-align:center;font-size:11px;color:#A8917C;margin-top:14px;transition:opacity .3s;}
 .cd-hint.gone{opacity:0;}
 .cd-after{opacity:0;height:0;overflow:hidden;transform:translateY(10px);
   transition:opacity .5s,transform .5s;}
 .cd-after.on{opacity:1;height:auto;transform:none;}
-.cd-pillwrap{display:flex;justify-content:center;margin-top:20px;}
+.cd-pillwrap{display:flex;justify-content:center;margin-top:16px;}
 .cd-title{font-family:'Baskerville','Forum',Georgia,serif;color:#EFE5DA;font-size:16px;
-  line-height:1.26;text-align:center;text-wrap:balance;margin:14px 0 0;}
-.cd-rule{width:32px;height:1px;margin:13px auto 0;
+  line-height:1.26;text-align:center;text-wrap:balance;margin:12px 0 0;}
+.cd-rule{width:32px;height:1px;margin:11px auto 0;
   background:linear-gradient(90deg,transparent,rgba(233,201,131,.6),transparent);}
-.cd-text{font-size:12.5px;line-height:1.6;color:#A8917C;text-align:center;
-  margin:12px auto 0;max-width:33ch;}
+.cd-text{font-size:12.5px;line-height:1.55;color:#A8917C;text-align:center;
+  margin:10px auto 0;max-width:33ch;}
 .cd-date{margin-left:auto;font-size:10px;letter-spacing:.18em;text-transform:uppercase;
   color:#A8917C;padding-right:4px;}
 #s-section .topbar{padding:16px 14px 0;}
@@ -527,17 +532,19 @@ body.ob-open .tabbar{display:none;}
   <div class="topbar"><span class="back" data-back>‹</span><span class="tb-title">Карта дня</span>
     <span class="cd-date" id="cd-date"></span></div>
   <div class="cd-wrap">
-    <div class="cd-stage" id="cd-stage">
-      <div class="cd-deck" id="cd-deck"></div>
-      <div class="cd-res"><img id="cd-img" alt=""></div>
-    </div>
-    <div class="cd-hint" id="cd-hint">коснись колоды</div>
-    <div class="cd-after" id="cd-after">
-      <div class="cd-pillwrap"><span class="pill"><span class="gsp"></span>
-        <span class="pin" id="cd-name"></span></span></div>
-      <div class="cd-title" id="cd-title"></div>
-      <div class="cd-rule"></div>
-      <p class="cd-text" id="cd-text"></p>
+    <div class="cd-inner">
+      <div class="cd-stage" id="cd-stage">
+        <div class="cd-deck" id="cd-deck"></div>
+        <div class="cd-res"><img id="cd-img" alt=""></div>
+      </div>
+      <div class="cd-hint" id="cd-hint">коснись колоды</div>
+      <div class="cd-after" id="cd-after">
+        <div class="cd-pillwrap"><span class="pill"><span class="gsp"></span>
+          <span class="pin" id="cd-name"></span></span></div>
+        <div class="cd-title" id="cd-title"></div>
+        <div class="cd-rule"></div>
+        <p class="cd-text" id="cd-text"></p>
+      </div>
     </div>
   </div>
 </section>
