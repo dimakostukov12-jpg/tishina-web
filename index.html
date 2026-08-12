@@ -96,8 +96,17 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .st-th.on{opacity:1;filter:none;                     /* обводка внутрь: снаружи она ложилась на полпикселя и «сползала» */
   box-shadow:inset 0 0 0 2px #F3E1AC, 0 0 12px rgba(243,225,172,.42);}
 .st-th.past{opacity:.7;filter:grayscale(.2);}
+.dy-list{padding:0 16px 30px;}
+.dy-card{border-radius:17px;padding:14px 16px 15px;margin-bottom:11px;cursor:pointer;
+  background:rgba(255,246,232,.05);border:1px solid rgba(233,214,194,.1);
+  transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s;}
+.dy-card:active{transform:scale(.975);background:rgba(255,246,232,.09);}
+.dy-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.dy-name{font-family:'Baskerville','Forum',Georgia,serif;font-size:17px;color:#F3DCA0;}
+.dy-when{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A6857;flex:none;}
+.dy-text{font-size:13.5px;color:#D8C6B6;line-height:1.55;margin-top:7px;white-space:pre-line;}
 /* --- «Поговорить»: переписка --- */
-#s-talk{display:none;padding-bottom:0;overflow:hidden;}
+#s-talk{display:none;padding-bottom:calc(60px + env(safe-area-inset-bottom));overflow:hidden;}
 #s-talk.active{display:flex;flex-direction:column;}
 .tk-chat{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px;
@@ -116,7 +125,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
   background:rgba(255,246,232,.05);border:1px solid rgba(233,214,194,.14);cursor:pointer;
   transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s;}
 .tk-chip:active{transform:scale(.95);background:rgba(255,246,232,.1);}
-.tk-bar{display:flex;gap:8px;align-items:flex-end;margin:8px 14px calc(12px + env(safe-area-inset-bottom));
+.tk-bar{display:flex;gap:8px;align-items:flex-end;margin:8px 14px 4px;
   background:rgba(25,18,13,.6);border:1px solid rgba(233,201,131,.34);border-radius:22px;
   padding:7px 7px 7px 16px;}
 .tk-input{flex:1;background:transparent;border:0;outline:none;color:#F3ECE2;font-family:inherit;
@@ -458,8 +467,8 @@ body.ob-open .tabbar{display:none;}
     <div class="st-strip" id="st-strip"></div>
     <div class="st-lb">Разделы</div>
     <div class="st-tiles">
-      <div class="st-tile" id="tile-talk"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.3c0 3.8-3.8 6.9-8.5 6.9-1 0-2-.14-2.9-.4L4 19.6l1.35-3.3C4.2 15 3.5 13.2 3.5 11.3c0-3.8 3.8-6.9 8.5-6.9s8.5 3.1 8.5 6.9z"/><path d="M12 8.1l.85 2.05 2.05.85-2.05.85L12 13.9l-.85-2.05-2.05-.85 2.05-.85z"/></svg></span>
-        <span class="st-tn">Поговорить</span><span class="st-tv">Хочешь выговориться? AI-психолог рядом 24/7</span></div>
+      <div class="st-tile" id="tile-diary"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a2 2 0 0 1 2 2v13"/><path d="M5 4v16h11"/><path d="M8 8h6M8 11h6"/><path d="M19.5 13.5l2 2-4.5 4.5H15v-2z"/></svg></span>
+        <span class="st-tn">Мой дневник</span><span class="st-tv" id="tv-diary"></span></div>
       <div class="st-tile" id="tile-fav"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.2C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></span>
         <span class="st-tn">Избранное</span><span class="st-tv" id="tv-fav"></span></div>
       <div class="st-tile" id="tile-sub"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.1 5.5.5-4.2 3.7 1.3 5.4L12 14.8 7.2 17.7l1.3-5.4-4.2-3.7 5.5-.5z"/></svg></span>
@@ -470,9 +479,16 @@ body.ob-open .tabbar{display:none;}
   </div>
 </section>
 
+<section class="screen" id="s-diary">
+  <div class="safetop"></div>
+  <div class="topbar"><span class="back" data-back>‹</span><span class="tb-title">Мой дневник</span></div>
+  <div class="sec-sub">Всё, что ты записала после практик — по порядку</div>
+  <div class="dy-list" id="dy-list"></div>
+</section>
+
 <section class="screen" id="s-talk">
   <div class="safetop"></div>
-  <div class="topbar"><span class="back" data-back>‹</span><span class="tb-title">Поговорить</span></div>
+  <div class="topbar"><span class="tb-title" style="padding-left:6px">Поговорить</span></div>
   <div class="tk-chat" id="tk-chat"></div>
   <div class="tk-chips" id="tk-chips"></div>
   <div class="tk-bar">
@@ -576,6 +592,7 @@ body.ob-open .tabbar{display:none;}
 
 <nav class="tabbar" id="tabbar">
   <div class="tab on" data-tab="home"><svg viewBox="0 0 24 24"><path d="M12 20c5-2 7-7 7-13-6 0-11 2-13 7"/><path d="M5 20c0-5 3-9 7-11"/></svg>Медитации</div>
+  <div class="tab" data-tab="talk"><svg viewBox="0 0 24 24"><path d="M20.5 11.3c0 3.8-3.8 6.9-8.5 6.9-1 0-2-.14-2.9-.4L4 19.6l1.35-3.3C4.2 15 3.5 13.2 3.5 11.3c0-3.8 3.8-6.9 8.5-6.9s8.5 3.1 8.5 6.9z"/><path d="M12 8.1l.85 2.05 2.05.85-2.05.85L12 13.9l-.85-2.05-2.05-.85 2.05-.85z"/></svg>Поговорить</div>
   <div class="tab" data-tab="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Профиль</div>
 </nav>
 
@@ -627,12 +644,12 @@ function toggleFav(id){ let a=favs(); const i=a.indexOf(id); if(i>=0)a.splice(i,
 
 /* ---------- router ---------- */
 let stack=[]; let curTab="home";
-const TAB_SCREEN={home:"s-home",fav:"s-fav",profile:"s-profile"};
+const TAB_SCREEN={home:"s-home",talk:"s-talk",fav:"s-fav",profile:"s-profile"};
 function showScreen(id){
-  ["s-home","s-section","s-fav","s-profile","s-detail","s-talk"].forEach(s=>$(s).classList.toggle("active",s===id));
+  ["s-home","s-section","s-fav","s-profile","s-detail","s-talk","s-diary"].forEach(s=>$(s).classList.toggle("active",s===id));
   $("s-player").classList.toggle("active", id==="s-player");
-  const deep = (id==="s-player"||id==="s-section"||id==="s-detail"||id==="s-talk"||(id==="s-fav"&&curTab!=="fav"));
-  $("tabbar").classList.toggle("hide", id==="s-player"||id==="s-detail"||id==="s-talk");
+  const deep = (id==="s-player"||id==="s-section"||id==="s-detail"||id==="s-diary"||(id==="s-fav"&&curTab!=="fav"));
+  $("tabbar").classList.toggle("hide", id==="s-player"||id==="s-detail");
   if(id==="s-player"){ PFX.start(); } else { PFX.stop(); }
   if(id==="s-detail" && curId){ $("d-heart").classList.toggle("on",isFav(curId)); }
   $("d-iri").style.display = (id==="s-detail") ? "block" : "none";
@@ -654,6 +671,7 @@ function setTab(tab){
   showScreen(TAB_SCREEN[tab]);                 /* экран открываем ПЕРВЫМ */
   try{                                          /* сбой отрисовки больше не блокирует переход */
     if(tab==="fav") renderFav();
+    if(tab==="talk"){ tkRender(); setTimeout(tkScroll,60); }
     if(tab==="profile") renderProfile();
   }catch(e){}
 }
@@ -912,6 +930,27 @@ function setupMediaSession(){
 }
 
 /* ---------- favorites screen ---------- */
+function renderDiary(){
+  const box=$("dy-list"); box.innerHTML="";
+  const rows=[];
+  ALL_SECS.forEach(sec=>sec.items.forEach(it=>{
+    const t=loadNote(it.id); if(t) rows.push({it, t});
+  }));
+  if(!rows.length){
+    box.innerHTML='<div class="empty"><div class="big">Пока пусто</div>'
+      + 'После практики внизу есть поле «что поднялось». Всё, что там напишешь, '
+      + 'соберётся здесь — и через месяц это будет очень интересно перечитать.</div>';
+    return;
+  }
+  rows.forEach(({it,t})=>{
+    const d=document.createElement("div"); d.className="dy-card";
+    d.innerHTML='<div class="dy-top"><span class="dy-name">'+it.title+'</span>'
+      + '<span class="dy-when">'+it.dur+'</span></div>'
+      + '<div class="dy-text">'+t.replace(/</g,"&lt;")+'</div>';
+    press(d, ()=>openDetail(it.id));
+    box.appendChild(d);
+  });
+}
 function renderFav(){
   const list=$("fav-list"); const ids=favs(); list.innerHTML="";
   if(!ids.length){ list.innerHTML='<div class="empty"><div class="big">Пока пусто</div>Открой любую медитацию и нажми ♡ — она появится здесь.</div>'; return; }
@@ -1113,6 +1152,8 @@ function renderStage(){
   $("st-mins").textContent=listenedMin();
   $("st-tasks").textContent=tasksDone();
   $("tv-fav").textContent=favs().length+" "+plural(favs().length,"медитация","медитации","медитаций");
+  let nt=0; ALL_SECS.forEach(sc=>sc.items.forEach(it=>{ if(loadNote(it.id)) nt++; }));
+  $("tv-diary").textContent = nt ? nt+" "+plural(nt,"запись","записи","записей") : "ещё пусто";
   const inStage=days%DAYS_PER_STAGE, last=idx>=STAGES.length;
   $("st-fill").style.width=(last?100:Math.round(inStage/DAYS_PER_STAGE*100))+"%";
   const left=DAYS_PER_STAGE-inStage;
@@ -1123,7 +1164,7 @@ function renderStage(){
     '" style="background-image:url('+s.th+')"></div>').join("");
 }
 press($("tile-fav"), ()=>{ renderFav(); go("s-fav",true); });
-press($("tile-talk"), ()=>{ tkRender(); go("s-talk",true); setTimeout(tkScroll,60); });
+press($("tile-diary"), ()=>{ renderDiary(); go("s-diary",true); });
 press($("tile-sub"), ()=>{});
 press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
 
