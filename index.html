@@ -957,7 +957,7 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{haptic();setTab(t.da
 /* ---------- «Поговорить»: переписка с ИИ-психологом ----------
    TALK_URL — единственное место, куда подключается модель. Пусто = ещё не подключено.
    Ключ Claude живёт на сервере, в приложение он попасть не может: файл открыт всем. */
-const TALK_URL = "";
+const TALK_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/talk";
 const TALKKEY = "tishina_talk";
 const TK_HELLO = "Привет 🌙 Я рядом. Расскажи, что сейчас происходит — что тревожит, "
   + "что не отпускает, чему радуешься. Можно как есть, без красивых слов.";
