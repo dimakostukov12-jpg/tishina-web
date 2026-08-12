@@ -147,10 +147,6 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .st-ic svg{width:100%;display:block;}
 .st-tn{display:block;font-size:13px;color:#EFE5DA;margin-top:9px;}
 .st-tv{display:block;font-size:10px;color:#A8917C;margin-top:2px;}
-/* широкая плитка: конус крутится квадратом, иначе на длинной стороне оголяются углы */
-#tile-card{grid-column:1/-1;}
-#tile-card::before{inset:-210% -50%;}
-
 /* ——— КАРТА ДНЯ ——— */
 /* экран тянется флексом, а не 100vh: у Telegram высота окна своя и меняется,
    так содержимое центрируется само и скролл не появляется */
@@ -516,8 +512,6 @@ body.ob-open .tabbar{display:none;}
     <div class="st-tiles">
       <div class="st-tile" id="tile-card"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2.8" width="12.5" height="18.4" rx="2.4"/><path d="M18.4 6.2l1.4.5a2 2 0 0 1 1.2 2.5l-3.6 10.6"/><path d="M10.2 8.4l.9 2.1 2.3.2-1.7 1.5.5 2.2-2-1.2-2 1.2.5-2.2-1.7-1.5 2.3-.2z"/></svg></span>
         <span class="st-tn">Карта дня</span><span class="st-tv" id="tv-card">одна карта в сутки — вытяни свою</span></div>
-      <div class="st-tile" id="tile-diary"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a2 2 0 0 1 2 2v13"/><path d="M5 4v16h11"/><path d="M8 8h6M8 11h6"/><path d="M19.5 13.5l2 2-4.5 4.5H15v-2z"/></svg></span>
-        <span class="st-tn">Мой дневник</span><span class="st-tv" id="tv-diary"></span></div>
       <div class="st-tile" id="tile-fav"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.2C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></span>
         <span class="st-tn">Избранное</span><span class="st-tv" id="tv-fav"></span></div>
       <div class="st-tile" id="tile-sub"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.1 5.5.5-4.2 3.7 1.3 5.4L12 14.8 7.2 17.7l1.3-5.4-4.2-3.7 5.5-.5z"/></svg></span>
@@ -1223,8 +1217,6 @@ function renderStage(){
   $("st-mins").textContent=listenedMin();
   $("st-tasks").textContent=tasksDone();
   $("tv-fav").textContent=favs().length+" "+plural(favs().length,"медитация","медитации","медитаций");
-  let nt=0; ALL_SECS.forEach(sc=>sc.items.forEach(it=>{ if(loadNote(it.id)) nt++; }));
-  $("tv-diary").textContent = nt ? nt+" "+plural(nt,"запись","записи","записей") : "ещё пусто";
   const inStage=days%DAYS_PER_STAGE, last=idx>=STAGES.length;
   $("st-fill").style.width=(last?100:Math.round(inStage/DAYS_PER_STAGE*100))+"%";
   const left=DAYS_PER_STAGE-inStage;
@@ -1316,7 +1308,6 @@ try{ const st=cdState();
 
 press($("tile-card"), openCardDay);
 press($("tile-fav"), ()=>{ renderFav(); go("s-fav",true); });
-press($("tile-diary"), ()=>{ renderDiary(); go("s-diary",true); });
 press($("tile-sub"), ()=>{});
 press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
 
