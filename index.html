@@ -154,6 +154,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 @keyframes tkPulse{50%{opacity:.25;}}
 .tk-time{font-size:14px;color:#F3ECE2;font-variant-numeric:tabular-nums;}
 .tk-rec-hint{font-size:12.5px;color:#9B958F;flex:1;}
+.tk-rec-hint.warn{color:#E2A05F;}
 .tk-rec-x,.tk-rec-ok{flex:0 0 auto;cursor:pointer;border:0;font-family:inherit;}
 .tk-rec-x{background:transparent;color:#9B958F;font-size:13px;padding:6px 8px;}
 .tk-rec-ok{background:linear-gradient(180deg,#F3E1AC,#D8B26A);color:#2A1C10;font-size:13px;
@@ -1185,7 +1186,8 @@ tkChips();
    а обратно приходит текст и ложится в поле ввода — чтобы она видела,
    что распозналось, до отправки. */
 const VOICE_URL = TALK_URL.replace(/\/talk$/, "/voice");
-const REC_MAX = 120;                                   /* секунд, дальше режем сами */
+const REC_MAX = 300;                                   /* секунд, дальше режем сами */
+const REC_MAX_LABEL = "до 5 минут";
 let mrec=null, mchunks=[], mtimer=null, mstart=0, mcancel=false, mstream=null;
 
 function micOk(){
@@ -1203,6 +1205,12 @@ function recUI(on){
 function recClock(){
   const s=Math.floor((Date.now()-mstart)/1000);
   $("tk-time").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+  const left=REC_MAX-s;
+  const hint=$("tk-rec-hint");
+  if(left<=30){                                        /* к концу подсказка меняется на обратный счёт */
+    hint.textContent="осталось 0:"+String(Math.max(left,0)).padStart(2,"0");
+    hint.classList.add("warn");
+  }
   if(s>=REC_MAX) recStop();
 }
 async function recStart(){
@@ -1222,7 +1230,8 @@ async function recStart(){
   mrec.onstop=recDone;
   mrec.start();
   mstart=Date.now(); $("tk-time").textContent="0:00";
-  $("tk-rec-hint").textContent="идёт запись";
+  $("tk-rec-hint").textContent=REC_MAX_LABEL;
+  $("tk-rec-hint").classList.remove("warn");
   mtimer=setInterval(recClock,250);
   recUI(true); haptic("medium");
 }
