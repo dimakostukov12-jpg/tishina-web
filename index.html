@@ -152,8 +152,11 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 #tile-card::before{inset:-210% -50%;}
 
 /* ——— КАРТА ДНЯ ——— */
-.cd-wrap{display:flex;flex-direction:column;justify-content:center;
-  min-height:calc(100vh - 72px);padding:4px 18px 26px;}
+/* экран тянется флексом, а не 100vh: у Telegram высота окна своя и меняется,
+   так содержимое центрируется само и скролл не появляется */
+#s-card.active{display:flex;flex-direction:column;}
+.cd-wrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  justify-content:center;padding:4px 18px 26px;}
 .cd-stage{position:relative;width:70%;max-width:252px;margin:0 auto;
   aspect-ratio:831/1256;perspective:900px;cursor:pointer;}
 .cd-deck,.cd-res{position:absolute;inset:0;}
