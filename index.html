@@ -116,7 +116,11 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .pill{position:relative;display:inline-block;border-radius:26px;padding:2px;overflow:hidden;
   isolation:isolate;transform:translateZ(0);
   box-shadow:0 0 10px rgba(233,201,131,.5),0 0 24px rgba(233,201,131,.24);}
-.pill .gsp{content:"";position:absolute;inset:-220%;z-index:0;pointer-events:none;
+/* квадрат в 1.8 ширины медальона: любой поворот накрывает его целиком,
+   какой бы длинной ни была надпись. Раньше был inset:-220% — на «Экстренных
+   медитациях» и «Волшебнице» высоты не хватало, и перелив уходил с боков. */
+.pill .gsp{content:"";position:absolute;top:50%;left:50%;width:180%;aspect-ratio:1;
+  margin:-90% 0 0 -90%;z-index:0;pointer-events:none;
   background:conic-gradient(#6f4f18,#E7C983,#FFF6D8,#E7C983,#B98F3C,#F3E1AC,#FFF6D8,#C9A24B,#6f4f18);
   animation:gspin 6s linear infinite;}
 .pin{position:relative;z-index:1;display:block;border-radius:24px;background:rgba(18,11,7,.9);
