@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Иммерсия · проверка карт дня</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;margin:0;overflow:hidden;background:#160a22;overscroll-behavior:none}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#EFE5DA;
+    -webkit-font-smoothing:antialiased;
+    background:radial-gradient(120% 70% at 50% -12%, rgba(233,201,131,.13), transparent 62%),
+      radial-gradient(95% 58% at 50% 106%, rgba(140,70,150,.30), transparent 62%),
+      linear-gradient(180deg,#160a22,#241030);}
+  .scr{position:fixed;inset:0;overflow:hidden auto;overscroll-behavior:contain;display:flex;flex-direction:column}
+
+  @keyframes gspin{to{transform:rotate(360deg);}}
+  .topbar{display:flex;align-items:center;gap:10px;padding:16px 16px 6px;flex:0 0 auto}
+  .tb-title{font-family:'Baskerville','Hoefler Text',Georgia,serif;font-size:21px;color:#F3DCA0;letter-spacing:.02em}
+  .cd-date{margin-left:auto;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#A8917C;padding-right:4px}
+
+  .cd-wrap{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:4px 18px 8px}
+  .cd-inner{margin:auto 0;width:100%}
+  .cd-stage{position:relative;width:62%;max-width:228px;margin:0 auto;aspect-ratio:831/1256;perspective:900px;cursor:pointer}
+  @media(max-height:740px){.cd-stage{width:47%}}
+  .cd-deck,.cd-res{position:absolute;inset:0}
+  .cd-dc,.cd-res{border-radius:7.7% / 5.09%;overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.5)}
+  .cd-dc{position:absolute;inset:0}
+  .cd-dc img,.cd-res img{width:100%;height:100%;object-fit:cover;display:block}
+  .cd-res{opacity:0;transform:scale(.2)}
+  .cd-stage.done .cd-res{opacity:1;transform:none;transition:opacity .45s,transform .6s cubic-bezier(.2,1.1,.35,1)}
+  .cd-stage.done .cd-deck{opacity:0}
+  .cd-stage.run .cd-dc{animation:cdFade 1.9s ease-in forwards;animation-delay:calc(var(--i) * 20ms)}
+  @keyframes cdFade{0%{transform:scale(1);opacity:1;filter:none}
+    30%{transform:scale(1.03);opacity:.5;filter:brightness(1.5)}
+    45%{transform:scale(1.06);opacity:0}100%{opacity:0}}
+  .cd-sp{position:absolute;top:50%;left:50%;width:3px;height:3px;margin:-1.5px 0 0 -1.5px;
+    border-radius:50%;background:#F6E3B0;box-shadow:0 0 6px 1px rgba(243,225,172,.85);opacity:0}
+  .cd-stage.run .cd-sp{animation:cdSpark 1.35s cubic-bezier(.3,.1,.2,1) forwards;animation-delay:calc(var(--sd) + 380ms)}
+  @keyframes cdSpark{0%{transform:translate(var(--sx),var(--sy)) scale(.4);opacity:0}
+    25%{opacity:1}100%{transform:translate(0,0) scale(1.6);opacity:0}}
+  @media(prefers-reduced-motion:reduce){.cd-stage.run .cd-dc,.cd-stage.run .cd-sp{animation:none}}
+  .cd-hint{text-align:center;font-size:11px;color:#A8917C;margin-top:14px;transition:opacity .3s}
+  .cd-hint.gone{opacity:0}
+  .cd-after{opacity:0;height:0;overflow:hidden;transform:translateY(10px);transition:opacity .5s,transform .5s}
+  .cd-after.on{opacity:1;height:auto;transform:none}
+  .cd-pillwrap{display:flex;justify-content:center;margin-top:16px}
+  .cd-title{font-family:'Baskerville','Hoefler Text',Georgia,serif;color:#EFE5DA;font-size:16px;
+    line-height:1.26;text-align:center;text-wrap:balance;margin:12px 0 0}
+  .cd-rule{width:32px;height:1px;margin:11px auto 0;background:linear-gradient(90deg,transparent,rgba(233,201,131,.6),transparent)}
+  .cd-text{font-size:12.5px;line-height:1.55;color:#A8917C;text-align:center;margin:10px auto 0;max-width:33ch}
+  .cd-el{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#7C7188;text-align:center;margin:10px auto 0}
+
+  .pill{position:relative;display:inline-block;border-radius:26px;padding:2px;overflow:hidden;
+    isolation:isolate;transform:translateZ(0);box-shadow:0 0 10px rgba(233,201,131,.5),0 0 24px rgba(233,201,131,.24)}
+  .pill .gsp{content:"";position:absolute;top:50%;left:50%;width:180%;aspect-ratio:1;margin:-90% 0 0 -90%;
+    z-index:0;pointer-events:none;
+    background:conic-gradient(#6f4f18,#E7C983,#FFF6D8,#E7C983,#B98F3C,#F3E1AC,#FFF6D8,#C9A24B,#6f4f18);
+    animation:gspin 6s linear infinite}
+  .pin{position:relative;z-index:1;display:block;border-radius:24px;background:rgba(18,11,7,.9);
+    padding:6px 18px;font-family:'Baskerville','Hoefler Text',Georgia,serif;font-size:19px;color:#EFE0CD;
+    letter-spacing:.02em;line-height:1.2}
+
+  .qa-nav{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:10px;
+    padding:0 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+  .qa-btn{font-family:inherit;font-size:13px;color:#EFE5DA;background:rgba(255,255,255,.06);
+    border:1px solid rgba(216,184,120,.22);border-radius:999px;padding:9px 16px;cursor:pointer}
+  .qa-btn:active{transform:scale(.96)}
+  .qa-jump{width:52px;text-align:center;font-family:inherit;font-size:13px;color:#EFE5DA;
+    background:rgba(255,255,255,.06);border:1px solid rgba(216,184,120,.22);border-radius:999px;padding:9px 4px}
+  .qa-note{flex:0 0 auto;text-align:center;font-size:10.5px;color:#7C7188;padding:0 16px 10px}
+</style>
+</head>
+<body>
+<div class="scr">
+  <div class="topbar"><span class="tb-title">Карта дня — проверка</span><span class="cd-date" id="counter">1 / 50</span></div>
+  <div class="cd-wrap"><div class="cd-inner">
+    <div class="cd-stage" id="cd-stage">
+      <div class="cd-deck" id="cd-deck"></div>
+      <div class="cd-res"><img id="cd-img" alt=""></div>
+    </div>
+    <div class="cd-hint" id="cd-hint">коснись, чтобы открыть карту</div>
+    <div class="cd-after" id="cd-after">
+      <div class="cd-pillwrap"><span class="pill"><span class="gsp"></span><span class="pin" id="cd-name"></span></span></div>
+      <div class="cd-title" id="cd-title"></div>
+      <div class="cd-rule"></div>
+      <p class="cd-text" id="cd-text"></p>
+      <p class="cd-el" id="cd-el"></p>
+    </div>
+  </div></div>
+  <div class="qa-nav">
+    <button class="qa-btn" id="prevBtn">‹ пред.</button>
+    <input class="qa-jump" id="jump" type="number" min="1" max="50" value="1">
+    <button class="qa-btn" id="jumpBtn">→</button>
+    <button class="qa-btn" id="nextBtn">след. ›</button>
+  </div>
+  <div class="qa-note">Тестовая страница вне приложения — проверка картинок и текстов колоды «Карта дня»</div>
+</div>
+
+<script>
+const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
+const DECK = [{"id": 1, "el": "root", "name": "Зерно", "img": "01-zerno.jpg", "title": "Всё растущее растёт в темноте.", "text": "Корень не отчитывается о сроках. То, что снаружи выглядит остановкой, изнутри чаще оказывается глубиной. Дать созреть — не то же самое, что ждать."}, {"id": 2, "el": "root", "name": "Корни", "img": "02-korni.jpg", "title": "Ты не первая, кто это несёт.", "text": "За тобой стоят те, кто донёс. Часть тяжести никогда не была твоей — её просто передали дальше. Разобрать, где чьё, и половина веса останется у прежних хозяев."}, {"id": 3, "el": "root", "name": "Камень", "img": "03-kamen.jpg", "title": "Опора не спрашивает, устала ли ты.", "text": "Есть вещи, которые держат, даже когда ты в них не веришь: земля под ногами, дыхание, утро. Опереться можно на то, что не требует твоих сил. Не всё нужно нести — на части можно стоять."}, {"id": 4, "el": "root", "name": "Порог", "img": "04-porog.jpg", "title": "Дом начинается там, где тебя не надо заслуживать.", "text": "Своё место узнаётся по дыханию: в нём оно становится глубже. Право быть не выдают — его занимают. Порог переступают изнутри."}, {"id": 5, "el": "root", "name": "Гнездо", "img": "05-gnezdo.jpg", "title": "Тепло делают из мелочей и терпения.", "text": "Гнездо не строят разом, его собирают по травинке. Заботясь о другом, легко забыть, что и тебя кто-то должен согреть. Просить — тоже часть строительства."}, {"id": 6, "el": "root", "name": "Пещера", "img": "06-peschera.jpg", "title": "Уходить внутрь — не то же самое, что убегать.", "text": "Зверь уходит в темноту залечить бок, а не прятаться навсегда. Тишина, темнота и никого — это не поражение, это лечение. Из пещеры выходят."}, {"id": 7, "el": "root", "name": "Соль", "img": "07-sol.jpg", "title": "Простое держит крепче чудесного.", "text": "Вода, сон, еда, ходьба, чистая рубашка. То, что называют мелочью, и есть основание, на котором стоит остальное. Великое подождёт своей очереди — сначала будни."}, {"id": 8, "el": "root", "name": "Мёд", "img": "08-med.jpg", "title": "Сладкое достаётся тем, кто способен его принять.", "text": "Достаток приходит не к самой измученной. Взять — отдельное умение, ему учатся, как всему остальному. Отказ от своей доли ещё никого не сделал добрее."}, {"id": 9, "el": "root", "name": "Кость", "img": "09-kost.jpg", "title": "У всего живого есть предел, и он не слабость.", "text": "Кость срастается прочнее — но не тогда, когда её продолжают гнуть. Услышать «больше не могу» раньше, чем это скажет тело. Остановка входит в выносливость, а не отменяет её."}, {"id": 10, "el": "root", "name": "Сад", "img": "10-sad.jpg", "title": "Цветёт то, к чему возвращались.", "text": "Ни один сад не вырос от порыва, только от постоянства. Оглянуться на выращенное бывает важнее, чем сажать новое. Плоды считает тот, кто не забывал поливать."}, {"id": 11, "el": "water", "name": "Ладони", "img": "11-ladoni.jpg", "title": "Полное не наполняют.", "text": "Искомое снаружи всё это время лежало под слоем чужих голосов. Источник не приходит и не уходит. Открытая ладонь удерживает больше, чем сжатая."}, {"id": 12, "el": "water", "name": "Слеза", "img": "12-sleza.jpg", "title": "Соль выходит наружу, чтобы не разъедать изнутри.", "text": "Слёзы — не признак слабости, а способ тела вернуть себе равновесие. Невыплаканное не исчезает, оно оседает в плечах и горле. Дать пролиться."}, {"id": 13, "el": "water", "name": "Река", "img": "13-reka.jpg", "title": "Река не держится за берега, которые прошла.", "text": "Отпустить не значит перестать любить. Значит перестать тащить. То, что твоё, течёт вместе с тобой; остальное остаётся позади само."}, {"id": 14, "el": "water", "name": "Омут", "img": "14-omut.jpg", "title": "Глубокое кажется тёмным только сверху.", "text": "То, чего ты в себе боишься, чаще оказывается не чудовищем, а болью, которую не рассмотрели. Опуститься глубже — единственный способ увидеть дно. Дно есть."}, {"id": 15, "el": "water", "name": "Роса", "img": "15-rosa.jpg", "title": "Малое появляется, когда никто не смотрит.", "text": "Роса не падает с неба, она проступает сама, в самый холодный час. Так же приходит нежность к себе: не по приказу, а в тишине. Мелкое не значит незначительное."}, {"id": 16, "el": "water", "name": "Отражение", "img": "16-otrazhenie.jpg", "title": "Вода не спорит с тем, кто в неё смотрит.", "text": "Мы видим не себя, а привычку смотреть. Чужой взгляд, выученный в детстве, легко принять за собственный. Посмотреть заново — уже другое лицо."}, {"id": 17, "el": "water", "name": "Волна", "img": "17-volna.jpg", "title": "Всё, что уходит, устроено так, чтобы вернуться.", "text": "Силы, желание и вера ходят кругами, а не по прямой. Отлив не отменяет моря. Спад — не конец, а форма движения."}, {"id": 18, "el": "water", "name": "Лёд", "img": "18-led.jpg", "title": "Замёрзшее не мёртвое.", "text": "Оцепенение приходит, когда чувствовать было опасно, и однажды оно спасло. Лёд не колют — его отогревают. Медленно возвращается всё, даже то, что казалось потерянным."}, {"id": 19, "el": "water", "name": "Родник", "img": "19-rodnik.jpg", "title": "Источник не убывает от того, что из него пьют.", "text": "Есть занятия, после которых сил больше, а не меньше. Их немного, и они редко бывают полезными. Помнить, где твой родник, важнее, чем экономить воду."}, {"id": 20, "el": "water", "name": "Море", "img": "20-more.jpg", "title": "Большое не требует, чтобы его понимали.", "text": "Иногда единственное верное — перестать быть отдельной. Раствориться в чём-то большем не значит исчезнуть. Море не убавляется от того, что в него впадают."}, {"id": 21, "el": "fire", "name": "Пламя", "img": "21-plamya.jpg", "title": "Огонь не спрашивает разрешения гореть.", "text": "Злость приходит туда, где перешли черту, и знает эту черту лучше разума. Не гасить и не выливать — греться. Приручённое не становится ручным, оно становится своим."}, {"id": 22, "el": "fire", "name": "Искра", "img": "22-iskra.jpg", "title": "Темнота — это место, где зажигают.", "text": "Всё живое начинается там, где ещё ничего не видно. Малому не нужно немедленно становиться большим. Достаточно того, что оно уже началось."}, {"id": 23, "el": "fire", "name": "Кузница", "img": "23-kuznitsa.jpg", "title": "Форму даёт удар, но держит её огонь.", "text": "Меняет не боль. Меняет то, что ты остаёшься мягкой достаточно долго. Твёрдое ломается, раскалённое принимает форму. Позволить себе побыть в жаре."}, {"id": 24, "el": "fire", "name": "Уголь", "img": "24-ugol.jpg", "title": "Тлеющее опаснее горящего.", "text": "Невысказанное не проходит, оно тлеет и выедает изнутри. Копившееся годами вспыхивает от мелочи и жжёт не того. Дать словам выход, пока они ещё слова."}, {"id": 25, "el": "fire", "name": "Свеча", "img": "25-svecha.jpg", "title": "Одного огня хватает, чтобы перестало быть темно.", "text": "Не нужно освещать всю комнату — достаточно видеть следующий шаг. Малый свет заметнее в самую тёмную ночь. Хватит и его."}, {"id": 26, "el": "fire", "name": "Пожар", "img": "26-pozhar.jpg", "title": "После огня земля становится плодородной.", "text": "Есть потери, которые ничем не оправдать, — и всё же на выжженном растёт первым. Не торопить эту весну и не отрицать пепел. Обе правды живут вместе."}, {"id": 27, "el": "fire", "name": "Жар", "img": "27-zhar.jpg", "title": "Тело знает, чего хочет, раньше, чем находит слова.", "text": "Желание не нужно заслуживать и объяснять. Оно просто есть, как голод и как сон. Слушать его не стыдно."}, {"id": 28, "el": "fire", "name": "Клинок", "img": "28-klinok.jpg", "title": "Граница — это форма любви, а не её отсутствие.", "text": "Ясное «нет» бережёт отношения лучше, чем терпеливое «да» сквозь зубы. Резать больно один раз, гнить — долго. Чёткость милосерднее размытости."}, {"id": 29, "el": "fire", "name": "Зола", "img": "29-zola.jpg", "title": "Остаётся то, что не горит.", "text": "После всего сгоревшего обнаруживается то, чем ты была на самом деле. Этого меньше, чем казалось, и оно прочнее, чем думалось. Из него и строят заново."}, {"id": 30, "el": "fire", "name": "Солнце", "img": "30-solntse.jpg", "title": "Свет не выбирает, кого согреть.", "text": "Радость не выдают за заслуги, её просто впускают. Быть счастливой не нужно заслуживать страданием. Сегодняшнее тепло уже твоё."}, {"id": 31, "el": "air", "name": "Дверь", "img": "31-dver.jpg", "title": "Названное отпускает. Безымянное остаётся висеть.", "text": "Пока у этого нет имени, оно распоряжается тобой. Сказанное вслух перестаёт быть больше тебя. Дверь открывается в ту сторону, в которую на неё давят изнутри."}, {"id": 32, "el": "air", "name": "Перо", "img": "32-pero.jpg", "title": "Лёгкость — не отсутствие тяжести. Это разрешение не нести.", "text": "Можно поставить. Можно не объяснять. Можно смеяться там, где положено страдать. Игра — тоже путь, и он короче."}, {"id": 33, "el": "air", "name": "Крыло", "img": "33-krylo.jpg", "title": "Летит не то, что сильнее, а то, что отпустило лишнее.", "text": "Свобода начинается с вычитания, а не с приобретения. Каждое лишнее «должна» весит больше, чем кажется. Оставить только то, что твоё."}, {"id": 34, "el": "air", "name": "Ветер", "img": "34-veter.jpg", "title": "Перемены приходят раньше, чем к ним готовы.", "text": "Ветер не спрашивает, собрана ли ты. Сопротивляться ему выходит дороже, чем повернуться. Не всё, что рушится, нужно было спасать."}, {"id": 35, "el": "air", "name": "Колокол", "img": "35-kolokol.jpg", "title": "Сказанное вслух меняет расстановку.", "text": "Молчание кажется безопасным, но за него платят годами. Голос дрожит только первые несколько слов. Быть услышанной начинается с того, чтобы произнести."}, {"id": 36, "el": "air", "name": "Пауза", "img": "36-pauza.jpg", "title": "Между вопросом и ответом есть место, и оно твоё.", "text": "Не всякий вопрос требует немедленного ответа, и не всякий упрёк — оправдания. Пауза не грубость. Это способ остаться собой в чужом темпе."}, {"id": 37, "el": "air", "name": "Клетка", "img": "37-kletka.jpg", "title": "Дверца открыта дольше, чем кажется.", "text": "Привычка держит крепче замка. Многое из того, что называют обстоятельствами, оказывается решением, принятым однажды и не пересмотренным. Проверить, заперто ли."}, {"id": 38, "el": "air", "name": "Мост", "img": "38-most.jpg", "title": "Мост стоит на обоих берегах.", "text": "Выбор редко бывает между хорошим и плохим, чаще — между двумя своими частями. Не отрекаться от той, которую не выбрала. Она пригодится на обратном пути."}, {"id": 39, "el": "air", "name": "Туман", "img": "39-tuman.jpg", "title": "Не видеть дальше шага — не то же самое, что заблудиться.", "text": "В тумане идут по земле под ногами, а не по горизонту. Ясность возвращается сама, когда перестаёшь всматриваться. Достаточно знать следующий шаг."}, {"id": 40, "el": "air", "name": "Небо", "img": "40-nebo.jpg", "title": "Издалека почти всё оказывается меньше.", "text": "То, что заслоняет весь свет, часто размером с ладонь — просто её держат близко к глазам. Отодвинуть. Масштаб — это тоже лекарство."}, {"id": 41, "el": "night", "name": "Сосуд", "img": "41-sosud.jpg", "title": "Тишина знает ответ раньше тебя.", "text": "То, что не решается словами, решается молчанием. Пустой сосуд — не бедность, а место. Ночь ничего не забирает: она возвращает то, что день не дал расслышать."}, {"id": 42, "el": "night", "name": "Луна", "img": "42-luna.jpg", "title": "Убывающее не сломано.", "text": "Женское время идёт кругами: полнота, спад, темнота, снова свет. Требовать от себя одинаковости — спорить с природой. У каждой фазы своя работа."}, {"id": 43, "el": "night", "name": "Тень", "img": "43-ten.jpg", "title": "То, что не признано, действует свободнее.", "text": "Отвергнутая часть не исчезает — она начинает распоряжаться исподтишка. Зависть, злость и желание берут силу из темноты. Признанное перестаёт управлять."}, {"id": 44, "el": "night", "name": "Мотылёк", "img": "44-motylek.jpg", "title": "Свет, к которому летят, и огонь, который жжёт, иногда одно и то же.", "text": "Тяга не доказывает, что это твоё. Различить, где живое тепло, а где жар, в котором сгорают, — работа взрослой. Смотреть, что остаётся наутро."}, {"id": 45, "el": "night", "name": "Ключ", "img": "45-klyuch.jpg", "title": "Ключ обычно оказывается в кармане.", "text": "Почти всё, что ищется вовне, однажды уже было известно. Ответ приходит не новым — он вспоминается. Поискать у себя."}, {"id": 46, "el": "night", "name": "Нить", "img": "46-nit.jpg", "title": "Тянется то, что не отрезали.", "text": "Связи держат в обе стороны: и питают, и не пускают. Не всякую нить нужно рвать, но каждую стоит увидеть. Знать, что тебя тянет, — уже свобода."}, {"id": 47, "el": "night", "name": "Песок", "img": "47-pesok.jpg", "title": "Время нельзя вернуть, но можно перестать его терять.", "text": "Сожаление о прошедшем расходует то, что ещё сыплется. Ни один час не возвращается — и все оставшиеся ещё здесь. Считать не потери, а остаток."}, {"id": 48, "el": "night", "name": "Сон", "img": "48-son.jpg", "title": "Ночью говорят те части, которым днём не дают слова.", "text": "Сон ничего не предсказывает, он показывает то, что уже известно, но не разрешено. Не толковать, а вспомнить чувство. Тело помнит его дольше сюжета."}, {"id": 49, "el": "night", "name": "Затмение", "img": "49-zatmenie.jpg", "title": "Свет не исчезает от того, что его закрыли.", "text": "Бывают дни, когда не видно ничего, и это не наказание и не знак. Темнота проходит по своим срокам, а не по заслугам. Переждать, не делая выводов о себе."}, {"id": 50, "el": "night", "name": "Звезда", "img": "50-zvezda.jpg", "title": "По дальнему свету идут, к нему не приходя.", "text": "Ориентир нужен не для того, чтобы его достичь, а чтобы не сбиться. Вера — не уверенность, а согласие идти без гарантий. Смотреть выше собственных ног."}];
+const ELS = {"root": {"name": "Корень", "colors": ["#7E8C5A", "#8A6A3E", "#D8B26A"]}, "water": {"name": "Вода", "colors": ["#3E8A93", "#2E4A78", "#D8B26A"]}, "fire": {"name": "Огонь", "colors": ["#B44A2A", "#C77A3C", "#D8B26A"]}, "air": {"name": "Воздух", "colors": ["#8E86C4", "#9FC0DA", "#D8B26A"]}, "night": {"name": "Ночь", "colors": ["#2B3350", "#6E7789", "#D8B26A"]}};
+let idx = 0;      // индекс в массиве DECK (0..49)
+let running = false;
+
+const stage=document.getElementById("cd-stage"), deck=document.getElementById("cd-deck"),
+  hint=document.getElementById("cd-hint"), after=document.getElementById("cd-after"),
+  counter=document.getElementById("counter"), jump=document.getElementById("jump");
+
+function buildDeck(){
+  deck.innerHTML = "";
+  let h = "";
+  for(let i=0;i<6;i++) h += '<div class="cd-dc" style="--i:'+i+'"><img src="'+CARD_BASE+'back.jpg" alt=""></div>';
+  for(let i=0;i<34;i++){
+    const a = Math.random()*6.283, r = 60+Math.random()*105;
+    h += '<i class="cd-sp" style="--sx:'+(Math.cos(a)*r).toFixed(0)+'px;--sy:'+
+      (Math.sin(a)*r*1.35).toFixed(0)+'px;--sd:'+Math.floor(Math.random()*260)+'ms"></i>';
+  }
+  deck.innerHTML = h;
+}
+
+function fillCard(c){
+  document.getElementById("cd-img").src = CARD_BASE + c.img;
+  document.getElementById("cd-name").textContent = c.name;
+  document.getElementById("cd-title").textContent = c.title;
+  document.getElementById("cd-text").textContent = c.text;
+  document.getElementById("cd-el").textContent = (ELS[c.el] && ELS[c.el].name || c.el) + " · карта " + (idx+1) + " из " + DECK.length + " · id " + c.id;
+  counter.textContent = (idx+1) + " / " + DECK.length;
+  jump.value = idx+1;
+}
+
+function reveal(){
+  if(running) return;
+  running = true;
+  buildDeck();
+  stage.classList.remove("done");
+  after.classList.remove("on");
+  hint.classList.add("gone");
+  fillCard(DECK[idx]);
+  requestAnimationFrame(()=>{
+    stage.classList.add("run");
+    setTimeout(()=>{
+      stage.classList.remove("run");
+      stage.classList.add("done");
+      after.classList.add("on");
+      running = false;
+    }, 2100);
+  });
+}
+
+function goTo(newIdx){
+  idx = ((newIdx % DECK.length) + DECK.length) % DECK.length;
+  reveal();
+}
+
+stage.addEventListener("click", ()=>{
+  if(!stage.classList.contains("done") && !running){ reveal(); return; }
+  if(stage.classList.contains("done")) goTo(idx+1);
+});
+document.getElementById("nextBtn").addEventListener("click", ()=>goTo(idx+1));
+document.getElementById("prevBtn").addEventListener("click", ()=>goTo(idx-1));
+document.getElementById("jumpBtn").addEventListener("click", ()=>{
+  const n = parseInt(jump.value,10);
+  if(n>=1 && n<=DECK.length) goTo(n-1);
+});
+
+// первая карта показана сразу открытой, дальше — по клику/кнопкам
+buildDeck();
+fillCard(DECK[idx]);
+stage.classList.add("done");
+after.classList.add("on");
+hint.classList.add("gone");
+new Image().src = CARD_BASE+"back.jpg";
+</script>
+</body>
+</html>
