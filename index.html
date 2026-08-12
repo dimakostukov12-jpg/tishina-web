@@ -414,8 +414,8 @@ body.ob-open .tabbar{display:none;}
     <div class="st-strip" id="st-strip"></div>
     <div class="st-lb">Разделы</div>
     <div class="st-tiles">
-      <div class="st-tile" id="tile-diary"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a2 2 0 0 1 2 2v13"/><path d="M5 4v16h11"/><path d="M8 8h6M8 11h6"/><path d="M19.5 13.5l2 2-4.5 4.5H15v-2z"/></svg></span>
-        <span class="st-tn">Мой дневник</span><span class="st-tv" id="tv-diary"></span></div>
+      <div class="st-tile" id="tile-talk"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.3c0 3.8-3.8 6.9-8.5 6.9-1 0-2-.14-2.9-.4L4 19.6l1.35-3.3C4.2 15 3.5 13.2 3.5 11.3c0-3.8 3.8-6.9 8.5-6.9s8.5 3.1 8.5 6.9z"/><path d="M12 8.1l.85 2.05 2.05.85-2.05.85L12 13.9l-.85-2.05-2.05-.85 2.05-.85z"/></svg></span>
+        <span class="st-tn">Поговорить</span><span class="st-tv">психолог Дима рядом</span></div>
       <div class="st-tile" id="tile-fav"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.2C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></span>
         <span class="st-tn">Избранное</span><span class="st-tv" id="tv-fav"></span></div>
       <div class="st-tile" id="tile-sub"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.1 5.5.5-4.2 3.7 1.3 5.4L12 14.8 7.2 17.7l1.3-5.4-4.2-3.7 5.5-.5z"/></svg></span>
@@ -424,6 +424,14 @@ body.ob-open .tabbar{display:none;}
         <span class="st-tn">Поддержка</span><span class="st-tv">написать Дмитрию</span></div>
     </div>
   </div>
+</section>
+
+<section class="screen" id="s-talk">
+  <div class="safetop"></div>
+  <div class="topbar"><span class="tb-title" style="padding-left:6px">Поговорить</span></div>
+  <div class="sec-sub">Психолог Дима рядом — можно написать в любой момент</div>
+  <div class="soon"><div class="big">Скоро</div>Здесь можно будет рассказать, что происходит,
+    и получить ответ — как в переписке. Настраиваем.</div>
 </section>
 
 <section class="screen" id="s-detail">
@@ -575,9 +583,9 @@ function toggleFav(id){ let a=favs(); const i=a.indexOf(id); if(i>=0)a.splice(i,
 let stack=[]; let curTab="home";
 const TAB_SCREEN={home:"s-home",fav:"s-fav",profile:"s-profile"};
 function showScreen(id){
-  ["s-home","s-section","s-fav","s-profile","s-detail"].forEach(s=>$(s).classList.toggle("active",s===id));
+  ["s-home","s-section","s-fav","s-profile","s-detail","s-talk"].forEach(s=>$(s).classList.toggle("active",s===id));
   $("s-player").classList.toggle("active", id==="s-player");
-  const deep = (id==="s-player"||id==="s-section"||id==="s-detail");
+  const deep = (id==="s-player"||id==="s-section"||id==="s-detail"||id==="s-talk");
   $("tabbar").classList.toggle("hide", id==="s-player"||id==="s-detail");
   if(id==="s-player"){ PFX.start(); } else { PFX.stop(); }
   if(id==="s-detail" && curId){ $("d-heart").classList.toggle("on",isFav(curId)); }
@@ -974,8 +982,6 @@ function renderStage(){
   $("st-mins").textContent=listenedMin();
   $("st-tasks").textContent=tasksDone();
   $("tv-fav").textContent=favs().length+" "+plural(favs().length,"медитация","медитации","медитаций");
-  const notes=ALL_SECS.reduce((k,s)=>k+s.items.filter(it=>loadNote(it.id)).length,0);
-  $("tv-diary").textContent=notes+" "+plural(notes,"запись","записи","записей");
   const inStage=days%DAYS_PER_STAGE, last=idx>=STAGES.length;
   $("st-fill").style.width=(last?100:Math.round(inStage/DAYS_PER_STAGE*100))+"%";
   const left=DAYS_PER_STAGE-inStage;
@@ -986,7 +992,7 @@ function renderStage(){
     '" style="background-image:url('+s.th+')"></div>').join("");
 }
 press($("tile-fav"), ()=>setTab("fav"));
-press($("tile-diary"), ()=>setTab("fav"));
+press($("tile-talk"), ()=>go("s-talk",true));
 press($("tile-sub"), ()=>{});
 press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
 
