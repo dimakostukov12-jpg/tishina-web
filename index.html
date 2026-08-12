@@ -111,7 +111,9 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .dy-when{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A6857;flex:none;}
 .dy-text{font-size:13.5px;color:#D8C6B6;line-height:1.55;margin-top:7px;white-space:pre-line;}
 /* --- «Поговорить»: переписка --- */
-#s-talk{display:none;padding-bottom:calc(60px + env(safe-area-inset-bottom));overflow:hidden;}
+/* 76px — высота таббара плюс воздух: при 60px нижняя граница поля ввода
+   ложилась ровно на его верхнюю грань, и рамки сливались в одну линию */
+#s-talk{display:none;padding-bottom:calc(76px + env(safe-area-inset-bottom));overflow:hidden;}
 #s-talk.active{display:flex;flex-direction:column;}
 .tk-chat{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px;
@@ -130,7 +132,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
   background:rgba(255,246,232,.05);border:1px solid rgba(233,214,194,.14);cursor:pointer;
   transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s;}
 .tk-chip:active{transform:scale(.95);background:rgba(255,246,232,.1);}
-.tk-bar{display:flex;gap:8px;align-items:flex-end;margin:8px 14px 4px;
+.tk-bar{display:flex;gap:8px;align-items:flex-end;margin:8px 14px 8px;
   background:rgba(25,18,13,.6);border:1px solid rgba(233,201,131,.34);border-radius:22px;
   padding:7px 7px 7px 16px;}
 .tk-input{flex:1;background:transparent;border:0;outline:none;color:#F3ECE2;font-family:inherit;
