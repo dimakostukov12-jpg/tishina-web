@@ -96,6 +96,32 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .st-th.on{opacity:1;filter:none;                     /* обводка внутрь: снаружи она ложилась на полпикселя и «сползала» */
   box-shadow:inset 0 0 0 2px #F3E1AC, 0 0 12px rgba(243,225,172,.42);}
 .st-th.past{opacity:.7;filter:grayscale(.2);}
+/* --- «Поговорить»: переписка --- */
+#s-talk{display:none;padding-bottom:0;overflow:hidden;}
+#s-talk.active{display:flex;flex-direction:column;}
+.tk-chat{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px;
+  padding:8px 16px 4px;}
+.tk-bub{max-width:84%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.45;
+  white-space:pre-line;animation:obIn .32s ease;}
+.tk-bub.bot{align-self:flex-start;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.10);color:#EAE7E4;border-bottom-left-radius:5px;}
+.tk-bub.me{align-self:flex-end;color:#F7ECC6;border-bottom-right-radius:5px;
+  background:linear-gradient(180deg,rgba(233,201,131,.22),rgba(233,201,131,.12));
+  border:1px solid rgba(233,201,131,.34);}
+.tk-typing{align-self:flex-start;color:#9B958F;font-size:14px;padding:6px 12px;letter-spacing:.12em;}
+.tk-chips{display:flex;gap:7px;overflow-x:auto;padding:2px 16px 0;}
+.tk-chips::-webkit-scrollbar{height:0;}
+.tk-chip{flex:0 0 auto;font-size:12.5px;color:#D8C6B6;padding:7px 13px;border-radius:999px;
+  background:rgba(255,246,232,.05);border:1px solid rgba(233,214,194,.14);cursor:pointer;
+  transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s;}
+.tk-chip:active{transform:scale(.95);background:rgba(255,246,232,.1);}
+.tk-bar{display:flex;gap:8px;align-items:flex-end;margin:8px 14px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(25,18,13,.6);border:1px solid rgba(233,201,131,.34);border-radius:22px;
+  padding:7px 7px 7px 16px;}
+.tk-input{flex:1;background:transparent;border:0;outline:none;color:#F3ECE2;font-family:inherit;
+  font-size:15px;line-height:1.4;resize:none;max-height:120px;padding:6px 0;}
+.tk-input::placeholder{color:#9B958F;}
 .st-tiles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px;}
 .st-tile{position:relative;border-radius:17px;padding:15px 15px 16px;cursor:pointer;
   overflow:hidden;isolation:isolate;transform:translateZ(0);
@@ -447,9 +473,12 @@ body.ob-open .tabbar{display:none;}
 <section class="screen" id="s-talk">
   <div class="safetop"></div>
   <div class="topbar"><span class="back" data-back>‹</span><span class="tb-title">Поговорить</span></div>
-  <div class="sec-sub">AI-психолог рядом 24/7 — можно написать в любой момент</div>
-  <div class="soon"><div class="big">Скоро</div>Здесь можно будет рассказать, что происходит,
-    и получить ответ — как в переписке. Настраиваем.</div>
+  <div class="tk-chat" id="tk-chat"></div>
+  <div class="tk-chips" id="tk-chips"></div>
+  <div class="tk-bar">
+    <textarea class="tk-input" id="tk-input" rows="1" placeholder="Расскажи, что происходит…"></textarea>
+    <button class="ob-send" id="tk-send" aria-label="Отправить"></button>
+  </div>
 </section>
 
 <section class="screen" id="s-detail">
@@ -603,7 +632,7 @@ function showScreen(id){
   ["s-home","s-section","s-fav","s-profile","s-detail","s-talk"].forEach(s=>$(s).classList.toggle("active",s===id));
   $("s-player").classList.toggle("active", id==="s-player");
   const deep = (id==="s-player"||id==="s-section"||id==="s-detail"||id==="s-talk"||(id==="s-fav"&&curTab!=="fav"));
-  $("tabbar").classList.toggle("hide", id==="s-player"||id==="s-detail");
+  $("tabbar").classList.toggle("hide", id==="s-player"||id==="s-detail"||id==="s-talk");
   if(id==="s-player"){ PFX.start(); } else { PFX.stop(); }
   if(id==="s-detail" && curId){ $("d-heart").classList.toggle("on",isFav(curId)); }
   $("d-iri").style.display = (id==="s-detail") ? "block" : "none";
@@ -925,6 +954,76 @@ function plural(n,a,b,c){const m=n%100,d=n%10;if(m>=11&&m<=14)return c;if(d===1)
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{haptic();back();});
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{haptic();setTab(t.dataset.tab);});
 
+/* ---------- «Поговорить»: переписка с ИИ-психологом ----------
+   TALK_URL — единственное место, куда подключается модель. Пусто = ещё не подключено.
+   Ключ Claude живёт на сервере, в приложение он попасть не может: файл открыт всем. */
+const TALK_URL = "";
+const TALKKEY = "tishina_talk";
+const TK_HELLO = "Привет 🌙 Я рядом. Расскажи, что сейчас происходит — что тревожит, "
+  + "что не отпускает, чему радуешься. Можно как есть, без красивых слов.";
+const TK_CHIPS = ["Тревожно", "Не могу уснуть", "Поссорились", "Пусто внутри", "Выгорела"];
+
+function tkLoad(){ try{ return JSON.parse(localStorage.getItem(TALKKEY)||"[]"); }catch(e){ return []; } }
+function tkSave(h){ try{ localStorage.setItem(TALKKEY, JSON.stringify(h.slice(-40))); }catch(e){} }
+function tkScroll(){ const c=$("tk-chat"); c.scrollTop=c.scrollHeight; }
+function tkBubble(role, text){
+  const d=document.createElement("div");
+  d.className="tk-bub "+(role==="user"?"me":"bot");
+  d.textContent=text; $("tk-chat").appendChild(d); tkScroll(); return d;
+}
+function tkRender(){
+  const c=$("tk-chat"); c.innerHTML=""; const h=tkLoad();
+  if(!h.length) tkBubble("bot", TK_HELLO);
+  else h.forEach(m=>tkBubble(m.role, m.text));
+  $("tk-chips").style.display = h.length ? "none" : "flex";
+}
+function tkChips(){
+  $("tk-chips").innerHTML="";
+  TK_CHIPS.forEach(t=>{
+    const b=document.createElement("div"); b.className="tk-chip"; b.textContent=t;
+    press(b, ()=>{ $("tk-input").value=t; tkSend(); });
+    $("tk-chips").appendChild(b);
+  });
+}
+let tkBusy=false;
+async function tkAsk(history){
+  /* Сюда встанет модель. Сервер сам подставит системный промпт и ключ. */
+  if(!TALK_URL) return null;
+  const r=await fetch(TALK_URL,{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ initData: (tg && tg.initData) || "", messages: history })
+  });
+  if(!r.ok) throw new Error("bad status "+r.status);
+  return (await r.json()).reply;
+}
+async function tkSend(){
+  if(tkBusy) return;
+  const el=$("tk-input"), text=el.value.trim(); if(!text) return;
+  el.value=""; el.style.height="auto";
+  $("tk-chips").style.display="none";
+  const h=tkLoad(); h.push({role:"user", text}); tkSave(h);
+  tkBubble("user", text); haptic("light");
+  tkBusy=true;
+  const ty=document.createElement("div"); ty.className="tk-typing"; ty.textContent="печатает…";
+  $("tk-chat").appendChild(ty); tkScroll();
+  let reply=null;
+  try{ reply=await tkAsk(h); }catch(e){ reply="Связь пропала. Попробуй ещё раз через минуту."; }
+  ty.remove();
+  if(reply===null){
+    reply="Я тебя слышу — и очень скоро смогу ответить по-настоящему. "
+      + "Сейчас меня как раз настраивают.\n\nПока могу побыть рядом молча: "
+      + "выбери практику в разделе «Экстренные» — там есть на любое состояние.";
+  }
+  const h2=tkLoad(); h2.push({role:"assistant", text:reply}); tkSave(h2);
+  tkBubble("assistant", reply); haptic("light"); tkBusy=false;
+}
+$("tk-send").onclick=tkSend;
+$("tk-input").addEventListener("keydown",e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); tkSend(); } });
+$("tk-input").addEventListener("input",function(){
+  this.style.height="auto"; this.style.height=Math.min(120,this.scrollHeight)+"px"; });
+tkChips();
+
 /* ---------- онбординг: тёплый диалог (имя · город · запрос) ---------- */
 const PROFKEY="tishina_profile";
 const OB_STEPS=[
@@ -1016,7 +1115,7 @@ function renderStage(){
     '" style="background-image:url('+s.th+')"></div>').join("");
 }
 press($("tile-fav"), ()=>{ renderFav(); go("s-fav",true); });
-press($("tile-talk"), ()=>go("s-talk",true));
+press($("tile-talk"), ()=>{ tkRender(); go("s-talk",true); setTimeout(tkScroll,60); });
 press($("tile-sub"), ()=>{});
 press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
 
