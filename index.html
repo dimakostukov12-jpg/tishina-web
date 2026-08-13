@@ -1105,7 +1105,17 @@ async function subFetch(force){
     if(!initData) return;                       // вне телеграма спрашивать нечего
     const r=await fetch(CLUB_URL,{ method:"POST",
       headers:{"Content-Type":"application/json"}, body:JSON.stringify({initData}) });
-    const d=await r.json();
+    let d=await r.json();
+    /* Подписка действует весь последний день целиком: с end_date 3 сентября
+       она жива до полуночи на 4-е. Если клуб перестал её отдавать раньше
+       (например, в 09:02 того же дня, по времени внутри end_date), держим
+       доступ до конца той даты сами — иначе женщина увидит «закончилась»
+       на сутки раньше срока. Дата сравнивается по UTC, как в клубе. */
+    const prev=c && c.v, today=new Date().toISOString().slice(0,10);
+    if(d && d.state==="none" && prev && prev.state==="active"
+       && prev.until && prev.until>=today){
+      d={ state:"active", inClub:true, until:prev.until, plan:prev.plan, autoRenew:false };
+    }
     if(d && d.state){
       try{ localStorage.setItem(SUBKEY, JSON.stringify({t:Date.now(), v:d})); }catch(e){}
       subPaint();
