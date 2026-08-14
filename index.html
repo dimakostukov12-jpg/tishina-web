@@ -603,7 +603,7 @@ body.ob-open .tabbar{display:none;}
 .cal-cap{text-align:center;margin-top:13px;font-size:12.5px;color:#E6C079;letter-spacing:.02em;}
 </style></head>
 <body>
-<div class="bg"></div><div class="sec-bg" id="sec-bg"></div><div class="d-iri" id="d-iri" style="display:none"></div><div class="grain"></div>
+<div class="bg"></div><div class="appfx" id="appfx"></div><div class="sec-bg" id="sec-bg"></div><div class="d-iri" id="d-iri" style="display:none"></div><div class="grain"></div>
 
 <section class="screen active" id="s-home">
   <div class="safetop"></div>
@@ -881,13 +881,16 @@ function toggleFav(id){ let a=favs(); const i=a.indexOf(id); if(i>=0)a.splice(i,
 let stack=[]; let curTab="home";
 const TAB_SCREEN={home:"s-home",vd:"s-vd",talk:"s-talk",fav:"s-fav",profile:"s-profile"};
 function showScreen(id){
-  ["s-home","s-section","s-fav","s-profile","s-detail","s-talk","s-diary","s-card"].forEach(s=>$(s).classList.toggle("active",s===id));
+  /* по всем .screen сразу: раньше здесь был список руками, и новый экран
+     (дневник) в него не попал — вкладка открывалась пустым фоном */
+  document.querySelectorAll(".screen").forEach(el=>el.classList.toggle("active", el.id===id));
   $("s-player").classList.toggle("active", id==="s-player");
   const deep = (id==="s-player"||id==="s-section"||id==="s-detail"||id==="s-diary"||id==="s-card"||(id==="s-fav"&&curTab!=="fav"));
   $("tabbar").classList.toggle("hide", id==="s-player"||id==="s-detail");
   if(id==="s-player"){ PFX.start(); } else { PFX.stop(); }
   if(id==="s-detail" && curId){ $("d-heart").classList.toggle("on",isFav(curId)); }
   $("d-iri").style.display = (id==="s-detail") ? "block" : "none";
+  $("appfx").style.display = (id==="s-detail") ? "none" : "block";
   $("sec-bg").style.display = (id==="s-section") ? "block" : "none";
   try{ $(id).scrollTop=0; }catch(e){}
   window.scrollTo(0,0);
