@@ -72,11 +72,9 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 /* низ аватарки растворяется в фоне, а имя заходит в это растворение —
    иначе картинка кончается ровной линией и читается как отдельная деталь */
 .st-art{position:relative;width:100%;aspect-ratio:900/855;background:#140C08 center top/cover no-repeat;
-  -webkit-mask-image:linear-gradient(180deg,#000 0 54%,rgba(0,0,0,.55) 80%,transparent 100%);
-  mask-image:linear-gradient(180deg,#000 0 54%,rgba(0,0,0,.55) 80%,transparent 100%);}
-/* отступ в процентах, а не в пикселях: он считается от ширины экрана,
-   поэтому имя садится в одну и ту же точку растворения на любом телефоне */
-.st-body{padding:0 18px;margin-top:-20%;position:relative;z-index:2;}
+  -webkit-mask-image:linear-gradient(180deg,#000 0 79%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0 79%,transparent 100%);}
+.st-body{padding:0 18px;margin-top:-10px;position:relative;z-index:2;}
 /* по центру, а не по базовой линии: у капсулы свои поля, и на общей базовой линии
    она зрительно всплывала над именем */
 .st-hd{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-top:5px;}
@@ -1475,9 +1473,25 @@ function fitHead(){
   let n=34; while(wide() && n>23){ n-=1;  nm.style.fontSize=n+"px"; }
 }
 addEventListener("resize",()=>{ try{ fitHead(); }catch(e){} });
+/* тестовый просмотр ступеней: долгое нажатие на картинку включает и выключает,
+   внутри — тычок в полоску «Все ступени» показывает любую. Женщинам не мешает:
+   без долгого нажатия полоска остаётся картинкой */
+let stageTest=0;
+function stageTestWire(){
+  const art=$("st-art"); let t=null;
+  const off=()=>{ clearTimeout(t); t=null; };
+  art.addEventListener("pointerdown",()=>{ off(); t=setTimeout(()=>{
+    stageTest = stageTest ? 0 : 1; haptic("heavy"); renderStage(); },700); });
+  ["pointerup","pointercancel","pointerleave"].forEach(e=>art.addEventListener(e,off));
+  $("st-strip").addEventListener("click",e=>{
+    if(!stageTest) return;
+    const th=e.target.closest(".st-th"); if(!th) return;
+    stageTest=[...$("st-strip").children].indexOf(th)+1; haptic("light"); renderStage();
+  });
+}
 function renderStage(){
   const days=practiceDays().length;
-  const idx=Math.min(STAGES.length, Math.floor(days/DAYS_PER_STAGE)+1);
+  const idx=stageTest || Math.min(STAGES.length, Math.floor(days/DAYS_PER_STAGE)+1);
   const st=STAGES[idx-1];
   const src="stage-"+idx+".jpg?v=3";   /* v=3 — новые персонажи в 4к: без метки телефон достаёт старую картинку из кэша */
   if($("st-art").dataset.src!==src){ $("st-art").dataset.src=src;
@@ -1494,7 +1508,8 @@ function renderStage(){
   const inStage=days%DAYS_PER_STAGE, last=idx>=STAGES.length;
   $("st-fill").style.width=(last?100:Math.round(inStage/DAYS_PER_STAGE*100))+"%";
   const left=DAYS_PER_STAGE-inStage;
-  $("st-upto").textContent = last ? "Путь пройден"
+  $("st-upto").textContent = stageTest ? "Тест: тыкай в ступени ниже · долгое нажатие на картинку — выйти"
+    : last ? "Путь пройден"
     : left+" "+plural(left,"день","дня","дней")+" до ступени «"+STAGES[idx].name+"»";
   fitHead();
   $("st-strip").innerHTML = STAGES.map(s=>
@@ -1588,7 +1603,7 @@ press($("tile-sub"), ()=>{
 });
 press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
 
-renderHome(); renderProfile(); renderStage(); renderCardTile(); setTab("home");
+renderHome(); renderProfile(); renderStage(); renderCardTile(); stageTestWire(); setTab("home");
 
 /* ---------- заставка при запуске ---------- */
 function afterSplash(){
