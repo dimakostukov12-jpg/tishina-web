@@ -23,7 +23,7 @@ body,input,textarea,button{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 :root{--lit:radial-gradient(120% 100% at 50% 0,rgba(233,201,131,.13),rgba(20,13,8,.5));
   --litline:rgba(233,201,131,.27);}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#140C08;overscroll-behavior:none;}
-body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden;background:#140C08;
+body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не все андроиды — vh как запасной */font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden;background:#140C08;
   /* сделано ровно тем же приёмом, что фон конкретной медитации: многослойная
      заливка на самом элементе. Ни отдельного слоя, ни осветления, ни фильтров —
      поэтому рисуется везде. Цвета взяты из макета голосового дневника */
@@ -105,10 +105,13 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 /* имя и ступень в одной оправе по центру: имя рядом с рамкой свисало лапками «Д»
    в пустоту, внутри рамки под ними поле — и строка читается ровной.
    Georgia вместо Baskerville: у неё выносные короче, буква сидит спокойнее */
-.st-hd{display:flex;justify-content:center;margin-top:7px;}
-.st-hd .pin{display:flex;align-items:center;gap:9px;padding:6px 17px;white-space:nowrap;}
+.st-hd{display:flex;justify-content:center;margin-top:7px;min-width:0;}
+/* max-width — страховка для узких телефонов: длинное имя ужимается шрифтом,
+   но если и это не помогло, рамка не вылезает за экран, а имя обрывается */
+.st-hd .pin{display:flex;align-items:center;gap:9px;padding:6px 17px;white-space:nowrap;
+  max-width:100%;min-width:0;}
 .st-name{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:17px;
-  line-height:1.35;color:#F4E7D6;}
+  line-height:1.35;color:#F4E7D6;min-width:0;overflow:hidden;text-overflow:ellipsis;}
 .st-rh{color:#E9C983;font-size:9px;line-height:1;}
 .st-stg{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:14px;
   line-height:1.35;color:#F3DCA0;}
@@ -220,9 +223,15 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .vd-ehd span{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#7A6857;}
 .vd-ebox{border-radius:18px;border:1px solid rgba(233,201,131,.34);background:rgba(25,18,13,.72);
   padding:10px 11px;box-shadow:0 0 14px rgba(233,201,131,.12);}
+/* Потолок поля считаем от того, что реально видно: высота экрана минус
+   клавиатура. На маленьком телефоне (iPhone SE, 320×568) клавиатура съедает
+   половину, и поле в 34vh вылезало за край вместе с кнопками. */
 .vd-ta{display:block;width:100%;border:0;background:transparent;outline:none;resize:none;
   color:#EFE3D4;font:inherit;font-size:13.5px;line-height:1.6;padding:2px 3px;
-  min-height:76px;max-height:34vh;overflow-y:auto;-webkit-appearance:none;}
+  min-height:52px;overflow-y:auto;-webkit-appearance:none;
+  max-height:34vh;
+  max-height:min(34vh, calc(100vh - var(--kb,0px) - 215px));
+  max-height:min(34dvh, calc(100dvh - var(--kb,0px) - 215px));}
 .vd-erow{display:flex;gap:8px;margin-top:9px;}
 .vd-ebtn{flex:1;text-align:center;border-radius:11px;padding:9px;font-size:13px;cursor:pointer;
   font-family:'Baskerville','Forum',Georgia,serif;}
@@ -488,6 +497,35 @@ body.ob-open .tabbar{display:none;}
 .tab.on{color:#F3DCA0;}
 .tab.on svg{filter:drop-shadow(0 0 6px rgba(243,220,160,.5));}
 .hide{display:none!important;}
+
+/* ---------- под разные телефоны ----------
+   Классы ios/android/narrow/short вешает скрипт при запуске: он спрашивает
+   Телеграм, что за устройство, и только потом браузер. */
+
+/* Айфон зумит всю страницу, когда трогаешь поле с кеглем меньше 16px, и выйти
+   из этого зума она уже не может. Поэтому на iOS поля ровно 16px. */
+html.ios .vd-ta,html.ios .tk-input,html.ios .ob-input,html.ios input,html.ios textarea{font-size:16px;}
+
+/* Узкие экраны (320–359: iPhone SE, старые андроиды) — режем поля, а не текст */
+html.narrow .vd-body{padding-left:12px;padding-right:12px;}
+html.narrow .grid{padding-left:12px;padding-right:12px;gap:9px;}
+html.narrow .st-body{padding-left:12px;padding-right:12px;}
+html.narrow .tab{font-size:9.5px;}
+html.narrow .tab svg{width:21px;height:21px;}
+html.narrow .vd-h{font-size:22px;}
+html.narrow .vd-dy b{font-size:12px;}
+
+/* Низкие экраны (568–667): подбираем воздух, чтобы помещалось без прокрутки */
+html.short .vd-hi{margin-top:8px;padding:10px 12px;}
+html.short .vd-wk,html.short .vd-rec{margin-top:8px;}
+html.short .vd-mic{width:46px;height:46px;}
+html.short .st-stats{margin-top:11px;}
+
+/* Старый андроид без backdrop-filter: панель делаем плотной, иначе сквозь неё
+   просвечивает лента и текст становится нечитаемым */
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .tabbar{background:rgba(30,19,11,.97);}
+}
 
 /* player screen */
 #s-player{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;color:#F6EEDD;background:linear-gradient(158deg,#452E1B,#140C08);}
@@ -887,7 +925,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "14.08 22:42";
+const BUILD = "14.08 23:10";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -945,6 +983,38 @@ const $ = s => document.getElementById(s);
 })();
 const byId = {}; ALL_SECS.forEach(s=>s.items.forEach(it=>byId[it.id]={...it, secTitle:s.title}));
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+/* ---------- что за телефон ----------
+   Ширину экрана css видит и сам, а вот систему — нет, и от неё зависят вещи,
+   которые из ширины не выводятся: айфон зумит страницу, когда трогаешь поле
+   мельче 16px; safe-area есть только у айфонов; андроид иначе ведёт себя с
+   клавиатурой. Спрашиваем сначала Телеграм (он знает точно), потом браузер. */
+const DEV = (function(){
+  const ua  = navigator.userAgent || "";
+  const tgp = String((tg && tg.platform) || "").toLowerCase();
+  /* основа — юзер-агент, он есть всегда; Телеграм только уточняет. Наоборот
+     нельзя: вне клиента platform приходит как «unknown» и стирает правду. */
+  let ios = /iPhone|iPad|iPod/.test(ua) ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let android = /Android/.test(ua);
+  if(tgp === "ios"){ ios = true; android = false; }
+  else if(tgp === "android"){ android = true; ios = false; }
+  const R = document.documentElement;
+  R.classList.add(ios ? "ios" : android ? "android" : "web");
+  if(tgp) R.classList.add("tg-" + tgp.replace(/[^a-z]/g, ""));
+  const d = {ios, android, platform: tgp || (ios ? "ios" : android ? "android" : "web"),
+             w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio || 1,
+             ver: (tg && tg.version) || ""};
+  d.label = (ios ? "iPhone" : android ? "Android" : "браузер") + " · " + d.w + "×" + d.h;
+  /* короткий экран — там, где после клавиатуры остаётся совсем мало места */
+  R.classList.toggle("short", window.innerHeight < 700);
+  R.classList.toggle("narrow", window.innerWidth < 360);
+  addEventListener("resize", () => {
+    d.w = window.innerWidth; d.h = window.innerHeight;
+    R.classList.toggle("narrow", d.w < 360);
+  });
+  return d;
+})();
 function haptic(t){
   t=t||'light';
   try{ const H=tg&&tg.HapticFeedback;
@@ -1865,6 +1935,10 @@ if(tg){ try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor('#140C08
      lockOrientation есть с Bot API 8.0 — на старых клиентах просто не сработает,
      поэтому кегль отдельно защищён через text-size-adjust. */
   try{ tg.lockOrientation && tg.lockOrientation(); }catch(e){}
+  /* без этого на андроиде движение вниз по ленте закрывает мини-приложение:
+     Телеграм принимает прокрутку за жест «свернуть». Есть с Bot API 7.7,
+     на старых клиентах просто отсутствует. */
+  try{ tg.disableVerticalSwipes && tg.disableVerticalSwipes(); }catch(e){}
   try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
   if(tg.BackButton){ tg.BackButton.onClick(()=>back()); } }
 
@@ -1893,12 +1967,15 @@ function fitHead(){
   const hd=$("st-hd"), nm=$("st-name"), stg=$("st-stage");
   if(!hd||!nm||!stg) return;                          /* разметка сменилась — молча выходим */
   const box=hd.firstElementChild;
-  nm.style.fontSize=""; stg.style.fontSize="";
-  const avail=hd.clientWidth;
+  nm.style.fontSize=""; stg.style.fontSize=""; box.style.padding="";
+  const avail=hd.clientWidth-2;                       /* пара пикселей на скругление */
   if(!avail) return;                                  /* экран ещё не показан — мерить нечего */
-  const wide=()=>box.offsetWidth>avail;
-  let p=14; while(wide() && p>11){ p-=.5; stg.style.fontSize=p+"px"; }
+  const wide=()=>box.scrollWidth>avail;
+  let p=14; while(wide() && p>10.5){ p-=.5; stg.style.fontSize=p+"px"; }
   let n=17; while(wide() && n>12){ n-=.5; nm.style.fontSize=n+"px"; }
+  /* на 320 длинному имени не хватает и мелкого кегля — поджимаем поля рамки,
+     дальше имя само обрежется многоточием, за край не полезет */
+  if(wide()) box.style.padding="6px 11px";
 }
 addEventListener("resize",()=>{ try{ fitHead(); }catch(e){} });
 /* тестовый просмотр ступеней: долгое нажатие на картинку включает и выключает,
@@ -1930,7 +2007,7 @@ function renderStage(){
   $("st-name").textContent=myName();
   $("st-stage").textContent=st.name+" · ступень "+idx;
   $("st-desc").textContent=st.desc;
-  try{ $("st-ver").textContent="сборка "+BUILD; }catch(e){}
+  try{ $("st-ver").textContent="сборка "+BUILD+" · "+DEV.label; }catch(e){}
   $("st-days").textContent=sinceDays();
   $("st-mins").textContent=listenedMin();
   $("st-tasks").textContent=tasksDone();
