@@ -204,18 +204,26 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .vd-pen svg{width:14px;height:14px;color:#E9C983;}
 .vd-tx{font-size:12.5px;color:#D8C6B6;line-height:1.6;margin-top:8px;white-space:pre-line;}
 .vd-rp{margin-top:8px;font-size:10px;color:rgba(246,238,221,.42);}
-.vd-ta{width:100%;margin-top:8px;border-radius:11px;border:1px solid rgba(233,201,131,.5);
-  background:rgba(12,7,5,.6);padding:10px 11px;color:#EFE3D4;font:inherit;font-size:12.5px;
-  line-height:1.6;resize:vertical;min-height:120px;outline:none;
-  box-shadow:0 0 12px rgba(233,201,131,.14);-webkit-appearance:none;}
+/* Правка устроена ровно как «Поговорить»: экран становится колонкой, лента
+   записей сжимается, а поле правки стоит внизу над таббаром. Таббар не прячем —
+   нижняя строка экрана всегда меню, а «Отмена» и «Сохранить» живут внутри
+   самого поля ввода. Иначе кнопки ложились поверх текста. */
+#s-vd.active.editing{display:flex;flex-direction:column;overflow:hidden;
+  padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+#s-vd.editing .safetop{flex:none;}
+#s-vd.editing .vd-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;padding-bottom:10px;}
+.vd-edit{display:none;}
+#s-vd.editing .vd-edit{display:block;flex:none;padding:6px 16px 0;}
+.vd-ehd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.vd-ehd b{font-family:'Baskerville','Forum',Georgia,serif;font-size:15px;font-weight:400;color:#F3DCA0;}
+.vd-ehd span{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#7A6857;}
+.vd-ebox{border-radius:18px;border:1px solid rgba(233,201,131,.34);background:rgba(25,18,13,.72);
+  padding:10px 11px;box-shadow:0 0 14px rgba(233,201,131,.12);}
+.vd-ta{display:block;width:100%;border:0;background:transparent;outline:none;resize:none;
+  color:#EFE3D4;font:inherit;font-size:13.5px;line-height:1.6;padding:2px 3px;
+  min-height:76px;max-height:34vh;overflow-y:auto;-webkit-appearance:none;}
 .vd-erow{display:flex;gap:8px;margin-top:9px;}
-/* в правке кнопки уходят вниз экрана и всегда остаются над клавиатурой —
-   тем же приёмом, что полоса ввода в «Поговорить» */
-#s-vd.editing .vd-erow{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:40;
-  margin:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
-  background:rgba(20,13,8,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-top:1px solid rgba(233,201,131,.2);}
-#s-vd.editing .vd-body{padding-bottom:calc(120px + env(safe-area-inset-bottom));}
 .vd-ebtn{flex:1;text-align:center;border-radius:11px;padding:9px;font-size:13px;cursor:pointer;
   font-family:'Baskerville','Forum',Georgia,serif;}
 .vd-ebtn.save{color:#1B1108;background:linear-gradient(180deg,#F6E7BE,#C9A24B);}
@@ -856,6 +864,7 @@ body.ob-open .tabbar{display:none;}
     <div class="vd-lbl" id="vd-lbl"></div>
     <div id="vd-list"></div>
   </div>
+  <div class="vd-edit" id="vd-edit"></div>
 </section>
 
 <nav class="tabbar" id="tabbar">
@@ -878,7 +887,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "14.08 21:53";
+const BUILD = "14.08 22:42";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -921,9 +930,10 @@ const $ = s => document.getElementById(s);
   function intoView(){
     const el = document.activeElement;
     if(!el || (el.tagName !== "TEXTAREA" && el.tagName !== "INPUT")) return;
-    /* у записи дневника важно показать не только поле, но и кнопки под ним */
-    const target = el.closest(".vd-ent") || el;
-    try{ target.scrollIntoView({block: target === el ? "center" : "end", behavior: "smooth"}); }catch(e){}
+    /* поля, которые сами стоят над клавиатурой (правка дневника, «Поговорить»,
+       онбординг), листать не надо — иначе экран дёргается впустую */
+    if(el.closest(".vd-edit") || el.closest(".tk-bar") || el.closest(".ob-inputbar")) return;
+    try{ el.scrollIntoView({block: "center", behavior: "smooth"}); }catch(e){}
   }
   vv.addEventListener("resize", apply);
   vv.addEventListener("scroll", apply);
@@ -993,6 +1003,9 @@ function back(){
   showScreen(prev);
 }
 function setTab(tab){
+  /* ушла с дневника посреди правки — правку закрываем, экран не должен
+     остаться колонкой с полем внизу */
+  if(vdEditing){ vdEditing=0; try{ vdEditMode(false); vdPaint(); }catch(e){} }
   curTab=tab; stack=[TAB_SCREEN[tab]];
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
   showScreen(TAB_SCREEN[tab]);                 /* экран открываем ПЕРВЫМ */
@@ -1074,24 +1087,30 @@ function vdPaint(){
       vdRange(s.from_day,s.to_day)+'</div><div class="x">'+escHtml(s.text)+'</div></div></div>' : "";
 
   $("vd-lbl").textContent = ent.length ? "Записи" : "";
-  $("vd-list").innerHTML = ent.map(e=>vdCard(e)).join("");
+  /* правящуюся запись из ленты убираем: её текст сейчас внизу, в поле правки */
+  $("vd-list").innerHTML = ent.filter(e=>e.id!==vdEditing).map(e=>vdCard(e)).join("");
+
+  const ed = vdEditing && ent.filter(e=>e.id===vdEditing)[0];
+  $("vd-edit").innerHTML = ed
+    ? '<div class="vd-ehd"><b>'+vdHuman(ed.day)+'</b><span>правка</span></div>'+
+      '<div class="vd-ebox"><textarea class="vd-ta" id="vd-ta" rows="1"></textarea>'+
+      '<div class="vd-erow"><div class="vd-ebtn cancel" data-cancel="1">Отмена</div>'+
+      '<div class="vd-ebtn save" data-save="'+ed.id+'">Сохранить</div></div></div>'
+    : "";
+  if(ed){ const t=$("vd-ta"); t.value=ed.text; t.oninput=()=>vdFit(t); vdFit(t); }
 }
+/* поле растёт под текст, потолок держит css (max-height) */
+function vdFit(t){ t.style.height="auto"; t.style.height=t.scrollHeight+"px"; }
 function vdRange(a,b){
   const x=new Date(a+"T00:00:00"), y=new Date(b+"T00:00:00");
   return x.getDate()+" — "+y.getDate()+" "+VD_MON[y.getMonth()];
 }
-/* в правке прячем таббар — тем же способом, что на плеере и странице практики */
+/* таббар в правке остаётся на месте: он и есть нижняя строка экрана */
 function vdEditMode(on){
   $("s-vd").classList.toggle("editing", on);
-  $("tabbar").classList.toggle("hide", on);
+  if(!on){ try{ document.activeElement.blur(); }catch(e){} }
 }
 function vdCard(e){
-  if(vdEditing===e.id)
-    return '<div class="vd-ent"><div class="vd-top"><span class="vd-dt">'+vdHuman(e.day)+'</span>'+
-      '<span class="vd-rt"><span class="vd-du">правка</span></span></div>'+
-      '<textarea class="vd-ta" id="vd-ta">'+escHtml(e.text)+'</textarea>'+
-      '<div class="vd-erow"><div class="vd-ebtn cancel" data-cancel="1">Отмена</div>'+
-      '<div class="vd-ebtn save" data-save="'+e.id+'">Сохранить</div></div></div>';
   const mm=Math.floor((e.dur||0)/60), ss=(e.dur||0)%60;
   return '<div class="vd-ent"><div class="vd-top"><span class="vd-dt">'+vdHuman(e.day)+'</span>'+
     '<span class="vd-rt"><span class="vd-du">'+(e.dur?mm+":"+pad2(ss):"")+'</span>'+
@@ -1102,10 +1121,14 @@ function vdCard(e){
     '<div class="vd-rp">Записано голосом'+(e.edited?" · отредактировано":"")+'</div></div>';
 }
 $("vd-list").addEventListener("click",e=>{
-  const pen=e.target.closest("[data-edit]"), sv=e.target.closest("[data-save]"),
-        cn=e.target.closest("[data-cancel]");
-  if(pen){ vdEditing=+pen.dataset.edit; haptic("light"); vdEditMode(true); vdPaint();
-           setTimeout(()=>{const t=$("vd-ta"); if(t){t.focus();t.style.height=t.scrollHeight+"px";}},30); return; }
+  const pen=e.target.closest("[data-edit]");
+  if(!pen) return;
+  vdEditing=+pen.dataset.edit; haptic("light"); vdEditMode(true); vdPaint();
+  setTimeout(()=>{ const t=$("vd-ta"); if(!t) return;
+                   t.focus(); try{ t.setSelectionRange(t.value.length,t.value.length); }catch(e){} },30);
+});
+$("vd-edit").addEventListener("click",e=>{
+  const sv=e.target.closest("[data-save]"), cn=e.target.closest("[data-cancel]");
   if(cn){ vdEditing=0; haptic("light"); vdEditMode(false); vdPaint(); return; }
   if(sv){
     const id=+sv.dataset.save, t=$("vd-ta"), text=t?t.value.trim():"";
