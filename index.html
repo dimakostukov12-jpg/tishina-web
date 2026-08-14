@@ -208,6 +208,13 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
   line-height:1.6;resize:vertical;min-height:120px;outline:none;
   box-shadow:0 0 12px rgba(233,201,131,.14);-webkit-appearance:none;}
 .vd-erow{display:flex;gap:8px;margin-top:9px;}
+/* в правке кнопки уходят вниз экрана и всегда остаются над клавиатурой —
+   тем же приёмом, что полоса ввода в «Поговорить» */
+#s-vd.editing .vd-erow{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:40;
+  margin:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(20,13,8,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(233,201,131,.2);}
+#s-vd.editing .vd-body{padding-bottom:calc(120px + env(safe-area-inset-bottom));}
 .vd-ebtn{flex:1;text-align:center;border-radius:11px;padding:9px;font-size:13px;cursor:pointer;
   font-family:'Baskerville','Forum',Georgia,serif;}
 .vd-ebtn.save{color:#1B1108;background:linear-gradient(180deg,#F6E7BE,#C9A24B);}
@@ -451,7 +458,9 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 #s-onboard{position:fixed;inset:0;bottom:var(--kb,0px);z-index:100;display:none;flex-direction:column;background:linear-gradient(160deg,#352315,#130C07);}
 .ob-inner{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:calc(20px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));}
 .ob-brand{font-family:'Baskerville','Forum',Georgia,serif;font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:#E7C983;text-align:center;margin-bottom:16px;}
-.ob-chat{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
+/* min-height:0 — как в .tk-chat: без него лента не сжимается и выталкивает
+   полосу ввода за нижний край экрана, под клавиатуру */
+.ob-chat{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
 .ob-bub{max-width:82%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.45;animation:obIn .32s ease;}
 .ob-bub.bot{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:#EAE7E4;border-bottom-left-radius:5px;}
 .ob-bub.me{align-self:flex-end;background:linear-gradient(180deg,rgba(233,201,131,.22),rgba(233,201,131,.12));border:1px solid rgba(233,201,131,.34);color:#F7ECC6;border-bottom-right-radius:5px;}
@@ -1049,6 +1058,11 @@ function vdRange(a,b){
   const x=new Date(a+"T00:00:00"), y=new Date(b+"T00:00:00");
   return x.getDate()+" — "+y.getDate()+" "+VD_MON[y.getMonth()];
 }
+/* в правке прячем таббар — тем же способом, что на плеере и странице практики */
+function vdEditMode(on){
+  $("s-vd").classList.toggle("editing", on);
+  $("tabbar").classList.toggle("hide", on);
+}
 function vdCard(e){
   if(vdEditing===e.id)
     return '<div class="vd-ent"><div class="vd-top"><span class="vd-dt">'+vdHuman(e.day)+'</span>'+
@@ -1068,15 +1082,15 @@ function vdCard(e){
 $("vd-list").addEventListener("click",e=>{
   const pen=e.target.closest("[data-edit]"), sv=e.target.closest("[data-save]"),
         cn=e.target.closest("[data-cancel]");
-  if(pen){ vdEditing=+pen.dataset.edit; haptic("light"); vdPaint();
+  if(pen){ vdEditing=+pen.dataset.edit; haptic("light"); vdEditMode(true); vdPaint();
            setTimeout(()=>{const t=$("vd-ta"); if(t){t.focus();t.style.height=t.scrollHeight+"px";}},30); return; }
-  if(cn){ vdEditing=0; haptic("light"); vdPaint(); return; }
+  if(cn){ vdEditing=0; haptic("light"); vdEditMode(false); vdPaint(); return; }
   if(sv){
     const id=+sv.dataset.save, t=$("vd-ta"), text=t?t.value.trim():"";
     if(!text) return;
     const row=(vdData.entries||[]).find(x=>x.id===id);
     if(row){ row.text=text; row.edited=true; }
-    vdEditing=0; haptic("success"); vdPaint();
+    vdEditing=0; haptic("success"); vdEditMode(false); vdPaint();
     vdApi("edit",{id,text});
   }
 });
