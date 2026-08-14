@@ -1412,7 +1412,7 @@ function renderStage(){
   const days=practiceDays().length;
   const idx=Math.min(STAGES.length, Math.floor(days/DAYS_PER_STAGE)+1);
   const st=STAGES[idx-1];
-  const src="stage-"+idx+".jpg";
+  const src="stage-"+idx+".jpg?v=2";   /* v=2 — новые персонажи в 4к: без метки телефон достаёт старую картинку из кэша */
   if($("st-art").dataset.src!==src){ $("st-art").dataset.src=src;
     const pre=new Image(); pre.onload=()=>{ $("st-art").style.backgroundImage="url("+src+")"; };
     pre.src=src; if(pre.complete) $("st-art").style.backgroundImage="url("+src+")"; }
