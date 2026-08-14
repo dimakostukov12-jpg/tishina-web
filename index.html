@@ -46,7 +46,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 
 /* screens */
 /* каждый экран скроллится ВНУТРИ себя (документ не скроллится) — поверх статичного фикс-фона, без пустот при оверскролле */
-.screen{display:none;position:fixed;inset:0;overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(86px + env(safe-area-inset-bottom));}
+.screen{display:none;position:fixed;inset:0;bottom:var(--kb,0px);overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(86px + env(safe-area-inset-bottom));}
 .screen.active{display:block;}
 .safetop{height:env(safe-area-inset-top);}
 
@@ -448,7 +448,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 @media(prefers-reduced-motion:reduce){.sp-logo,.sp-tag,.sp-calls,.sp-btn{animation-duration:.01s!important;}
   .sp-glow{animation:none;}}
 
-#s-onboard{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;background:linear-gradient(160deg,#352315,#130C07);}
+#s-onboard{position:fixed;inset:0;bottom:var(--kb,0px);z-index:100;display:none;flex-direction:column;background:linear-gradient(160deg,#352315,#130C07);}
 .ob-inner{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:calc(20px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));}
 .ob-brand{font-family:'Baskerville','Forum',Georgia,serif;font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:#E7C983;text-align:center;margin-bottom:16px;}
 .ob-chat{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
@@ -464,7 +464,7 @@ body{min-height:100dvh;color:#F2E9E0;font-family:-apple-system,BlinkMacSystemFon
 .ob-send{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;flex:0 0 auto;background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 60%,#C89E4C);position:relative;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-appearance:none;appearance:none;box-shadow:0 0 12px rgba(243,220,160,.5);}
 .ob-send::after{content:"";position:absolute;left:14px;top:12px;border-left:13px solid #3E2918;border-top:8px solid transparent;border-bottom:8px solid transparent;}
 body.ob-open .tabbar{display:none;}
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:rgba(37,24,13,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.08);}
+.tabbar{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:30;display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:rgba(37,24,13,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.08);}
 .tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(246,238,221,.5);font-size:10.5px;letter-spacing:.03em;cursor:pointer;flex:1;padding:2px 0;}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .tab.on{color:#F3DCA0;}
@@ -868,6 +868,40 @@ const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
 const $ = s => document.getElementById(s);
+
+/* ---------- клавиатура ----------
+   На iOS клавиатура не уменьшает окно, а накрывает его: поле ввода и кнопки
+   оказываются под ней. visualViewport знает, сколько экрана реально видно —
+   разницу отдаём в css как --kb, и все фиксированные слои кончаются выше
+   клавиатуры. Если Телеграм сам ужал окно, разница равна нулю и ничего
+   не сдвинется дважды. */
+(function(){
+  const vv = window.visualViewport;
+  if(!vv) return;
+  let last = -1;
+  function apply(){
+    const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    const v = kb > 60 ? kb : 0;               /* мелкие колебания панелей не считаем */
+    if(v === last) return;
+    last = v;
+    document.documentElement.style.setProperty("--kb", v + "px");
+    if(v) setTimeout(intoView, 60);
+  }
+  function intoView(){
+    const el = document.activeElement;
+    if(!el || (el.tagName !== "TEXTAREA" && el.tagName !== "INPUT")) return;
+    /* у записи дневника важно показать не только поле, но и кнопки под ним */
+    const target = el.closest(".vd-ent") || el;
+    try{ target.scrollIntoView({block: target === el ? "center" : "end", behavior: "smooth"}); }catch(e){}
+  }
+  vv.addEventListener("resize", apply);
+  vv.addEventListener("scroll", apply);
+  document.addEventListener("focusin", e => {
+    const t = e.target;
+    if(t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT")) setTimeout(intoView, 340);
+  });
+  apply();
+})();
 const byId = {}; ALL_SECS.forEach(s=>s.items.forEach(it=>byId[it.id]={...it, secTitle:s.title}));
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 function haptic(t){
