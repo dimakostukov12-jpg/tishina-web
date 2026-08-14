@@ -864,7 +864,10 @@ function renderTracker(it){
   if(times>0){
     for(let i=0;i<times;i++){const d=document.createElement("span");d.className="dp-dot"+(i<done?" on":"");dotsEl.appendChild(d);}
     $("d-track").textContent=m.track||("Минимум "+NUMW[times]+" "+plRaz(times)+" за неделю");
-    $("d-rule").textContent="Новая практика открывается раз в неделю. После каждого прохождения запиши свой инсайт в поле ниже — проход засчитывается, если прослушано больше 80% практики.";
+    $("d-rule").textContent="Новая практика открывается каждую неделю — чтобы трансформация прошла максимально мягко и легко. "+
+      "За неделю, данную на практику, пройди её минимум "+NUMW[times]+" "+plRaz(times)+". "+
+      "После каждого прохождения запиши отзыв в поле «Твои инсайты» ниже. "+
+      "Прохождение засчитывается, только если прослушано больше 80% длительности практики и записан инсайт.";
     $("d-rule").style.display="";
     $("d-progress").textContent="Засчитано "+done+" из "+times; $("d-progress").style.display="";
   } else {
