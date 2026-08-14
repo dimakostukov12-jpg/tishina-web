@@ -901,7 +901,7 @@ function openDetail(id){
   $("d-desc").textContent = it.long||it.desc;
   $("d-result").textContent = m.result||"";
   $("d-result-panel").style.display = m.result?"":"none";
-  $("d-dur").textContent = it.dur+" · голос ♀";
+  $("d-dur").textContent = it.dur;
   const _sit = m.sit||"";
   $("d-sit").textContent = _sit;
   $("d-sit-panel").style.display = _sit?"":"none";
@@ -973,7 +973,7 @@ function openPlayer(id){
   curId=id; dur=0; acc=0; pendingSeek=null;
   $("p-cover").className="cov cov-"+it.cover;   // скрытый — только для обложки в Media Session
   $("p-title").textContent=it.title;
-  $("p-meta").textContent=it.secTitle+" · "+it.dur+" · голос ♀";
+  $("p-meta").textContent=it.secTitle+" · "+it.dur;
   $("p-crumb").textContent=it.secTitle;
   $("cur").textContent="0:00"; $("fill").style.width="0"; $("thumb").style.left="0";
   $("heart").classList.toggle("on",isFav(id));
