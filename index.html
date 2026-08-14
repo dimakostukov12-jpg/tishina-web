@@ -453,6 +453,7 @@ body.ob-open .tabbar{display:none;}
 .dp-dots{display:flex;gap:5px;flex:0 0 auto;}
 .dp-dot{width:11px;height:11px;border-radius:50%;border:1.4px solid #C89E4C;}
 .dp-dot.on{background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 60%,#C89E4C);border-color:transparent;box-shadow:0 0 8px rgba(243,220,160,.6);}
+.dp-rule{margin-top:10px;font-size:12px;color:#C0A793;line-height:1.5;}
 .dp-progress{margin-top:8px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:rgba(246,238,221,.55);}
 .dp-tasklead{font-size:12.5px;color:#F7ECC6;font-weight:600;margin-bottom:8px;}
 .dp-quote{font-family:'Baskerville','Forum',Georgia,serif;font-size:19px;color:#F7ECC6;line-height:1.3;margin-top:11px;padding:11px 14px;border-left:2px solid #E7C983;background:rgba(233,201,131,.06);border-radius:0 12px 12px 0;}
@@ -621,8 +622,9 @@ body.ob-open .tabbar{display:none;}
       <div class="dp-playrow"><button class="dp-play" id="d-play" aria-label="Слушать"></button><div class="dp-pr"><b>Слушать практику</b><span id="d-dur"></span></div></div>
     </div>
 
-    <div class="dp-panel"><div class="dp-eb"><span class="dp-ic">⏳</span><span class="dp-lb">Практика курса</span></div>
+    <div class="dp-panel"><div class="dp-eb"><span class="dp-ic">⏳</span><span class="dp-lb">Как проходить</span></div>
       <div class="dp-track"><span class="dp-tk" id="d-track"></span><span class="dp-dots" id="d-dots"></span></div>
+      <div class="dp-rule" id="d-rule"></div>
       <div class="dp-progress" id="d-progress"></div>
     </div>
 
@@ -839,9 +841,21 @@ function savePos(){ if(hasAudio && au.currentTime>0) localStorage.setItem(posKey
 /* ---------- страница медитации (детали) ---------- */
 const NOTEKEY=id=>"tishina_note_"+id, DONEKEY=id=>"tishina_done_"+id;
 function loadNote(id){return localStorage.getItem(NOTEKEY(id))||"";}
+/* инсайт пишется после каждого прохождения, поэтому храним список, а не одну запись;
+   у кого осталась старая одиночная — она становится первой в списке */
+const NOTESKEY=id=>"tishina_notes_"+id;
+function loadNotes(id){
+  try{ const a=JSON.parse(localStorage.getItem(NOTESKEY(id))||"[]"); if(a.length) return a; }catch(e){}
+  const one=loadNote(id); return one?[one]:[];
+}
+function addNote(id,t){ const a=loadNotes(id); a.push(t); localStorage.setItem(NOTESKEY(id),JSON.stringify(a)); }
 function doneCount(id){return parseInt(localStorage.getItem(DONEKEY(id))||"0",10)||0;}
+/* заход засчитывается, когда наслушано больше 80% практики; перемотка в счёт не идёт */
+const LISKEY=id=>"tishina_lis_"+id, CREDKEY=id=>"tishina_cred_"+id;
+function credits(id){return parseInt(localStorage.getItem(CREDKEY(id))||"0",10)||0;}
 function escHtml(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function plRaz(n){return n===1?"раз":(n>=2&&n<=4?"раза":"раз");}
+const NUMW={1:"один",2:"два",3:"три",4:"четыре"};   /* «минимум два раза» читается живее, чем «минимум 2 раза» */
 function plOtvet(n){const a=n%10,b=n%100;return (a===1&&b!==11)?"ответ":((a>=2&&a<=4)&&!(b>=12&&b<=14))?"ответа":"ответов";}
 
 function renderTracker(it){
@@ -849,10 +863,13 @@ function renderTracker(it){
   dotsEl.innerHTML="";
   if(times>0){
     for(let i=0;i<times;i++){const d=document.createElement("span");d.className="dp-dot"+(i<done?" on":"");dotsEl.appendChild(d);}
-    $("d-track").textContent=m.track||("Пройди "+times+" "+plRaz(times)+" за цикл — пока состояние не закрепится");
-    $("d-progress").textContent="Пройдено "+done+" из "+times; $("d-progress").style.display="";
+    $("d-track").textContent=m.track||("Минимум "+NUMW[times]+" "+plRaz(times)+" за неделю");
+    $("d-rule").textContent="Новая практика открывается раз в неделю. После каждого прохождения запиши свой инсайт в поле ниже — проход засчитывается, если прослушано больше 80% практики.";
+    $("d-rule").style.display="";
+    $("d-progress").textContent="Засчитано "+done+" из "+times; $("d-progress").style.display="";
   } else {
-    $("d-track").textContent=m.track||"Слушай перед сном, сколько нужно"; $("d-progress").style.display="none";
+    $("d-track").textContent=m.track||"Слушай перед сном, сколько нужно";
+    $("d-rule").style.display="none"; $("d-progress").style.display="none";
   }
 }
 function replyCard(name,letter,text,me){
@@ -862,8 +879,8 @@ function replyCard(name,letter,text,me){
 function repliesFor(id){ const a=REV.byId[id]; return (a && a.length)?a:REV.general; }
 let repliesOpen=false;
 function renderReplies(it){
-  let html=""; const my=loadNote(it.id);
-  if(my) html+=replyCard("Ты","Т",my,true);
+  let html=""; const mine=loadNotes(it.id);
+  for(let i=mine.length-1;i>=0;i--) html+=replyCard("Ты","Т",mine[i],true);   /* свежая запись сверху */
   const L=repliesFor(it.id);
   const shown=repliesOpen?L.length:3;
   for(let i=0;i<Math.min(shown,L.length);i++){const r=L[i];html+=replyCard(r[0],(r[0][0]||"•").toUpperCase(),r[1],false);}
@@ -894,15 +911,22 @@ function openDetail(id){
   const q=$("d-quote"); if(m.quote){q.textContent="«"+m.quote+"»";q.style.display="";}else{q.style.display="none";}
   renderTracker(it);
   repliesOpen=false; renderReplies(it);
-  $("d-note").value=loadNote(id);
-  $("d-savehint").textContent=loadNote(id)?"Сохранено на этом устройстве":"Сохранится только у тебя на устройстве";
+  $("d-note").value="";                       /* поле всегда чистое: каждый проход — новая запись */
+  $("d-savehint").textContent=loadNotes(id).length?"Твои записи сохранены на этом устройстве":"Сохранится только у тебя на устройстве";
   go("s-detail",true); window.scrollTo(0,0);
 }
 $("d-play").onclick=()=>{ if(!curId)return; haptic("medium"); openPlayer(curId); };
-$("d-save").onclick=()=>{ if(!curId)return; const t=$("d-note").value, had=!!loadNote(curId);
-  if(t.trim()){localStorage.setItem(NOTEKEY(curId),t);} else {localStorage.removeItem(NOTEKEY(curId));}
-  if(t.trim() && !had){const tm=(MED[curId]&&MED[curId].times)||99; localStorage.setItem(DONEKEY(curId),String(Math.min(doneCount(curId)+1,tm)));}
-  $("d-note").value=""; $("d-savehint").textContent="Сохранено ✓"; haptic("medium");
+$("d-save").onclick=()=>{ if(!curId)return; const t=$("d-note").value.trim();
+  if(!t){ $("d-savehint").textContent="Напиши хоть строчку — она и есть отметка"; haptic('rigid'); return; }
+  addNote(curId,t); localStorage.setItem(NOTEKEY(curId),t);
+  /* засчитываем проход только если есть недоиспользованный дослушанный заход */
+  const tm=(MED[curId]&&MED[curId].times)||99;
+  const counted=credits(curId)>doneCount(curId);
+  if(counted) localStorage.setItem(DONEKEY(curId),String(Math.min(doneCount(curId)+1,tm)));
+  $("d-note").value="";
+  $("d-savehint").textContent = counted ? "Проход засчитан ✓"
+    : "Записано ✓ — проход засчитается, когда прослушаешь больше 80%";
+  haptic("medium");
   renderTracker(byId[curId]); renderReplies(byId[curId]);
 };
 $("d-more").onclick=()=>{ repliesOpen=true; renderReplies(byId[curId]); haptic("light"); };
@@ -977,10 +1001,10 @@ au.addEventListener("loadedmetadata",()=>{
 au.addEventListener("durationchange",()=>{ dur=curDur(); if(isFinite(au.duration)&&au.duration>0){$("tot").textContent=fmt(au.duration);} });
 au.addEventListener("seeked",()=>{ pendingSeek=null; });
 au.addEventListener("play",()=>{wantPlay=true;$("play").classList.add("playing");$("play").setAttribute("aria-label","Пауза");markToday();});
-au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("play").setAttribute("aria-label","Играть");savePos();});  // не трогаем wantPlay: пауза может быть от фона
+au.addEventListener("pause",()=>{$("play").classList.remove("playing");$("play").setAttribute("aria-label","Играть");savePos();flushListen();});  // не трогаем wantPlay: пауза может быть от фона
 au.addEventListener("timeupdate",trackTime);
 au.addEventListener("play",()=>{ _lastT=au.currentTime; });
-au.addEventListener("ended",()=>{ wantPlay=false; if(curId) localStorage.removeItem(posKey(curId)); });
+au.addEventListener("ended",()=>{ wantPlay=false; flushListen(); if(curId) localStorage.removeItem(posKey(curId)); });
 
 $("play").onclick=()=>{
   if(!hasAudio){ haptic('rigid'); return; }
@@ -1141,14 +1165,23 @@ function sinceDays(){
   return Math.max(1, Math.round((b-a)/86400000)+1);
 }
 function listenedMin(){ return Math.floor((parseFloat(localStorage.getItem(MINKEY)||"0")||0)/60); }
-let _lastT=0, _acc=0;
+let _lastT=0, _acc=0, _pAcc=0;
 function trackTime(){
   const t=au.currentTime, d=t-_lastT; _lastT=t;
   if(d>0 && d<2){                                  /* перемотку не засчитываем */
-    _acc+=d;
+    _acc+=d; _pAcc+=d;
     if(_acc>=15){ const v=(parseFloat(localStorage.getItem(MINKEY)||"0")||0)+_acc;
       localStorage.setItem(MINKEY,String(v)); _acc=0; }
+    if(_pAcc>=10) flushListen();
   }
+}
+/* копим наслушанное по конкретной практике: набралось 80% длительности — заход дослушан */
+function flushListen(){
+  if(!curId || _pAcc<=0) return;
+  const id=curId, D=curDur();
+  let s=(parseFloat(localStorage.getItem(LISKEY(id))||"0")||0)+_pAcc; _pAcc=0;
+  if(D>0 && s>=D*0.8){ localStorage.setItem(CREDKEY(id),String(credits(id)+1)); s=0; }
+  localStorage.setItem(LISKEY(id),String(s));
 }
 function practiceDays(){ try{return JSON.parse(localStorage.getItem(DAYSKEY)||"[]");}catch(e){return[];} }
 function pad2(n){return String(n).padStart(2,"0");}
