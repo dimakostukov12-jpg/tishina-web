@@ -498,6 +498,76 @@ body.ob-open .tabbar{display:none;}
 .tab.on svg{filter:drop-shadow(0 0 6px rgba(243,220,160,.5));}
 .hide{display:none!important;}
 
+/* ---------- главная: приветствие, план недели, плашки ----------
+   Разделы с обложками сюда не выносим: они живут на своей вкладке. Здесь
+   только то, что нужно сегодня, и три двери с картинками. Картинка каждой
+   плашки пока рисуется градиентом; когда придут настоящие, меняется одна
+   строка css — background-image на файл. */
+#s-main{display:none;} #s-main.active{display:block;}
+.mn{padding:6px 16px calc(84px + env(safe-area-inset-bottom));}
+.mn-hi{font-family:'Baskerville','Forum',Georgia,serif;font-size:25px;color:#F4E7D6;line-height:1.12;}
+.mn-hi span{display:block;font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:11px;letter-spacing:.02em;color:#B49F89;margin-top:4px;}
+.mn-lbl{font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+  color:rgba(246,238,221,.42);margin:17px 0 9px;}
+
+/* план на неделю */
+.mn-plan{border-radius:16px;padding:13px 14px;margin-bottom:12px;
+  border:1px solid rgba(233,201,131,.24);
+  background:linear-gradient(180deg,rgba(233,201,131,.11),rgba(20,13,8,.40));}
+.mn-ph{display:flex;align-items:baseline;gap:9px;margin-bottom:10px;}
+.mn-ph b{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;font-size:16px;color:#F3DCA0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.mn-ph i{font-style:normal;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:#8E7A67;margin-left:auto;flex:none;}
+.mn-task{display:flex;gap:10px;align-items:flex-start;padding:8px 0;
+  border-top:1px solid rgba(233,201,131,.12);}
+.mn-task:first-of-type{border-top:0;}
+.mn-k{width:18px;height:18px;border-radius:50%;flex:none;display:grid;place-items:center;
+  border:1px solid rgba(233,201,131,.5);font-size:10px;color:#E9C983;margin-top:2px;}
+.mn-task.on .mn-k{background:linear-gradient(180deg,#F6E7BE,#C9A24B);color:#1B1108;border-color:transparent;}
+.mn-tt{font-size:13.5px;color:#EFE3D4;line-height:1.35;}
+.mn-ts{font-size:10.5px;color:#A8927C;margin-top:2px;line-height:1.4;}
+.mn-task.on .mn-tt{color:#9A8873;text-decoration:line-through;
+  text-decoration-color:rgba(154,136,115,.5);}
+.mn-empty{font-size:12.5px;color:#C6B29C;line-height:1.5;}
+
+/* плашка-дверь */
+.mn-pl{position:relative;border-radius:17px;overflow:hidden;margin-bottom:11px;cursor:pointer;
+  border:1px solid rgba(233,201,131,.26);box-shadow:0 8px 20px rgba(0,0,0,.34);
+  transition:transform .18s cubic-bezier(.2,.8,.3,1);}
+.mn-pl:active{transform:scale(.985);}
+.mn-art{position:absolute;inset:0;background-size:cover;background-position:center;}
+/* затемнение слева — под текст; правая треть картинки остаётся открытой */
+.mn-veil{position:absolute;inset:0;background:linear-gradient(90deg,
+  rgba(12,7,4,.90) 0%,rgba(12,7,4,.72) 38%,rgba(12,7,4,.12) 78%,transparent 100%);}
+.mn-in{position:relative;padding:14px 15px;min-height:98px;display:flex;
+  flex-direction:column;justify-content:center;}
+.mn-t{font-family:'Baskerville','Forum',Georgia,serif;font-size:20px;color:#F7ECC6;line-height:1.14;}
+.mn-s{font-size:11.5px;color:#C6B29C;margin-top:5px;max-width:62%;line-height:1.4;}
+.mn-go{margin-top:10px;align-self:flex-start;border-radius:999px;padding:6px 14px;font-size:11.5px;
+  color:#1B1108;background:linear-gradient(180deg,#F6E7BE,#C9A24B);}
+/* заглушки картинок: тот же язык, что у обложек практик */
+.art-med{background-image:
+  radial-gradient(at 74% 20%,rgba(216,140,190,.75),transparent 46%),
+  radial-gradient(at 92% 66%,rgba(150,120,236,.70),transparent 48%),
+  radial-gradient(at 55% 96%,rgba(240,214,150,.45),transparent 52%),
+  linear-gradient(120deg,#2a1630,#160f18);}
+.art-diary{background-image:
+  radial-gradient(at 80% 26%,rgba(120,196,214,.60),transparent 46%),
+  radial-gradient(at 96% 78%,rgba(233,201,131,.55),transparent 44%),
+  linear-gradient(120deg,#152430,#0f1216);}
+.art-card{background-image:
+  radial-gradient(at 78% 30%,rgba(243,225,172,.85),transparent 44%),
+  radial-gradient(at 95% 80%,rgba(201,162,75,.70),transparent 46%),
+  linear-gradient(120deg,#2b2008,#151007);}
+/* на низких экранах поджимаем, чтобы три двери влезали без прокрутки */
+html.short .mn-in{min-height:86px;padding:12px 14px;}
+html.short .mn-task{padding:6px 0;}
+html.short .mn-hi{font-size:22px;}
+html.narrow .mn{padding-left:12px;padding-right:12px;}
+html.narrow .mn-t{font-size:18px;} html.narrow .mn-s{max-width:70%;}
+
 /* ---------- под разные телефоны ----------
    Классы ios/android/narrow/short вешает скрипт при запуске: он спрашивает
    Телеграм, что за устройство, и только потом браузер. */
@@ -683,7 +753,29 @@ html.short .st-stats{margin-top:11px;}
 <body>
 <div class="bg"></div><div class="sec-bg" id="sec-bg"></div><div class="d-iri" id="d-iri" style="display:none"></div><div class="grain"></div>
 
-<section class="screen active" id="s-home">
+<section class="screen active" id="s-main">
+  <div class="safetop"></div>
+  <div class="mn">
+    <div class="mn-hi" id="mn-hi"></div>
+    <div class="mn-lbl" id="mn-lbl">Что сделать на этой неделе</div>
+    <div class="mn-plan" id="mn-plan"></div>
+
+    <div class="mn-pl" id="mn-med"><div class="mn-art art-med"></div><div class="mn-veil"></div>
+      <div class="mn-in"><div class="mn-t">Медитации</div>
+        <div class="mn-s" id="mn-med-s"></div>
+        <div class="mn-go">Открыть</div></div></div>
+
+    <div class="mn-pl" id="mn-vd"><div class="mn-art art-diary"></div><div class="mn-veil"></div>
+      <div class="mn-in"><div class="mn-t">Голосовой дневник</div>
+        <div class="mn-s">расскажи, как ты сейчас — минуту голосом</div></div></div>
+
+    <div class="mn-pl" id="mn-card"><div class="mn-art art-card"></div><div class="mn-veil"></div>
+      <div class="mn-in"><div class="mn-t">Карта дня</div>
+        <div class="mn-s" id="mn-card-s"></div></div></div>
+  </div>
+</section>
+
+<section class="screen" id="s-home">
   <div class="safetop"></div>
   <div class="home-hd"><h1 class="h-title">Выбери раздел и начни практику</h1><div class="h-arw"><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2 L12 12 L22 2"/></svg></div></div>
   <div class="grid" id="home-grid"></div>
@@ -906,7 +998,8 @@ html.short .st-stats{margin-top:11px;}
 </section>
 
 <nav class="tabbar" id="tabbar">
-  <div class="tab on" data-tab="home"><svg viewBox="0 0 24 24"><path d="M12 20c5-2 7-7 7-13-6 0-11 2-13 7"/><path d="M5 20c0-5 3-9 7-11"/></svg>Медитации</div>
+  <div class="tab on" data-tab="main"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4.5l8 6.7"/><path d="M6.2 10.4V19h11.6v-8.6"/><path d="M10 19v-4.4h4V19"/></svg>Главная</div>
+  <div class="tab" data-tab="home"><svg viewBox="0 0 24 24"><path d="M12 20c5-2 7-7 7-13-6 0-11 2-13 7"/><path d="M5 20c0-5 3-9 7-11"/></svg>Медитации</div>
   <div class="tab" data-tab="vd"><svg viewBox="0 0 24 24"><rect x="9" y="2.6" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg>Дневник</div>
   <div class="tab" data-tab="talk"><svg viewBox="0 0 24 24"><path d="M20.5 11.3c0 3.8-3.8 6.9-8.5 6.9-1 0-2-.14-2.9-.4L4 19.6l1.35-3.3C4.2 15 3.5 13.2 3.5 11.3c0-3.8 3.8-6.9 8.5-6.9s8.5 3.1 8.5 6.9z"/><path d="M12 8.1l.85 2.05 2.05.85-2.05.85L12 13.9l-.85-2.05-2.05-.85 2.05-.85z"/></svg>Поговорить</div>
   <div class="tab" data-tab="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Профиль</div>
@@ -925,7 +1018,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "15.08 10:33";
+const BUILD = "15.08 16:00";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1048,8 +1141,8 @@ function isFav(id){ return favs().indexOf(id)>=0; }
 function toggleFav(id){ let a=favs(); const i=a.indexOf(id); if(i>=0)a.splice(i,1); else a.push(id); localStorage.setItem(FAVKEY,JSON.stringify(a)); return a.indexOf(id)>=0; }
 
 /* ---------- router ---------- */
-let stack=[]; let curTab="home";
-const TAB_SCREEN={home:"s-home",vd:"s-vd",talk:"s-talk",fav:"s-fav",profile:"s-profile"};
+let stack=[]; let curTab="main";
+const TAB_SCREEN={main:"s-main",home:"s-home",vd:"s-vd",talk:"s-talk",fav:"s-fav",profile:"s-profile"};
 function showScreen(id){
   /* по всем .screen сразу: раньше здесь был список руками, и новый экран
      (дневник) в него не попал — вкладка открывалась пустым фоном */
@@ -1080,6 +1173,7 @@ function setTab(tab){
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
   showScreen(TAB_SCREEN[tab]);                 /* экран открываем ПЕРВЫМ */
   try{                                          /* сбой отрисовки больше не блокирует переход */
+    if(tab==="main") renderMain();
     if(tab==="fav") renderFav();
     if(tab==="talk"){ tkRender(); setTimeout(tkScroll,60); }
     if(tab==="profile") renderProfile();
@@ -1330,6 +1424,75 @@ async function vdDone(){
 }
 
 /* ---------- render home ---------- */
+/* ---------- главная ----------
+   План собирается из того, что приложение уже знает: сколько раз практика
+   дослушана (80%+), сколько проходов засчитано, сколько инсайтов написано.
+   «Практика недели» пока — та, которую она слушала последней и не закрыла;
+   когда включим недельные ступени, сюда встанет практика недели, а разметка
+   останется прежней. */
+const LASTKEY="tishina_lastmed";
+function lastMed(){
+  const id=localStorage.getItem(LASTKEY);
+  if(id && byId[id]) return id;
+  /* ничего не отмечено — берём любую начатую */
+  let found=null;
+  ALL_SECS.forEach(s=>s.items.forEach(it=>{
+    if(!found && (credits(it.id)||doneCount(it.id)||parseFloat(localStorage.getItem(LISKEY(it.id))||"0")>0))
+      found=it.id;
+  }));
+  return found;
+}
+function renderMain(){
+  const days=practiceDays().length;
+  const idx=Math.min(STAGES.length, Math.floor(days/DAYS_PER_STAGE)+1);
+  $("mn-hi").innerHTML = "Здравствуй, "+escHtml(myName())+
+    "<span>ступень "+idx+" · "+STAGES[idx-1].name+"</span>";
+
+  const id=lastMed(), it=id&&byId[id];
+  const times=(id && MED[id] && MED[id].times) || 2;
+  const done=id?doneCount(id):0, notes=id?loadNotes(id).length:0;
+  const cred=id?credits(id):0;
+
+  if(!it){
+    $("mn-lbl").textContent="С чего начать";
+    $("mn-plan").innerHTML='<div class="mn-empty">Открой любой раздел и выбери первую практику. '+
+      'Дальше я буду держать здесь твой путь: сколько проходов сделано и что осталось.</div>';
+  } else {
+    $("mn-lbl").textContent="Что сделать на этой неделе";
+    const left=Math.max(0,times-done);
+    const pct=(function(){                       /* сколько дослушано в текущем заходе */
+      const D=it.durSec||0, s=parseFloat(localStorage.getItem(LISKEY(id))||"0")||0;
+      return D>0 ? Math.min(99, Math.round(s/D*100)) : 0;
+    })();
+    let rows="";
+    for(let n=1;n<=times;n++){
+      const ok=done>=n;
+      const sub = ok ? "пройдена и отмечена"
+        : (n===done+1 && pct>4 ? "дослушано "+pct+"% — осталось немного"
+                               : (cred>done ? "прослушана — осталось записать инсайт"
+                                            : "слушай целиком, засчитается после 80%"));
+      rows += '<div class="mn-task'+(ok?" on":"")+'"><div class="mn-k">'+(ok?"✓":"")+'</div>'+
+              '<div><div class="mn-tt">'+(n===1?"Первый":"Второй")+' проход практики</div>'+
+              '<div class="mn-ts">'+sub+'</div></div></div>';
+    }
+    const insOk = notes>=times;
+    rows += '<div class="mn-task'+(insOk?" on":"")+'"><div class="mn-k">'+(insOk?"✓":"")+'</div>'+
+            '<div><div class="mn-tt">Инсайт после каждого прохода</div>'+
+            '<div class="mn-ts">'+(insOk? "записаны оба"
+              : (notes? "записан "+notes+" из "+times : "пара строк — это и есть отметка"))+'</div></div></div>';
+    $("mn-plan").innerHTML='<div class="mn-ph"><b>'+escHtml(it.title)+'</b><i>'+
+      (left? left+" "+plural(left,"проход","прохода","проходов")+" осталось" : "всё сделано")+
+      '</i></div>'+rows;
+  }
+
+  let n=0; ALL_SECS.forEach(s=>n+=s.items.length);
+  $("mn-med-s").textContent = SECTIONS.length+" "+plural(SECTIONS.length,"раздел","раздела","разделов")+
+    " и экстренные · "+n+" "+plural(n,"практика","практики","практик");
+  const cst=cdState();
+  $("mn-card-s").textContent = (cst && cst.d===cdToday() && cst.open)
+    ? "сегодня уже вытянута — можно перечитать" : "сегодня ещё не вытянута";
+}
+
 function renderHome(){
   const g=$("home-grid"); g.innerHTML="";
   SECTIONS.forEach(sec=>{
@@ -1525,6 +1688,7 @@ function openPlayer(id){
   const it=byId[id]; if(!it) return;
   curId=id; dur=0; acc=0; pendingSeek=null;
   pulse("player",{id:id});      /* начала — важно отдельно от «дослушала» */
+  try{ localStorage.setItem(LASTKEY,id); }catch(e){}   /* эту практику покажем в плане на главной */
   $("p-cover").className="cov cov-"+it.cover;   // скрытый — только для обложки в Media Session
   $("p-title").textContent=it.title;
   $("p-meta").textContent=it.secTitle+" · "+it.dur;
@@ -2148,6 +2312,11 @@ try{ const st=cdState();
   if(st.d===cdToday() && st.id) new Image().src=CARD_BASE+cdCard(st.id).img;
 }catch(e){}
 
+/* плашки главной: каждая — дверь в свою вкладку */
+press($("mn-med"),  ()=>setTab("home"));
+press($("mn-vd"),   ()=>setTab("vd"));
+press($("mn-card"), openCardDay);
+
 press($("tile-card"), openCardDay);
 press($("tile-fav"), ()=>{ renderFav(); go("s-fav",true); });
 press($("tile-sub"), ()=>{
@@ -2160,7 +2329,7 @@ press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLin
 [renderHome,renderProfile,renderStage,renderCardTile,stageTestWire].forEach(f=>{
   try{ f(); }catch(e){}
 });
-setTab("home");
+setTab("main");
 pulse("open");                 /* с этого начинается всё, что мы про неё знаем */
 
 /* ---------- заставка при запуске ---------- */
