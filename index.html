@@ -925,7 +925,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "15.08 09:32";
+const BUILD = "15.08 10:19";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1094,6 +1094,37 @@ function setTab(tab){
 /* адрес пишем целиком, а не через TALK_URL: тот объявлен ниже по файлу,
    и обращение к нему отсюда роняет весь скрипт ещё до отрисовки */
 const DIARY_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/diary";
+
+/* ---------- пульс ----------
+   Короткие сообщения серверу о том, что произошло: зашла, дослушала практику,
+   написала инсайт. Без этого мы не знаем о ней ничего — весь её путь лежит в
+   телефоне, и написать «практика открыта, а ты не заходила три дня» неоткуда.
+   Ни текстов дневника, ни разговоров здесь нет, только факты действий.
+   Копим в очередь и отправляем пачкой, чтобы не дёргать сеть на каждый шаг. */
+const PULSE_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/pulse";
+const PULSE_Q = "tishina_pulse";
+let pulseTimer = null;
+function pulse(kind, meta){
+  try{
+    const q = JSON.parse(localStorage.getItem(PULSE_Q) || "[]");
+    q.push({kind, meta: meta || null, at: Date.now()});
+    localStorage.setItem(PULSE_Q, JSON.stringify(q.slice(-40)));
+  }catch(e){}
+  clearTimeout(pulseTimer);
+  pulseTimer = setTimeout(pulseFlush, 4000);      /* даём событиям склеиться */
+}
+function pulseFlush(){
+  let q = [];
+  try{ q = JSON.parse(localStorage.getItem(PULSE_Q) || "[]"); }catch(e){}
+  if(!q.length) return;
+  const initData = (tg && tg.initData) || "";
+  if(!initData) return;                            /* вне телеграма подписи нет */
+  localStorage.removeItem(PULSE_Q);                /* при обрыве потеряем пачку — не беда */
+  fetch(PULSE_URL, {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
+    body: JSON.stringify({initData, events:q, tz: -new Date().getTimezoneOffset()})
+  }).catch(()=>{});
+}
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden) pulseFlush(); });
 const VD_ASKS = [
   "Расскажи, как ты себя чувствуешь сейчас",
   "Как прошёл твой день и что у тебя на завтра?",
@@ -1443,6 +1474,7 @@ $("d-save").onclick=()=>{ if(!curId)return; const t=$("d-note").value.trim();
   $("d-savehint").textContent = counted ? "Проход засчитан ✓"
     : "Записано ✓ — проход засчитается, когда прослушаешь больше 80%";
   haptic("medium");
+  pulse("insight",{id:curId, done:counted});
   renderTracker(byId[curId]); renderReplies(byId[curId]);
 };
 $("d-more").onclick=()=>{ repliesOpen=true; renderReplies(byId[curId]); haptic("light"); };
@@ -1487,6 +1519,7 @@ window.addEventListener('resize',()=>PFX.resize());
 function openPlayer(id){
   const it=byId[id]; if(!it) return;
   curId=id; dur=0; acc=0; pendingSeek=null;
+  pulse("player",{id:id});      /* начала — важно отдельно от «дослушала» */
   $("p-cover").className="cov cov-"+it.cover;   // скрытый — только для обложки в Media Session
   $("p-title").textContent=it.title;
   $("p-meta").textContent=it.secTitle+" · "+it.dur;
@@ -1701,7 +1734,8 @@ function flushListen(){
   if(!curId || _pAcc<=0) return;
   const id=curId, D=curDur();
   let s=(parseFloat(localStorage.getItem(LISKEY(id))||"0")||0)+_pAcc; _pAcc=0;
-  if(D>0 && s>=D*0.8){ localStorage.setItem(CREDKEY(id),String(credits(id)+1)); s=0; }
+  if(D>0 && s>=D*0.8){ localStorage.setItem(CREDKEY(id),String(credits(id)+1)); s=0;
+                       pulse("listen",{id:id, n:credits(id)}); }
   localStorage.setItem(LISKEY(id),String(s));
 }
 function practiceDays(){ try{return JSON.parse(localStorage.getItem(DAYSKEY)||"[]");}catch(e){return[];} }
@@ -2122,6 +2156,7 @@ press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLin
   try{ f(); }catch(e){}
 });
 setTab("home");
+pulse("open");                 /* с этого начинается всё, что мы про неё знаем */
 
 /* ---------- заставка при запуске ---------- */
 function afterSplash(){
