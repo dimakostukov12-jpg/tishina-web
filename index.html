@@ -925,7 +925,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "14.08 23:10";
+const BUILD = "15.08 09:32";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1582,9 +1582,12 @@ function setupMediaSession(){
 /* ---------- favorites screen ---------- */
 function renderDiary(){
   const box=$("dy-list"); box.innerHTML="";
+  /* инсайт пишется после каждого прохождения, а проходов минимум два —
+     показываем все, а не только последний, иначе половина написанного пропадала */
   const rows=[];
   ALL_SECS.forEach(sec=>sec.items.forEach(it=>{
-    const t=loadNote(it.id); if(t) rows.push({it, t});
+    const list=loadNotes(it.id);
+    list.forEach((t,i)=>rows.push({it, t, n:list.length>1 ? i+1 : 0}));
   }));
   if(!rows.length){
     box.innerHTML='<div class="empty"><div class="big">Пока пусто</div>'
@@ -1592,17 +1595,19 @@ function renderDiary(){
       + 'соберётся здесь — и через месяц это будет очень интересно перечитать.</div>';
     return;
   }
-  rows.forEach(({it,t})=>{
+  rows.forEach(({it,t,n})=>{
     const d=document.createElement("div"); d.className="dy-card";
     d.innerHTML='<div class="dy-top"><span class="dy-name">'+it.title+'</span>'
-      + '<span class="dy-when">'+it.dur+'</span></div>'
+      + '<span class="dy-when">'+(n ? "проход "+n : it.dur)+'</span></div>'
       + '<div class="dy-text">'+t.replace(/</g,"&lt;")+'</div>';
     press(d, ()=>openDetail(it.id));
     box.appendChild(d);
   });
 }
 function renderFav(){
-  const list=$("fav-list"); const ids=favs(); list.innerHTML="";
+  /* фильтруем сразу: если медитацию переименовали, её id остаётся в избранном,
+     и раньше экран выходил пустым — ни карточек, ни надписи «пока пусто» */
+  const list=$("fav-list"); const ids=favs().filter(id=>byId[id]); list.innerHTML="";
   if(!ids.length){ list.innerHTML='<div class="empty"><div class="big">Пока пусто</div>Открой любую медитацию и нажми ♡ — она появится здесь.</div>'; return; }
   ids.forEach(id=>{ const it=byId[id]; if(!it)return;
     const r=document.createElement("div"); r.className="lrow"; r.innerHTML=rowHTML(it);
