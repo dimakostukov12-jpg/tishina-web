@@ -580,6 +580,55 @@ html.short .mn-hi{font-size:22px;}
 html.narrow .mn{padding-left:12px;padding-right:12px;}
 html.narrow .mn-t{font-size:18px;} html.narrow .mn-s{max-width:70%;}
 
+/* ---------- подписка ---------- */
+#s-sub{display:none;} #s-sub.active{display:block;}
+.sb-body{padding:6px 16px calc(84px + env(safe-area-inset-bottom));}
+.sb-card{position:relative;border-radius:18px;padding:2px;overflow:hidden;isolation:isolate;
+  margin-top:10px;transform:translateZ(0);box-shadow:0 0 16px rgba(233,201,131,.26);}
+.sb-card::before{content:"";position:absolute;inset:-60%;z-index:0;
+  background:conic-gradient(#6f4f18,#E7C983,#FFF6D8,#E7C983,#B98F3C,#F3E1AC,#FFF6D8,#C9A24B,#6f4f18);
+  animation:gspin 7s linear infinite;}
+.sb-in{position:relative;z-index:1;border-radius:16px;background:rgba(18,11,7,.94);padding:16px 17px 17px;}
+.sb-state{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:#8E7A67;}
+.sb-till{font-family:'Baskerville','Forum',Georgia,serif;font-size:24px;color:#F4E7D6;
+  line-height:1.15;margin-top:5px;}
+.sb-note{font-size:12.5px;color:#C0A793;line-height:1.55;margin-top:8px;}
+.sb-rows{margin-top:13px;border-top:1px solid rgba(233,201,131,.14);}
+.sb-row{display:flex;align-items:baseline;gap:10px;padding:9px 0;
+  border-bottom:1px solid rgba(233,201,131,.10);font-size:12.5px;color:#C6B29C;}
+.sb-row b{font-weight:400;color:#EFE3D4;margin-left:auto;text-align:right;}
+.sb-btn{margin-top:12px;text-align:center;border-radius:13px;padding:13px;cursor:pointer;
+  font-family:'Baskerville','Forum',Georgia,serif;font-size:16px;color:#1B1108;
+  background:linear-gradient(180deg,#F6E7BE,#C9A24B);
+  transition:transform .18s cubic-bezier(.2,.8,.3,1);}
+.sb-btn:active{transform:scale(.98);}
+.sb-btn.quiet{background:none;border:1px solid rgba(233,214,194,.22);color:#C0A793;font-size:14px;padding:11px;}
+.sb-keep{margin-top:16px;border-radius:14px;padding:13px 14px;
+  border:1px solid var(--litline);background:var(--lit);}
+.sb-keep b{display:block;font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;
+  font-size:14.5px;color:#F3DCA0;margin-bottom:5px;}
+.sb-keep span{font-size:12.5px;color:#C0A793;line-height:1.55;}
+.sb-help{margin-top:14px;font-size:12px;color:#8E7A67;text-align:center;line-height:1.5;}
+.sb-help u{color:#E9C983;text-decoration:none;}
+
+/* замок: подписка кончилась — приложение видно, но не работает */
+#s-lock{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
+  padding:26px;background:rgba(10,6,4,.82);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
+#s-lock.on{display:flex;}
+.lk{max-width:330px;width:100%;text-align:center;border-radius:20px;padding:24px 20px 20px;
+  border:1px solid rgba(233,201,131,.3);background:rgba(24,15,9,.96);
+  box-shadow:0 20px 50px rgba(0,0,0,.6);}
+.lk-ic{width:52px;height:52px;margin:0 auto 13px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid rgba(233,201,131,.45);background:rgba(233,201,131,.09);}
+.lk-ic svg{width:24px;height:24px;fill:none;stroke:#F3E1AC;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round;}
+.lk h3{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;font-size:23px;
+  color:#F4E7D6;margin:0 0 9px;line-height:1.2;}
+.lk p{font-size:13px;color:#C0A793;line-height:1.6;margin:0 0 6px;}
+.lk .sb-btn{margin-top:15px;}
+.lk .again{margin-top:11px;font-size:12px;color:#8E7A67;cursor:pointer;}
+.lk .again u{color:#E9C983;text-decoration:none;}
+
 /* ---------- под разные телефоны ----------
    Классы ios/android/narrow/short вешает скрипт при запуске: он спрашивает
    Телеграм, что за устройство, и только потом браузер. */
@@ -798,6 +847,27 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
   </div>
 </section>
 
+<section class="screen" id="s-sub">
+  <div class="safetop"></div>
+  <div class="topbar"><span class="back back-w" data-back>‹<b>Назад</b></span>
+    <span class="pill"><span class="gsp"></span><span class="pin" style="font-size:17px;padding:5px 15px">Подписка</span></span></div>
+  <div class="sb-body">
+    <div class="sb-card"><div class="sb-in">
+      <div class="sb-state" id="sb-state"></div>
+      <div class="sb-till" id="sb-till"></div>
+      <div class="sb-note" id="sb-note"></div>
+      <div class="sb-rows" id="sb-rows"></div>
+      <div class="sb-btn" id="sb-extend">Продлить подписку</div>
+      <div class="sb-btn quiet" id="sb-cancel">Отменить подписку</div>
+    </div></div>
+
+    <div class="sb-keep"><b>Что останется, если не продлить</b>
+      <span>Записи голосового дневника, инсайты после практик и твой путь по ступеням никуда не исчезнут — всё это сохраняется и ждёт тебя. Закроется только доступ к практикам.</span></div>
+
+    <div class="sb-help">Что-то не сходится с оплатой или сроком?<br><u id="sb-help">Напиши мне — разберёмся</u></div>
+  </div>
+</section>
+
 <section class="screen" id="s-start">
   <div class="safetop"></div>
   <div class="topbar"><span class="back back-w" data-back>‹<b>Назад</b></span>
@@ -860,8 +930,8 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <div class="st-ver" id="st-ver"></div>
     <div class="st-lb">Разделы</div>
     <div class="st-tiles">
-      <div class="st-tile" id="tile-card"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2.8" width="12.5" height="18.4" rx="2.4"/><path d="M18.4 6.2l1.4.5a2 2 0 0 1 1.2 2.5l-3.6 10.6"/><path d="M10.2 8.4l.9 2.1 2.3.2-1.7 1.5.5 2.2-2-1.2-2 1.2.5-2.2-1.7-1.5 2.3-.2z"/></svg></span>
-        <span class="st-tn">Карта дня</span><span class="st-tv" id="tv-card">одна карта в сутки — вытяни свою</span></div>
+      <div class="st-tile" id="tile-max"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="13" rx="2.4"/><path d="M8 21h8"/><path d="M12 17.5V21"/><path d="M7.6 13.4V8.6l2.6 3 2.6-3v4.8"/></svg></span>
+        <span class="st-tn">Подключить приложение</span><span class="st-tv" id="tv-max">в мессенджере MAX — скоро</span></div>
       <div class="st-tile" id="tile-fav"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5S3.5 15 3.5 8.9C3.5 6 5.7 4 8.2 4c1.7 0 3 .9 3.8 2.2C12.8 4.9 14.1 4 15.8 4c2.5 0 4.7 2 4.7 4.9 0 6.1-8.5 11.6-8.5 11.6z"/></svg></span>
         <span class="st-tn">Избранное</span><span class="st-tv" id="tv-fav"></span></div>
       <div class="st-tile" id="tile-sub"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 5.1 5.5.5-4.2 3.7 1.3 5.4L12 14.8 7.2 17.7l1.3-5.4-4.2-3.7 5.5-.5z"/></svg></span>
@@ -1036,6 +1106,18 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
   <div class="vd-edit" id="vd-edit"></div>
 </section>
 
+<div id="s-lock">
+  <div class="lk">
+    <div class="lk-ic"><svg viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/><circle cx="12" cy="15.2" r="1.1"/></svg></div>
+    <h3 id="lk-title">Подписка закончилась</h3>
+    <p id="lk-text"></p>
+    <p>Дневник, инсайты и твой путь сохранены — всё вернётся вместе с доступом.</p>
+    <div class="sb-btn" id="lk-extend">Продлить подписку</div>
+    <div class="again" id="lk-again">Уже оплатила? <u>Проверить ещё раз</u></div>
+    <div class="again" id="lk-help">Подписка есть, а доступа нет? <u>Напиши мне</u></div>
+  </div>
+</div>
+
 <nav class="tabbar" id="tabbar">
   <div class="tab on" data-tab="main"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4.5l8 6.7"/><path d="M6.2 10.4V19h11.6v-8.6"/><path d="M10 19v-4.4h4V19"/></svg>Главная</div>
   <div class="tab" data-tab="home"><svg viewBox="0 0 24 24"><path d="M12 20c5-2 7-7 7-13-6 0-11 2-13 7"/><path d="M5 20c0-5 3-9 7-11"/></svg>Медитации</div>
@@ -1057,7 +1139,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "15.08 20:32";
+const BUILD = "15.08 20:45";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1924,6 +2006,70 @@ function subText(v){
 function subPaint(){
   const e=$("tv-sub"), c=subLoad();
   if(e) e.textContent=subText(c && c.v);
+  try{ subScreen(); subLock(); }catch(_){}
+}
+/* полные даты для экрана подписки: «3 сентября 2026» */
+function subFull(s){
+  const p=String(s||"").split("-");
+  if(p.length<3) return "";
+  return parseInt(p[2],10)+" "+SUB_MON[parseInt(p[1],10)-1]+" "+p[0];
+}
+function subDaysLeft(until){
+  const t=Date.parse(until+"T23:59:59Z"), now=Date.now();
+  return Math.max(0, Math.ceil((t-now)/86400000));
+}
+/* ---------- экран подписки ---------- */
+function openSub(){ haptic("light"); subScreen(); go("s-sub",true); subFetch(true); }
+function subScreen(){
+  if(!$("sb-state")) return;
+  const v=(subLoad()||{}).v;
+  const st=v && v.state;
+  const rows=[];
+  let head, till, note, showCancel=false;
+
+  if(st==="active"){
+    const left=subDaysLeft(v.until);
+    head="Подписка активна";
+    till="до "+subFull(v.until);
+    note = v.autoRenew
+      ? "Продлевается сама. Спишется в последний день, доступ не прервётся."
+      : "Автопродление отключено — после этой даты доступ закроется.";
+    rows.push(["Осталось", left+" "+plural(left,"день","дня","дней")]);
+    if(v.plan) rows.push(["Тариф", v.plan]);
+    rows.push(["Автопродление", v.autoRenew ? "включено" : "выключено"]);
+    showCancel = !!v.autoRenew;
+  } else if(st==="none"){
+    head = v.inClub ? "Подписка закончилась" : "Подписка не оформлена";
+    till = v.inClub ? "доступ закрыт" : "доступ ещё не открыт";
+    note = "Практики, дневник и разговоры откроются сразу после оплаты.";
+  } else {
+    head="Не удалось проверить";
+    till="статус неизвестен";
+    note="Похоже, нет связи. Доступ я не закрываю — открой экран ещё раз чуть позже.";
+  }
+  $("sb-state").textContent=head;
+  $("sb-till").textContent=till;
+  $("sb-note").textContent=note;
+  $("sb-rows").innerHTML = rows.map(r=>'<div class="sb-row"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join("");
+  $("sb-extend").textContent = st==="active" ? "Продлить заранее" : "Продлить подписку";
+  $("sb-cancel").style.display = showCancel ? "" : "none";
+}
+/* ---------- замок ----------
+   Закрываем приложение только когда клуб ответил прямо: подписки нет.
+   Молчание, ошибка сети и «неизвестно» замок не включают — женщина не должна
+   остаться без практик из-за нашего сбоя. */
+function subLock(){
+  const el=$("s-lock"); if(!el) return;
+  const v=(subLoad()||{}).v;
+  const locked = !!(v && v.state==="none" && tg && tg.initData);
+  el.classList.toggle("on", locked);
+  document.body.classList.toggle("locked", locked);
+  if(locked){
+    $("lk-title").textContent = v.inClub ? "Подписка закончилась" : "Нужна подписка";
+    $("lk-text").textContent = v.inClub
+      ? "Практики, дневник и разговоры сейчас закрыты. Чтобы продолжить, продли подписку."
+      : "Чтобы открыть практики, дневник и разговоры, оформи подписку.";
+  }
 }
 async function subFetch(force){
   const c=subLoad();
@@ -2407,12 +2553,43 @@ $("sv-done").onclick=()=>{ markStart(); renderMain(); haptic("light"); back(); }
 press($("mn-vd"),   ()=>setTab("vd"));
 press($("mn-card"), openCardDay);
 
-press($("tile-card"), openCardDay);
-press($("tile-fav"), ()=>{ renderFav(); go("s-fav",true); });
-press($("tile-sub"), ()=>{
-  try{ tg && tg.openTelegramLink && tg.openTelegramLink(SUB_LINK); }catch(e){}
+press($("tile-max"), ()=>{
+  haptic("light");
+  try{ tg && tg.showPopup && tg.showPopup({title:"Скоро",
+    message:"Готовим то же приложение в мессенджере MAX. Как откроем — расскажу здесь.",
+    buttons:[{type:"ok"}]}); }catch(e){}
 });
+press($("tile-fav"), ()=>{ renderFav(); go("s-fav",true); });
+press($("tile-sub"), openSub);
 press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
+
+/* кнопки подписки: продление и отмена уходят в бота — оплату держит он */
+function subOpenBot(what){
+  try{ tg && tg.openTelegramLink && tg.openTelegramLink(SUB_LINK+(what||"")); }catch(e){}
+}
+press($("sb-extend"), ()=>{ haptic("medium"); subOpenBot(); });
+press($("sb-help"),   ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
+press($("sb-cancel"), ()=>{
+  haptic("rigid");
+  const v=(subLoad()||{}).v||{};
+  const till=v.until?subFull(v.until):"конца оплаченного срока";
+  const ask="Доступ останется до "+till+" — деньги за оплаченное не пропадут. "+
+            "Дальше приложение закроется, а записи дневника сохранятся.";
+  const go=()=>subOpenBot("_cancel");
+  try{
+    if(tg && tg.showPopup){
+      tg.showPopup({title:"Отменить продление?", message:ask,
+        buttons:[{id:"no",type:"cancel"},{id:"yes",type:"destructive",text:"Отменить"}]},
+        id=>{ if(id==="yes") go(); });
+    } else if(confirm(ask)) go();
+  }catch(e){ go(); }
+});
+press($("lk-extend"), ()=>{ haptic("medium"); subOpenBot(); });
+press($("lk-help"),   ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
+press($("lk-again"),  ()=>{ haptic("light"); $("lk-again").innerHTML="проверяю…"; subFetch(true)
+  .then(()=>setTimeout(()=>{ $("lk-again").innerHTML='Уже оплатила? <u>Проверить ещё раз</u>'; },900)); });
+/* вернулась из бота — сразу перепроверяем, не заставляя её перезапускать */
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) subFetch(true); });
 
 /* каждый кусок в своей обёртке: сбой одного экрана больше не оставит
    приложение без стартовой вкладки */
@@ -2420,7 +2597,8 @@ press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLin
   try{ f(); }catch(e){}
 });
 setTab("main");
-pulse("open");                 /* с этого начинается всё, что мы про неё знаем */
+pulse("open");
+try{ subPaint(); subFetch(); }catch(e){}   /* состояние подписки и замок */                 /* с этого начинается всё, что мы про неё знаем */
 
 /* ---------- заставка при запуске ---------- */
 function afterSplash(){
