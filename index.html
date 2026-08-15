@@ -562,6 +562,35 @@ body.ob-open .tabbar{display:none;}
   radial-gradient(at 95% 80%,rgba(201,162,75,.70),transparent 46%),
   linear-gradient(120deg,#2b2008,#151007);}
 /* на низких экранах поджимаем, чтобы три двери влезали без прокрутки */
+/* «С чего начать» — плашка первая и заметнее прочих: пока не посмотрела,
+   у неё золотая обводка потолще; после просмотра успокаивается */
+.mn-pl.first{border-color:rgba(233,201,131,.5);box-shadow:0 0 16px rgba(233,201,131,.24),0 8px 20px rgba(0,0,0,.34);}
+.art-start{background-image:
+  radial-gradient(at 76% 24%,rgba(243,225,172,.75),transparent 46%),
+  radial-gradient(at 95% 74%,rgba(216,140,190,.45),transparent 46%),
+  linear-gradient(120deg,#33240e,#150e08);}
+.mn-play{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:44px;height:44px;
+  border-radius:50%;display:grid;place-items:center;border:1px solid rgba(233,201,131,.55);
+  background:rgba(18,11,7,.55);box-shadow:0 0 14px rgba(233,201,131,.3);}
+.mn-play::after{content:"";border-left:13px solid #F3E1AC;border-top:8px solid transparent;
+  border-bottom:8px solid transparent;margin-left:3px;}
+
+/* экран с видео */
+#s-start{display:none;} #s-start.active{display:block;}
+.sv-body{padding:4px 16px calc(84px + env(safe-area-inset-bottom));}
+.sv-box{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(233,201,131,.3);
+  background:#0E0906;box-shadow:0 10px 26px rgba(0,0,0,.45);}
+.sv-video{display:block;width:100%;aspect-ratio:9/16;max-height:62vh;background:#0E0906;object-fit:contain;}
+.sv-soon{padding:44px 22px;text-align:center;color:#C6B29C;font-size:13px;line-height:1.6;}
+.sv-soon b{display:block;font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;
+  font-size:19px;color:#F3DCA0;margin-bottom:8px;}
+.sv-txt{margin-top:14px;font-size:13px;color:#D8C6B6;line-height:1.6;}
+.sv-txt b{color:#F3DCA0;font-weight:400;font-family:'Baskerville','Forum',Georgia,serif;font-size:15px;}
+.sv-done{margin-top:14px;text-align:center;border-radius:13px;padding:12px;cursor:pointer;
+  font-family:'Baskerville','Forum',Georgia,serif;font-size:15px;color:#1B1108;
+  background:linear-gradient(180deg,#F6E7BE,#C9A24B);transition:transform .18s cubic-bezier(.2,.8,.3,1);}
+.sv-done:active{transform:scale(.98);}
+.sv-done.seen{background:none;border:1px solid rgba(233,214,194,.2);color:#C0A793;}
 html.short .mn-in{min-height:86px;padding:12px 14px;}
 html.short .mn-task{padding:6px 0;}
 html.short .mn-hi{font-size:22px;}
@@ -768,6 +797,11 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <div class="mn-lbl" id="mn-lbl">Что сделать на этой неделе</div>
     <div class="mn-plan" id="mn-plan"></div>
 
+    <div class="mn-pl first" id="mn-start"><div class="mn-art art-start"></div><div class="mn-veil"></div>
+      <div class="mn-in"><div class="mn-t">С чего начать</div>
+        <div class="mn-s" id="mn-start-s"></div></div>
+      <div class="mn-play"></div></div>
+
     <div class="mn-pl" id="mn-med"><div class="mn-art art-med"></div><div class="mn-veil"></div>
       <div class="mn-in"><div class="mn-t">Медитации</div>
         <div class="mn-s" id="mn-med-s"></div>
@@ -780,6 +814,21 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <div class="mn-pl" id="mn-card"><div class="mn-art art-card"></div><div class="mn-veil"></div>
       <div class="mn-in"><div class="mn-t">Карта дня</div>
         <div class="mn-s" id="mn-card-s"></div></div></div>
+  </div>
+</section>
+
+<section class="screen" id="s-start">
+  <div class="safetop"></div>
+  <div class="topbar"><span class="back back-w" data-back>‹<b>Назад</b></span>
+    <span class="pill"><span class="gsp"></span><span class="pin" style="font-size:17px;padding:5px 15px">С чего начать</span></span></div>
+  <div class="sv-body">
+    <div class="sv-box" id="sv-box">
+      <video class="sv-video" id="sv-video" playsinline controls preload="metadata" style="display:none"></video>
+      <div class="sv-soon" id="sv-soon"><b>Видео уже записывается</b>
+        Здесь будет короткий рассказ о том, как устроено приложение и с чего начать путь. Пока можешь открыть «Медитации» и выбрать первую практику сама.</div>
+    </div>
+    <div class="sv-txt" id="sv-txt"></div>
+    <div class="sv-done" id="sv-done">Я посмотрела — дальше</div>
   </div>
 </section>
 
@@ -1027,7 +1076,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "15.08 16:05";
+const BUILD = "15.08 16:10";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1439,6 +1488,33 @@ async function vdDone(){
    «Практика недели» пока — та, которую она слушала последней и не закрыла;
    когда включим недельные ступени, сюда встанет практика недели, а разметка
    останется прежней. */
+/* ---------- «с чего начать» ----------
+   Пока видео не залито, START_VIDEO пустой: плашка честно говорит «скоро»
+   и ничего не загораживает. Как только файл появится, раздел сам становится
+   первым шагом плана — до просмотра практика в плане не показывается. */
+const START_VIDEO="";
+const STARTKEY="tishina_start";
+function startSeen(){ return localStorage.getItem(STARTKEY)==="1"; }
+function markStart(){
+  if(startSeen()) return;
+  try{ localStorage.setItem(STARTKEY,"1"); }catch(e){}
+  pulse("start");
+  haptic("success");
+}
+function openStart(){
+  const v=$("sv-video"), soon=$("sv-soon");
+  if(START_VIDEO){
+    soon.style.display="none"; v.style.display="block";
+    if(v.dataset.on!=="1"){ v.dataset.on="1"; v.src=START_VIDEO; }
+  } else { soon.style.display="block"; v.style.display="none"; }
+  $("sv-txt").innerHTML = START_VIDEO
+    ? '<b>Посмотри первым делом.</b> Здесь я рассказываю, как устроен клуб: почему практика одна в неделю, зачем проходить её дважды и что записывать после.'
+    : '';
+  const b=$("sv-done");
+  b.classList.toggle("seen", startSeen());
+  b.textContent = startSeen() ? "Уже посмотрено" : "Я посмотрела — дальше";
+  go("s-start",true);
+}
 const LASTKEY="tishina_lastmed";
 function lastMed(){
   const id=localStorage.getItem(LASTKEY);
@@ -1462,7 +1538,18 @@ function renderMain(){
   const done=id?doneCount(id):0, notes=id?loadNotes(id).length:0;
   const cred=id?credits(id):0;
 
-  if(!it){
+  /* первый шаг для новенькой — видео. Пока оно не посмотрено, планов про
+     практику не показываем: иначе на первом экране висит чужая практика */
+  if(START_VIDEO && !startSeen()){
+    $("mn-lbl").textContent="С чего начать";
+    $("mn-plan").innerHTML='<div class="mn-ph"><b>Знакомство с клубом</b><i>7 минут</i></div>'+
+      '<div class="mn-task"><div class="mn-k"></div><div>'+
+      '<div class="mn-tt">Посмотреть «С чего начать»</div>'+
+      '<div class="mn-ts">как всё устроено и с чего начинается путь</div></div></div>'+
+      '<div class="mn-task"><div class="mn-k"></div><div>'+
+      '<div class="mn-tt">Первая практика</div>'+
+      '<div class="mn-ts">откроется сразу после видео</div></div></div>';
+  } else if(!it){
     $("mn-lbl").textContent="С чего начать";
     $("mn-plan").innerHTML='<div class="mn-empty">Открой любой раздел и выбери первую практику. '+
       'Дальше я буду держать здесь твой путь: сколько проходов сделано и что осталось.</div>';
@@ -1493,6 +1580,10 @@ function renderMain(){
       (left? left+" "+plural(left,"проход","прохода","проходов")+" осталось" : "всё сделано")+
       '</i></div>'+rows;
   }
+
+  $("mn-start-s").textContent = !START_VIDEO ? "скоро — короткое видео о том, как всё устроено"
+    : (startSeen() ? "посмотрено — можно вернуться в любой момент"
+                   : "короткое видео: как устроен клуб и с чего начать");
 
   let n=0; ALL_SECS.forEach(s=>n+=s.items.length);
   $("mn-med-s").textContent = SECTIONS.length+" "+plural(SECTIONS.length,"раздел","раздела","разделов")+
@@ -2224,7 +2315,9 @@ function renderStage(){
   $("st-name").textContent=myName();
   $("st-stage").textContent=st.name+" · ступень "+idx;
   $("st-desc").textContent=st.desc;
-  try{ $("st-ver").textContent="сборка "+BUILD+" · "+DEV.label; }catch(e){}
+  /* номер сборки женщине не нужен — показываем только в тестовом режиме
+     (долгое нажатие на картинку ступени), чтобы было чем диагностировать */
+  try{ $("st-ver").textContent = stageTest ? ("сборка "+BUILD+" · "+DEV.label) : ""; }catch(e){}
   $("st-days").textContent=sinceDays();
   $("st-mins").textContent=listenedMin();
   $("st-tasks").textContent=tasksDone();
@@ -2322,7 +2415,14 @@ try{ const st=cdState();
 }catch(e){}
 
 /* плашки главной: каждая — дверь в свою вкладку */
+press($("mn-start"), openStart);
 press($("mn-med"),  ()=>setTab("home"));
+/* засчитываем просмотр: досмотрела до конца или почти — и по кнопке */
+$("sv-video").addEventListener("ended", ()=>{ markStart(); renderMain(); $("sv-done").textContent="Уже посмотрено"; });
+$("sv-video").addEventListener("timeupdate", function(){
+  if(!startSeen() && this.duration>0 && this.currentTime/this.duration>0.9){ markStart(); renderMain(); }
+});
+$("sv-done").onclick=()=>{ markStart(); renderMain(); haptic("light"); back(); };
 press($("mn-vd"),   ()=>setTab("vd"));
 press($("mn-card"), openCardDay);
 
