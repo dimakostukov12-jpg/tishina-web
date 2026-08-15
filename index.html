@@ -145,7 +145,10 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
 /* ---------- голосовой дневник ---------- */
 #s-vd{display:none;} #s-vd.active{display:block;}
 .vd-body{padding:6px 16px calc(84px + env(safe-area-inset-bottom));}
-.vd-h{font-family:'Baskerville','Forum',Georgia,serif;font-size:26px;color:#F4E7D6;line-height:1.1;}
+/* шапка дневника: тот же медальон, что во всех разделах, но отступы уже
+   есть у .vd-body — свои горизонтальные обнуляем, иначе поля удвоятся */
+.vd-hd{padding:10px 0 2px;}
+.vd-hd .pin{font-size:19px;padding:5px 15px;}
 .vd-panel{border-radius:15px;border:1px solid var(--litline);background:var(--lit);}
 .vd-hi{margin-top:11px;padding:12px 14px;}
 .vd-hi p{margin:0;font-size:12.5px;color:#D8C6B6;line-height:1.55;}
@@ -510,6 +513,8 @@ body.ob-open .tabbar{display:none;}
 .mn-hi{font-family:'Baskerville','Forum',Georgia,serif;font-size:25px;color:#F4E7D6;line-height:1.12;}
 .mn-hi span{display:block;font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   font-size:11px;letter-spacing:.02em;color:#B49F89;margin-top:4px;}
+.mn-hi .mn-hrt{font-style:normal;color:#E9C983;font-size:.8em;
+  text-shadow:0 0 10px rgba(233,201,131,.6);}
 .mn-lbl{font-size:9px;letter-spacing:.24em;text-transform:uppercase;
   color:rgba(246,238,221,.42);margin:17px 0 9px;}
 
@@ -835,7 +840,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
   <div class="safetop"></div>
   <div class="mn">
     <div class="mn-hi" id="mn-hi"></div>
-    <div class="mn-lbl" id="mn-lbl">Что сделать на этой неделе</div>
+    <div class="mn-lbl" id="mn-lbl">Что сделать на этой неделе?</div>
     <div class="mn-plan" id="mn-plan"></div>
 
     <div class="mn-pl first" id="mn-start"><div class="mn-art art-start"></div><div class="mn-veil"></div>
@@ -895,7 +900,9 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 
 <section class="screen" id="s-home">
   <div class="safetop"></div>
-  <div class="home-hd"><h1 class="h-title">Выбери раздел и начни практику</h1><div class="h-arw"><svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2 L12 12 L22 2"/></svg></div></div>
+  <div class="topbar"><span class="back" data-home>‹</span>
+    <span class="pill"><span class="gsp"></span><span class="pin">Медитации</span></span></div>
+  <div class="sec-intro">Выбери раздел и начни практику</div>
   <div class="grid" id="home-grid"></div>
 </section>
 
@@ -983,7 +990,8 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 
 <section class="screen" id="s-talk">
   <div class="safetop"></div>
-  <div class="topbar"><span class="tb-title" style="padding-left:6px">Поговорить</span></div>
+  <div class="topbar"><span class="back" data-home>‹</span>
+    <span class="pill"><span class="gsp"></span><span class="pin">Поговорить</span></span></div>
   <div class="tk-chat" id="tk-chat"></div>
   <div class="tk-chips" id="tk-chips"></div>
   <div class="tk-bar" id="tk-bar">
@@ -1098,7 +1106,8 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 <section class="screen" id="s-vd">
   <div class="safetop"></div>
   <div class="vd-body">
-    <div class="vd-h">Голосовой дневник</div>
+    <div class="topbar vd-hd"><span class="back" data-home>‹</span>
+      <span class="pill"><span class="gsp"></span><span class="pin">Голосовой дневник</span></span></div>
     <div class="vd-panel vd-hi" id="vd-hi"><p><b>Привет, это твой дневник.</b> Нажми и расскажи, как ты сейчас — своими словами, тебя тут никто не читает. Я расшифрую голос в текст, а через неделю соберу из записей вывод.</p></div>
     <div class="vd-panel vd-wk"><div class="vd-days" id="vd-days"></div><div class="vd-wkft" id="vd-wkft"></div></div>
     <div class="vd-panel vd-rec" id="vd-rec">
@@ -1149,7 +1158,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "15.08 22:10";
+const BUILD = "15.08 22:15";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1602,10 +1611,7 @@ function lastMed(){
   return found;
 }
 function renderMain(){
-  const days=practiceDays().length;
-  const idx=Math.min(STAGES.length, Math.floor(days/DAYS_PER_STAGE)+1);
-  $("mn-hi").innerHTML = "Здравствуй, "+escHtml(myName())+
-    "<span>ступень "+idx+" · "+STAGES[idx-1].name+"</span>";
+  $("mn-hi").innerHTML = "Здравствуй, "+escHtml(myName())+" <i class=\"mn-hrt\">♡</i>";
 
   const id=lastMed(), it=id&&byId[id];
   const times=(id && MED[id] && MED[id].times) || 2;
@@ -1628,7 +1634,7 @@ function renderMain(){
     $("mn-plan").innerHTML='<div class="mn-empty">Открой любой раздел и выбери первую практику. '+
       'Дальше я буду держать здесь твой путь: сколько проходов сделано и что осталось.</div>';
   } else {
-    $("mn-lbl").textContent="Что сделать на этой неделе";
+    $("mn-lbl").textContent="Что сделать на этой неделе?";
     const left=Math.max(0,times-done);
     const pct=(function(){                       /* сколько дослушано в текущем заходе */
       const D=it.durSec||0, s=parseFloat(localStorage.getItem(LISKEY(id))||"0")||0;
@@ -2180,6 +2186,8 @@ function plural(n,a,b,c){const m=n%100,d=n%10;if(m>=11&&m<=14)return c;if(d===1)
 
 /* ---------- wire ---------- */
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{haptic();back();});
+/* стрелка на вкладках: возвращаться некуда — из них выходят на главную */
+document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>{haptic();setTab("main");});
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{haptic();setTab(t.dataset.tab);});
 
 /* ---------- «Поговорить»: переписка с ИИ-психологом ----------
