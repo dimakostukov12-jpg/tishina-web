@@ -866,7 +866,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <div class="sb-keep"><b>Что останется, если не продлить</b>
       <span>Записи голосового дневника, инсайты после практик и твой путь по ступеням никуда не исчезнут — всё это сохраняется и ждёт тебя. Закроется только доступ к практикам.</span></div>
 
-    <div class="sb-help">Что-то не сходится с оплатой или сроком?<br><u id="sb-help">Напиши мне — разберёмся</u></div>
+    <div class="sb-help">Что-то не сходится с оплатой или сроком?<br><u id="sb-help">Напиши в поддержку — разберёмся</u></div>
   </div>
 </section>
 
@@ -1116,7 +1116,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <p>Дневник, инсайты и твой путь сохранены — всё вернётся вместе с доступом.</p>
     <div class="sb-btn" id="lk-extend">Продлить подписку</div>
     <div class="again" id="lk-again">Уже оплатила? <u>Проверить ещё раз</u></div>
-    <div class="again" id="lk-help">Подписка есть, а доступа нет? <u>Напиши мне</u></div>
+    <div class="again" id="lk-help">Подписка есть, а доступа нет? <u>Напиши в поддержку</u></div>
   </div>
 </div>
 
@@ -1141,7 +1141,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "15.08 20:57";
+const BUILD = "15.08 21:03";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1990,6 +1990,13 @@ const CLUB_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/club";
 const SUBKEY   = "tishina_sub";
 const SUB_TTL  = 10*60*1000;
 const SUB_LINK = "https://t.me/zanovo_siyat_bot?start=subsextend";
+/* поддержка: живой бот, а не личка — пишет сразу, ждать ответа не в переписке со мной */
+const HELP_LINK = "https://t.me/dimakostukov_suppotbot";
+function openHelp(){
+  haptic("light");
+  try{ if(tg && tg.openTelegramLink){ tg.openTelegramLink(HELP_LINK); return; } }catch(e){}
+  try{ window.open(HELP_LINK,"_blank"); }catch(e){}
+}
 const SUB_MON  = ["января","февраля","марта","апреля","мая","июня",
                   "июля","августа","сентября","октября","ноября","декабря"];
 
@@ -2564,14 +2571,14 @@ press($("tile-max"), ()=>{
 });
 press($("tile-fav"), ()=>{ renderFav(); go("s-fav",true); });
 press($("tile-sub"), openSub);
-press($("tile-help"), ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
+press($("tile-help"), openHelp);
 
 /* кнопки подписки: продление и отмена уходят в бота — оплату держит он */
 function subOpenBot(what){
   try{ tg && tg.openTelegramLink && tg.openTelegramLink(SUB_LINK+(what||"")); }catch(e){}
 }
 press($("sb-extend"), ()=>{ haptic("medium"); subOpenBot(); });
-press($("sb-help"),   ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
+press($("sb-help"),   openHelp);
 press($("sb-cancel"), ()=>{
   haptic("rigid");
   const v=(subLoad()||{}).v||{};
@@ -2588,7 +2595,7 @@ press($("sb-cancel"), ()=>{
   }catch(e){ go(); }
 });
 press($("lk-extend"), ()=>{ haptic("medium"); subOpenBot(); });
-press($("lk-help"),   ()=>{ try{ tg && tg.openTelegramLink && tg.openTelegramLink("https://t.me/dima_kostukov"); }catch(e){} });
+press($("lk-help"),   openHelp);
 press($("lk-again"),  ()=>{ haptic("light"); $("lk-again").innerHTML="проверяю…"; subFetch(true)
   .then(()=>setTimeout(()=>{ $("lk-again").innerHTML='Уже оплатила? <u>Проверить ещё раз</u>'; },900)); });
 /* вернулась из бота — сразу перепроверяем, не заставляя её перезапускать */
