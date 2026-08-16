@@ -20,7 +20,7 @@ body,input,textarea,button{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 /* тёплый свет, падающий сверху панели и гаснущий к низу: панели перестают быть
    чёрными плашками и светятся изнутри. Одно место на всё приложение — если надо
    светлее или темнее, менять только эти две строки */
-:root{--lit:radial-gradient(120% 100% at 50% 0,rgba(233,201,131,.17),rgba(20,13,8,.45));
+:root{--lit:radial-gradient(120% 100% at 50% 0,rgba(48,32,19,.80),rgba(17,11,7,.86));
   --litline:rgba(233,201,131,.27);}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#20140D;overscroll-behavior:none;}
 /* Заливка живёт на html, а не на body: слои с картинкой (.bg, .sec-bg, .d-iri)
@@ -276,7 +276,7 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
 .dy-card{border-radius:17px;padding:14px 16px 15px;margin-bottom:11px;cursor:pointer;
   background:var(--lit);border:1px solid var(--litline);
   transition:transform .18s cubic-bezier(.2,.8,.3,1),background .2s;}
-.dy-card:active{transform:scale(.975);background:rgba(255,246,232,.09);}
+.dy-card:active{transform:scale(.975);background:rgba(46,31,19,.88);}
 .dy-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
 .dy-name{font-family:'Baskerville','Forum',Georgia,serif;font-size:17px;color:#F3DCA0;}
 .dy-when{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A6857;flex:none;}
@@ -291,7 +291,7 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
   padding:8px 16px 4px;}
 .tk-bub{max-width:84%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.45;
   white-space:pre-line;animation:obIn .32s ease;}
-.tk-bub.bot{align-self:flex-start;background:rgba(255,255,255,.07);
+.tk-bub.bot{align-self:flex-start;background:rgba(26,17,10,.82);
   border:1px solid rgba(255,255,255,.10);color:#EAE7E4;border-bottom-left-radius:5px;}
 .tk-bub.me{align-self:flex-end;color:#F7ECC6;border-bottom-right-radius:5px;
   background:linear-gradient(180deg,rgba(233,201,131,.22),rgba(233,201,131,.12));
@@ -435,8 +435,8 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
   border:1px solid var(--litline);padding:13px 15px;color:#D8C6B6;font-size:13px;
   line-height:1.55;}
 .sec-list{padding:0 16px;}
-.lrow{display:flex;gap:12px;align-items:center;padding:10px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);margin-bottom:11px;cursor:pointer;will-change:transform;transition:transform .6s cubic-bezier(.25,.8,.35,1),background .4s,box-shadow .4s;}
-.lrow.press{transform:scale(.965);background:rgba(255,255,255,.085);}
+.lrow{display:flex;gap:12px;align-items:center;padding:10px;border-radius:18px;background:rgba(22,14,9,.78);border:1px solid rgba(233,201,131,.16);margin-bottom:11px;cursor:pointer;will-change:transform;transition:transform .6s cubic-bezier(.25,.8,.35,1),background .4s,box-shadow .4s;}
+.lrow.press{transform:scale(.965);background:rgba(38,25,15,.86);}
 .lrow.pop{box-shadow:0 0 0 1.5px rgba(243,220,160,.35),0 10px 24px rgba(0,0,0,.4);}
 .cframe{flex:0 0 43%;border-radius:13px;padding:1.9px;box-shadow:0 0 8px rgba(233,201,131,.5),0 0 16px rgba(233,201,131,.22),0 6px 16px rgba(0,0,0,.35);}
 .cov{position:relative;z-index:1;overflow:hidden;width:100%;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:11px;}
@@ -527,7 +527,7 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
    полосу ввода за нижний край экрана, под клавиатуру */
 .ob-chat{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
 .ob-bub{max-width:82%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.45;animation:obIn .32s ease;}
-.ob-bub.bot{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:#EAE7E4;border-bottom-left-radius:5px;}
+.ob-bub.bot{align-self:flex-start;background:rgba(26,17,10,.82);border:1px solid rgba(233,201,131,.16);color:#EAE7E4;border-bottom-left-radius:5px;}
 .ob-bub.me{align-self:flex-end;background:linear-gradient(180deg,rgba(233,201,131,.22),rgba(233,201,131,.12));border:1px solid rgba(233,201,131,.34);color:#F7ECC6;border-bottom-right-radius:5px;}
 .ob-hint{align-self:flex-start;color:#9B958F;font-size:12px;padding:0 6px;margin-top:-4px;}
 .ob-typing{align-self:flex-start;color:#9B958F;font-size:14px;padding:6px 12px;letter-spacing:.12em;}
@@ -566,7 +566,7 @@ body.ob-open .tabbar{display:none;}
 /* карточка плотнее фона, иначе на светлом дыме текст плывёт */
 .mn-plan{border-radius:16px;padding:13px 14px;margin-bottom:12px;
   border:1px solid rgba(233,201,131,.30);
-  background:linear-gradient(180deg,rgba(28,18,11,.90),rgba(15,9,6,.94));
+  background:linear-gradient(180deg,rgba(44,29,18,.86),rgba(20,13,8,.90));
   box-shadow:0 8px 22px rgba(0,0,0,.34);}
 .mn-ph{display:flex;align-items:baseline;gap:9px;margin-bottom:10px;}
 .mn-ph b{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;font-size:16px;color:#F3DCA0;
@@ -593,7 +593,11 @@ body.ob-open .tabbar{display:none;}
   isolation:isolate;transform:translateZ(0);
   box-shadow:0 0 11px rgba(233,201,131,.42),0 0 24px rgba(233,201,131,.16),0 8px 20px rgba(0,0,0,.34);
   transition:transform .18s cubic-bezier(.2,.8,.3,1);}
-.mn-pl::before{content:"";position:absolute;inset:-65%;z-index:0;pointer-events:none;
+/* квадрат в полтора ширины плашки, привязанный к центру: при любом угле
+   поворота он накрывает её целиком. С inset:-65% у широкой плашки углы
+   на части оборота оставались пустыми — рамка «сползала». */
+.mn-pl::before{content:"";position:absolute;top:50%;left:50%;width:150%;aspect-ratio:1;
+  margin:-75% 0 0 -75%;z-index:0;pointer-events:none;
   background:conic-gradient(#6f4f18,#E7C983,#FFF6D8,#E7C983,#B98F3C,#F3E1AC,#FFF6D8,#C9A24B,#6f4f18);
   animation:gspin 6s linear infinite;}
 .mn-pl:active{transform:scale(.985);}
@@ -863,12 +867,12 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 .p-name{font-family:'Baskerville','Forum',Georgia,serif;font-size:26px;color:#F3DCA0;margin:14px 0 2px;}
 .p-role{font-size:12.5px;color:#B9B3AE;letter-spacing:.05em;text-transform:uppercase;}
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;padding:20px 16px;}
-.stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px 8px;text-align:center;}
+.stat{background:rgba(22,14,9,.76);border:1px solid rgba(233,201,131,.16);border-radius:16px;padding:16px 8px;text-align:center;}
 .stat b{display:block;font-family:'Baskerville','Forum',Georgia,serif;font-size:26px;color:#F3DCA0;}
 .stat span{font-size:11px;color:#B9B3AE;letter-spacing:.03em;}
 .sect-title{font-family:'Baskerville','Forum',Georgia,serif;font-size:20px;color:#F3DCA0;padding:6px 20px 2px;}
 /* календарь практики */
-.cal{margin:8px 16px 4px;padding:14px 14px 12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:18px;}
+.cal{margin:8px 16px 4px;padding:14px 14px 12px;background:rgba(22,14,9,.76);border:1px solid rgba(233,201,131,.16);border-radius:18px;}
 .cal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .cal-title{font-family:'Baskerville','Forum',Georgia,serif;font-size:19px;color:#F3DCA0;letter-spacing:.02em;}
 .cal-nav{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;color:#F3DCA0;cursor:pointer;border-radius:50%;user-select:none;-webkit-tap-highlight-color:transparent;}
@@ -1211,7 +1215,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "16.08 12:01";
+const BUILD = "16.08 12:06";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
