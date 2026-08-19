@@ -1215,7 +1215,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "16.08 12:06";
+const BUILD = "19.08 20:10";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -2061,11 +2061,12 @@ const CLUB_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/club";
 const SUBKEY   = "tishina_sub";
 const SUB_TTL  = 10*60*1000;
 /* Оплату и отмену держит бот. Команду из его меню ссылкой нажать нельзя —
-   телеграм умеет только «/start payload», поэтому бот должен ловить эти два
+   телеграм умеет только «/start payload», поэтому бот должен ловить эти
    payload и отвечать тем же, чем на команды продления и отмены. */
-const BOT_LINK    = "https://t.me/zanovo_siyat_bot";
-const SUB_LINK    = BOT_LINK+"?start=subscribe_extend";
-const CANCEL_LINK = BOT_LINK+"?start=subscribe_cancel";
+const BOT_LINK        = "https://t.me/zanovo_siyat_bot";
+const SUB_LINK_BUY    = BOT_LINK+"?start=start";        /* ещё ни разу не платила */
+const SUB_LINK_EXTEND = BOT_LINK+"?start=subsextend";   /* уже была в клубе */
+const CANCEL_LINK     = BOT_LINK+"?start=subscribe_cancel";
 /* поддержка: живой бот, а не личка — пишет сразу, ждать ответа не в переписке со мной */
 const HELP_LINK = "https://t.me/dimakostukov_suppotbot";
 function openHelp(){
@@ -2088,6 +2089,11 @@ function subText(v){
   if(!v || v.state==="unknown") return "сроки и оплата";
   if(v.state==="active") return "активна до "+subDate(v.until);
   return v.inClub ? "закончилась" : "не оформлена";
+}
+/* была ли она хоть раз в клубе — тем, кто уже платил, продление, остальным покупка */
+function subLink(){
+  const c=subLoad(), v=c && c.v;
+  return (v && v.inClub) ? SUB_LINK_EXTEND : SUB_LINK_BUY;
 }
 function subPaint(){
   const e=$("tv-sub"), c=subLoad();
@@ -2686,7 +2692,7 @@ press($("tile-help"), openHelp);
 
 /* кнопки подписки: продление и отмена уходят в бота — оплату держит он */
 function subOpenBot(link){
-  const url=link||SUB_LINK;
+  const url=link||subLink();   /* без аргумента — покупка или продление, по её истории */
   try{ if(tg && tg.openTelegramLink){ tg.openTelegramLink(url); return; } }catch(e){}
   try{ window.open(url,"_blank"); }catch(e){}
 }
