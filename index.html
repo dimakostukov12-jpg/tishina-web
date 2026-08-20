@@ -1224,7 +1224,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "20.08 21:48";
+const BUILD = "20.08 22:23";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1360,7 +1360,7 @@ function press(el,onTap){
 /* ---------- favorites ---------- */
 function favs(){ try{return JSON.parse(localStorage.getItem(FAVKEY)||"[]");}catch(e){return[];} }
 function isFav(id){ return favs().indexOf(id)>=0; }
-function toggleFav(id){ let a=favs(); const i=a.indexOf(id); if(i>=0)a.splice(i,1); else a.push(id); localStorage.setItem(FAVKEY,JSON.stringify(a)); return a.indexOf(id)>=0; }
+function toggleFav(id){ let a=favs(); const i=a.indexOf(id); if(i>=0)a.splice(i,1); else a.push(id); localStorage.setItem(FAVKEY,JSON.stringify(a)); try{progSvesti();}catch(e){} return a.indexOf(id)>=0; }
 
 /* ---------- router ---------- */
 let stack=[]; let curTab="main";
@@ -1441,6 +1441,81 @@ function pulseFlush(){
   }).catch(()=>{});
 }
 document.addEventListener("visibilitychange", ()=>{ if(document.hidden) pulseFlush(); });
+/* ---------- свод прогресса между телефонами ----------
+   Один Телеграм, два телефона — две независимые памяти. Сервер сводит их
+   по правилу «побеждает большее» и возвращает общую картину. Приложение
+   спрашивает её при каждом запуске и после каждого изменения. */
+const PROG_SENT = "tishina_prog_sent";
+function progSnimok(){
+  const done={}, cred={}, lis={}, notes={};
+  ALL_SECS.forEach(sec=>sec.items.forEach(it=>{
+    const d=doneCount(it.id); if(d) done[it.id]=d;
+    const c=credits(it.id);   if(c) cred[it.id]=c;
+    const l=parseFloat(localStorage.getItem(LISKEY(it.id))||"0")||0; if(l>1) lis[it.id]=Math.round(l);
+    const nn=loadNotes(it.id); if(nn.length) notes[it.id]=nn;
+  }));
+  let profile=null;
+  try{ profile=JSON.parse(localStorage.getItem(PROFKEY)||"null"); }catch(e){}
+  return {v:1, done, cred, lis, notes, favs:favs(), days:practiceDays(),
+          seconds:parseInt(localStorage.getItem("tishina_seconds")||"0",10)||0,
+          since:localStorage.getItem("tishina_since")||"", profile};
+}
+/* Свод только дополняет: если на сервере больше — забираем, меньше — оставляем своё.
+   Поэтому потерять что-то на этом шаге нельзя ни при каком порядке событий. */
+function progPrimenit(p){
+  if(!p || typeof p!=="object") return false;
+  let menyalos=false;
+  const bolshe=(klyuch, znach)=>{
+    const bylo=parseFloat(localStorage.getItem(klyuch)||"0")||0;
+    if(znach>bylo){ localStorage.setItem(klyuch, String(znach)); menyalos=true; }
+  };
+  Object.keys(p.done||{}).forEach(id=>bolshe(DONEKEY(id), p.done[id]));
+  Object.keys(p.cred||{}).forEach(id=>bolshe(CREDKEY(id), p.cred[id]));
+  Object.keys(p.lis ||{}).forEach(id=>bolshe(LISKEY(id),  p.lis[id]));
+  Object.keys(p.notes||{}).forEach(id=>{
+    const bylo=loadNotes(id), prishlo=p.notes[id]||[];
+    const svod=[...new Set([...bylo, ...prishlo])];
+    if(svod.length>bylo.length){ localStorage.setItem(NOTESKEY(id), JSON.stringify(svod)); menyalos=true; }
+  });
+  if(Array.isArray(p.favs)){
+    const svod=[...new Set([...favs(), ...p.favs])];
+    if(svod.length>favs().length){ localStorage.setItem(FAVKEY, JSON.stringify(svod)); menyalos=true; }
+  }
+  if(Array.isArray(p.days)){
+    const svod=[...new Set([...practiceDays(), ...p.days])];
+    if(svod.length>practiceDays().length){ localStorage.setItem(DAYSKEY, JSON.stringify(svod)); menyalos=true; }
+  }
+  bolshe("tishina_seconds", p.seconds||0);
+  if(p.since){
+    const bylo=localStorage.getItem("tishina_since")||"";
+    if(!bylo || p.since<bylo){ localStorage.setItem("tishina_since", p.since); menyalos=true; }
+  }
+  if(p.profile && !localStorage.getItem(PROFKEY)){
+    localStorage.setItem(PROFKEY, JSON.stringify(p.profile)); menyalos=true;
+  }
+  return menyalos;
+}
+let progTimer=null;
+function progSvesti(srazu){
+  const initData=(tg && tg.initData) || "";
+  if(!initData) return;                     /* вне телеграма подписи нет, сводить нечего */
+  clearTimeout(progTimer);
+  progTimer=setTimeout(()=>{
+    const telo=JSON.stringify({initData, events:[], progress:progSnimok(), wantProgress:true,
+                               tz:-new Date().getTimezoneOffset()});
+    fetch(PULSE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:telo})
+      .then(r=>r.json())
+      .then(d=>{
+        if(!d || !d.progress) return;
+        localStorage.setItem(PROG_SENT, String(Date.now()));
+        if(progPrimenit(d.progress)){        /* пришло что-то новое с другого телефона */
+          try{ renderStage(); renderMain(); }catch(e){}
+          try{ if(curId) openDetail(curId); }catch(e){}
+        }
+      }).catch(()=>{});
+  }, srazu ? 0 : 1500);
+}
+
 const VD_ASKS = [
   "Расскажи, как ты себя чувствуешь сейчас",
   "Как прошёл твой день и что у тебя на завтра?",
@@ -1900,6 +1975,7 @@ $("d-save").onclick=()=>{ if(!curId)return; const t=$("d-note").value.trim();
   const tm=(MED[curId]&&MED[curId].times)||99;
   const counted=credits(curId)>doneCount(curId);
   if(counted) localStorage.setItem(DONEKEY(curId),String(Math.min(doneCount(curId)+1,tm)));
+  try{ progSvesti(); }catch(e){}      /* прогресс уехал на сервер — второй телефон его увидит */
   $("d-note").value="";
   $("d-savehint").textContent = counted ? "Проход засчитан ✓"
     : "Записано ✓ — проход засчитается, когда прослушаешь больше 80%";
@@ -2267,7 +2343,7 @@ function flushListen(){
 function practiceDays(){ try{return JSON.parse(localStorage.getItem(DAYSKEY)||"[]");}catch(e){return[];} }
 function pad2(n){return String(n).padStart(2,"0");}
 function ymdOf(d){return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());}
-function markToday(){ const t=ymdOf(new Date()); const a=practiceDays(); if(a.indexOf(t)<0){a.push(t);localStorage.setItem(DAYSKEY,JSON.stringify(a));}  }
+function markToday(){ const t=ymdOf(new Date()); const a=practiceDays(); if(a.indexOf(t)<0){a.push(t);localStorage.setItem(DAYSKEY,JSON.stringify(a)); try{progSvesti();}catch(e){}}  }
 const MONTHS=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
 function plural(n,a,b,c){const m=n%100,d=n%10;if(m>=11&&m<=14)return c;if(d===1)return a;if(d>=2&&d<=4)return b;return c;}
 /* календарь убран с профиля — вместо него ступень, цифры и плитки */
@@ -2504,6 +2580,7 @@ function obSend(){
 function obFinish(){
   obProfile.ts=Date.now();
   try{ localStorage.setItem(PROFKEY, JSON.stringify(obProfile)); }catch(e){}
+  try{ progSvesti(true); }catch(e){}   /* имя и запрос теперь переживут смену телефона */
   obAddBot("Спасибо, "+obProfile.name+". Я тебя услышала 🤍 Собираю твой личный путь…", null, ()=>{
     setTimeout(()=>{ $("s-onboard").style.display="none"; document.body.classList.remove("ob-open"); }, 1700);
   });
@@ -2774,7 +2851,10 @@ document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) subFetc
 });
 setTab("main");
 pulse("open");
-try{ subPaint(); subFetch(); }catch(e){}   /* состояние подписки и замок */                 /* с этого начинается всё, что мы про неё знаем */
+try{ subPaint(); subFetch(); }catch(e){}   /* состояние подписки и замок */
+/* Свод прогресса при каждом запуске: вдруг она слушала со второго телефона.
+   Ответ приходит через секунду-две и молча дорисовывает ступень и планы. */
+try{ progSvesti(true); }catch(e){}                 /* с этого начинается всё, что мы про неё знаем */
 
 /* ---------- заставка при запуске ---------- */
 function afterSplash(){
