@@ -1215,7 +1215,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "20.08 18:40";
+const BUILD = "20.08 21:03";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1261,6 +1261,22 @@ const $ = s => document.getElementById(s);
     /* поля, которые сами стоят над клавиатурой (правка дневника, «Поговорить»,
        онбординг), листать не надо — иначе экран дёргается впустую */
     if(el.closest(".vd-edit") || el.closest(".tk-bar") || el.closest(".ob-inputbar")) return;
+
+    /* Если под полем в той же панели есть кнопка (инсайты — «Сохранить»),
+       центрировать поле нельзя: кнопка останется под клавиатурой. Подводим
+       к видимой кромке НИЗ всей панели — тогда видно и поле, и кнопку. */
+    const panel = el.closest(".dp-panel");
+    const scr = el.closest(".screen");
+    if(panel && scr && panel.querySelector("button")){
+      const zapas = 14;
+      const nizhe = panel.getBoundingClientRect().bottom
+                  - (scr.getBoundingClientRect().bottom - zapas);
+      if(nizhe > 1){
+        try{ scr.scrollBy({top: nizhe, behavior: "smooth"}); }
+        catch(e){ scr.scrollTop += nizhe; }
+      }
+      return;
+    }
     try{ el.scrollIntoView({block: "center", behavior: "smooth"}); }catch(e){}
   }
   vv.addEventListener("resize", apply);
