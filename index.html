@@ -1224,7 +1224,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "20.08 21:09";
+const BUILD = "20.08 21:48";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -2530,6 +2530,27 @@ if(tg){ try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor('#20140D
   if(tg.BackButton){ tg.BackButton.onClick(()=>back()); } }
 
 /* ---------- ступень эволюции: считаем из того, что приложение уже пишет ---------- */
+/* Ступень растёт от пройденных практик, а не от дней.
+   Раньше считались дни, в которые была нажата кнопка «играть»: включила
+   и выключила — день зачтён. Из-за этого на двух телефонах одного человека
+   ступени расходились. Теперь ступень = сколько практик пути закрыто.
+   Экстренные не в счёт: их включают в моменте, это не ступени. */
+const PUT_SECS = () => SECTIONS;              /* путь — только разделы, без экстренных */
+function zakrytoPraktik(){
+  let k = 0;
+  PUT_SECS().forEach(s => s.items.forEach(it => { if (doneCount(it.id) > 0) k++; }));
+  return k;
+}
+/* ближайшая незакрытая практика пути и насколько она пройдена */
+function shagVStupeni(){
+  for (const s of PUT_SECS()) for (const it of s.items){
+    if (doneCount(it.id) > 0) continue;
+    const nado = ((MED[it.id]||{}).times || 2) * 2;     /* проход = послушать + записать */
+    const est  = doneCount(it.id)*2 + (credits(it.id) > doneCount(it.id) ? 1 : 0);
+    return {dolya: Math.min(1, est/nado), imya: it.title};
+  }
+  return {dolya: 1, imya: null};
+}
 const DAYS_PER_STAGE = 7;
 function streakDays(){
   const set=new Set(practiceDays()); if(!set.size) return 0;
@@ -2582,8 +2603,8 @@ function stageTestWire(){
   });
 }
 function renderStage(){
-  const days=practiceDays().length;
-  const idx=stageTest || Math.min(STAGES.length, Math.floor(days/DAYS_PER_STAGE)+1);
+  const zakryto=zakrytoPraktik();
+  const idx=stageTest || Math.min(STAGES.length, zakryto+1);
   const st=STAGES[idx-1];
   const src="stage-"+idx+".jpg?v=3";   /* v=3 — новые персонажи в 4к: без метки телефон достаёт старую картинку из кэша */
   $("st-pad").style.background = st.side
@@ -2602,12 +2623,12 @@ function renderStage(){
   $("st-tasks").textContent=tasksDone();
   $("tv-fav").textContent=favs().length+" "+plural(favs().length,"медитация","медитации","медитаций");
   try{ subPaint(); }catch(e){}
-  const inStage=days%DAYS_PER_STAGE, last=idx>=STAGES.length;
-  $("st-fill").style.width=(last?100:Math.round(inStage/DAYS_PER_STAGE*100))+"%";
-  const left=DAYS_PER_STAGE-inStage;
+  const shag=shagVStupeni(), last=idx>=STAGES.length;
+  $("st-fill").style.width=(last?100:Math.round(shag.dolya*100))+"%";
   $("st-upto").textContent = stageTest ? "Тест: тыкай в ступени ниже · долгое нажатие на картинку — выйти"
     : last ? "Путь пройден"
-    : left+" "+plural(left,"день","дня","дней")+" до ступени «"+STAGES[idx].name+"»";
+    : shag.imya ? "закрой «"+shag.imya+"» — откроется ступень «"+STAGES[idx].name+"»"
+    : "ступень «"+STAGES[idx].name+"» уже рядом";
   fitHead();
   $("st-strip").innerHTML = STAGES.map(s=>
     '<div class="st-th'+(s.n===idx?' on':(s.n<idx?' past':''))+
