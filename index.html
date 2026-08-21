@@ -11,7 +11,6 @@
 <!-- Постер заставки просим первым делом: он весит 7 КБ и приходит почти мгновенно,
      пока браузер ещё разбирает пятимегабайтные стили ниже. Без этого экран
      висит коричневым до самого конца разбора. -->
-<link rel="preload" as="image" href="splash-poster.jpg" fetchpriority="high">
 <link rel="preload" as="video" href="splash.mp4">
 <!-- Первые байты документа: пока разбирается пятимегабайтный CSS ниже, экран
      уже залит нашим тёмным, а Телеграм уже знает цвет окна. Без этого он
@@ -19,10 +18,6 @@
 </head>
 <body>
 <style>html,body{margin:0;background:#20140D}
-/* Первый кадр экрана — сам постер заставки, а не пустая заливка.
-   Когда подъедет настоящая заставка, она ляжет поверх этого же кадра,
-   и перехода видно не будет. */
-html{background-image:url(splash-poster.jpg);background-size:cover;background-position:center;background-repeat:no-repeat}
 *{box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 /* ПРАВИЛО: запретить автоувеличение шрифта в WebKit. Без этого iOS при повороте
    экрана «улучшает читаемость» и сам раздувает кегль в блоках с длинным текстом
@@ -59,11 +54,20 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
 #s-splash{position:fixed;inset:0;z-index:120;display:none;background:#000;overflow:hidden;}
 #s-splash.on{display:block;}
 .sp-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-/* Постер виден сразу: на медленном канале скрипт приезжает через десятки
-   секунд, и до него экран оставался чёрным. Прячем постер только когда видео
-   правда пошло — тогда подмены не видно. */
-.sp-poster{position:absolute;inset:0;background:#000 url(splash-poster.jpg) center/cover no-repeat;
-  opacity:1;transition:opacity .8s ease;}
+/* Пока видео не пошло, на экране мягкое свечение — оно рисуется кодом,
+   ничего не грузит и появляется мгновенно на любом канале. Раньше здесь стоял
+   кадр из середины ролика: он вспыхивал раскрытым цветком, а потом видео
+   начиналось с чёрного, и картинка откатывалась назад. Свечение стыкуется
+   с началом ролика по яркости, поэтому перехода не видно.
+   ОТКАТ: вернуть сюда background с splash-poster.jpg и атрибут poster у видео. */
+.sp-poster{position:absolute;inset:0;background:#05040A;opacity:1;transition:opacity .9s ease;}
+.sp-poster:before{content:"";position:absolute;left:50%;top:50%;
+  width:min(64vw,300px);height:min(64vw,300px);transform:translate(-50%,-50%);
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(130,178,224,.20) 0%,rgba(74,116,176,.11) 44%,transparent 70%);
+  filter:blur(26px);animation:spDyh 4.6s ease-in-out infinite;}
+@keyframes spDyh{0%,100%{transform:translate(-50%,-50%) scale(.9);opacity:.7}
+  50%{transform:translate(-50%,-50%) scale(1.1);opacity:1}}
 #s-splash.igraet .sp-poster{opacity:0;}
 #s-splash.novideo .sp-poster{opacity:1;animation:spBreathe 7s ease-in-out infinite;}
 @keyframes spBreathe{0%,100%{transform:scale(1);filter:brightness(.92)}
@@ -125,7 +129,7 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
 <div id="s-splash" class="on">
   <div class="sp-poster"></div>
   <video class="sp-vid" id="sp-intro" muted playsinline autoplay preload="auto"
-         poster="splash-poster.jpg" src="splash.mp4"></video>
+         src="splash.mp4"></video>
   <div class="sp-vign"></div>
   <div class="sp-center"><div class="sp-logo">ИММЕРСИЯ</div></div>
   <div class="sp-tag">погружение в себя</div>
@@ -140,7 +144,9 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
     <div class="sp-calls">Нажми, чтобы войти</div>
   </div>
 </div>
-<style></style>
+<style>
+/* Первый кадр экрана — наша темнота, а не белизна браузера. Картинку сюда
+   не ставим: постер вспыхивал раскрытым цветком раньше, чем начиналось видео. */</style>
 <script>try{var _t=window.Telegram&&window.Telegram.WebApp;if(_t){_t.ready();
 _t.setHeaderColor&&_t.setHeaderColor('#20140D');
 _t.setBackgroundColor&&_t.setBackgroundColor('#20140D');
@@ -1239,7 +1245,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "21.08 15:06";
+const BUILD = "21.08 17:15";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
