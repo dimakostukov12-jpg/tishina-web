@@ -8,10 +8,19 @@
 <title>Иммерсия</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta name="theme-color" content="#20140D">
+<!-- Постер заставки просим первым делом: он весит 7 КБ и приходит почти мгновенно,
+     пока браузер ещё разбирает пятимегабайтные стили ниже. Без этого экран
+     висит коричневым до самого конца разбора. -->
+<link rel="preload" as="image" href="splash-poster.jpg" fetchpriority="high">
+<link rel="preload" as="video" href="splash.mp4">
 <!-- Первые байты документа: пока разбирается пятимегабайтный CSS ниже, экран
      уже залит нашим тёмным, а Телеграм уже знает цвет окна. Без этого он
      показывает свою светлую заглушку с квадратиками — те самые блики. -->
-<style>html,body{margin:0;background:#20140D}</style>
+<style>html,body{margin:0;background:#20140D}
+/* Первый кадр экрана — сам постер заставки, а не пустая заливка.
+   Когда подъедет настоящая заставка, она ляжет поверх этого же кадра,
+   и перехода видно не будет. */
+html{background-image:url(splash-poster.jpg);background-size:cover;background-position:center;background-repeat:no-repeat}</style>
 <script>try{var _t=window.Telegram&&window.Telegram.WebApp;if(_t){_t.ready();
 _t.setHeaderColor&&_t.setHeaderColor('#20140D');
 _t.setBackgroundColor&&_t.setBackgroundColor('#20140D');
@@ -1224,7 +1233,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "21.08 11:19";
+const BUILD = "21.08 11:25";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
