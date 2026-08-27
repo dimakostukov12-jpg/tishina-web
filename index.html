@@ -63,8 +63,6 @@ html{
   background-attachment:fixed;
   animation:bgdrift 34s ease-in-out infinite alternate;}
 body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не все андроиды — vh как запасной */font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden;background:transparent;}
-html.doma #s-splash,
-html.doma #s-vne{bottom:calc(0px - env(safe-area-inset-top));}
 .safetop{height:env(safe-area-inset-top);}
 @keyframes gspin{to{transform:rotate(360deg);}}
 
@@ -219,9 +217,14 @@ html.doma body{
    верха: панель и экраны повисают выше края ровно на высоту строки. Опускаем
    их на неё же — величину сообщает сам айфон. В Телеграме правило не работает:
    класса doma там нет, и не сдвинется ничего. */
-html.doma .screen,
-html.doma .tabbar,
-html.doma #s-onboard{bottom:calc(var(--kb,0px) - env(safe-area-inset-top));}
+/* НИЗ НЕ ТРОГАЕМ. Здесь стояло правило, опускавшее панель на высоту строки
+   состояния. Оно понадобилось, когда айфон считал высоту окна без неё. После
+   переустановки система начала отдавать эти числа иначе, и то же правило
+   вытолкнуло панель за край экрана: подпись обрезалась.
+
+   Вывод простой: подгонять низ вслепую нельзя — величина зависит от того,
+   как именно система в этот раз посчитала окно. Низ оставляем системе,
+   она ставит его правильно. */
 @keyframes swim{from{transform:translate3d(-4%,3%,0) scale(1.06) rotate(-.6deg);}
                 to  {transform:translate3d(5%,-4%,0) scale(1.16) rotate(.8deg);}}
 @keyframes swimb{from{transform:translate3d(6%,-3%,0) scale(1.22) rotate(1deg);}
@@ -1456,7 +1459,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 19:48";
+const BUILD = "27.08 19:53";
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -1489,13 +1492,17 @@ const BUILD = "27.08 19:48";
         }
       }).catch(() => {});
   }
+  /* Проверяем несколько раз: GitHub выкладывает новую сборку не мгновенно,
+     и первая проверка часто попадает в окно, когда на сервере ещё старое. */
   setTimeout(proverit, 1500);
+  setTimeout(proverit, 12000);
+  setTimeout(proverit, 40000);
   /* Копию с домашнего экрана не закрывают неделями — она просто уходит в фон.
      Поэтому проверяем и на возвращении, но не чаще раза в пять минут. */
   let kogda = 0;
   document.addEventListener("visibilitychange", () => {
     if(document.visibilityState !== "visible") return;
-    if(Date.now() - kogda < 5*60*1000) return;
+    if(Date.now() - kogda < 30*1000) return;    /* вернулась в приложение — повод проверить */
     kogda = Date.now(); proverit();
   });
 })();
