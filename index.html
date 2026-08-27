@@ -1460,7 +1460,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 20:09";
+const BUILD = "27.08 20:15";
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -2649,8 +2649,21 @@ function renderProfile(){ try{ renderStage(); }catch(e){} try{ subFetch(); }catc
 /* ---------- календарь практики (синхронно с реальной датой) ---------- */
 const DAYSKEY="tishina_days";
 const SINCEKEY="tishina_since", MINKEY="tishina_seconds";
+/* Дни в пути считаем от того, что случилось раньше: первого открытия приложения
+   или прихода в клуб. Женщина в клубе с марта не должна видеть «1 день в пути»
+   только потому, что приложение поставила вчера, — это обесценивает всё, что
+   у неё уже было.
+
+   Дату прихода отдаёт клуб (created_at пользователя). Пока функция club её
+   не возвращает — поле since просто пусто, и считается по-старому. Заработает
+   в тот день, когда Николай добавит его в ответ. */
 function sinceDays(){
   let d=localStorage.getItem(SINCEKEY);
+  try{
+    const v=(subLoad()||{}).v;
+    const vKlube=v && v.since ? String(v.since).slice(0,10) : "";
+    if(vKlube && (!d || vKlube < d)){ d=vKlube; localStorage.setItem(SINCEKEY,d); }
+  }catch(e){}
   if(!d){ d=ymdOf(new Date()); localStorage.setItem(SINCEKEY,d); }
   const a=new Date(d+"T00:00:00"), b=new Date();
   return Math.max(1, Math.round((b-a)/86400000)+1);
