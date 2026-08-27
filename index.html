@@ -634,6 +634,27 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
   -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .dm-note{font-size:12px;color:#9B958F;line-height:1.5;margin:18px 0 0;}
 
+.hs-lnk{display:block;width:100%;margin-top:8px;padding:11px;border-radius:13px;background:none;
+  border:1px solid rgba(233,201,131,.2);color:rgba(233,201,131,.85);cursor:pointer;
+  font:500 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+.hs-lnk:active{background:rgba(233,201,131,.08);}
+.sv-in{display:block;width:100%;margin:6px 0 0;padding:15px;border-radius:14px;
+  background:rgba(22,14,9,.86);border:1px solid rgba(233,201,131,.3);color:#F7ECC6;
+  font:600 22px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.22em;
+  text-align:center;text-transform:uppercase;-webkit-appearance:none;appearance:none;}
+.sv-in:focus{outline:0;border-color:rgba(233,201,131,.6);}
+.sv-in::placeholder{color:rgba(246,238,221,.25);letter-spacing:.22em;}
+
+/* код связывания на экране установленной копии */
+.vn-kod{font:700 30px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.2em;
+  color:#F7ECC6;text-align:center;padding:15px 8px;border-radius:14px;
+  background:rgba(10,7,16,.6);border:1px solid rgba(233,201,131,.35);
+  text-shadow:0 0 22px rgba(233,201,131,.35);}
+.vn-kodp{font-size:13px;color:#C9C3BC;line-height:1.5;margin:12px 0 0;text-align:center;}
+.vn-kodp b{color:#F3DCA0;font-weight:600;}
+.vn-mel{font-size:11.5px;color:#9B958F;margin:10px 0 0;text-align:center;}
+
 /* экран, когда приложение открыли не из Телеграма */
 #s-vne{position:fixed;inset:0;z-index:130;display:none;
   background:#0A0710 center/cover no-repeat;background-image:url(splash-first.jpg);}
@@ -1141,6 +1162,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
         <span class="hs-tx"><b>Вынести на экран «Домой»</b><i>Открывать сразу, одним касанием</i></span>
         <span class="hs-go">›</span>
       </button>
+      <button class="hs-lnk" id="hs-svyaz" type="button">Связать устройство</button>
     </div>
     <div class="st-lb">Разделы</div>
     <div class="st-tiles">
@@ -1166,6 +1188,19 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <button class="dm-big" id="dm-big" type="button"></button>
     <button class="dm-done" id="dm-done" type="button">Готово, иконка на экране</button>
     <p class="dm-note" id="dm-note"></p>
+  </div>
+</section>
+
+<section class="screen" id="s-svyaz">
+  <div class="safetop"></div>
+  <div class="topbar"><span class="back" data-back>‹</span><span class="pill"><span class="gsp"></span>
+    <span class="pin" style="font-size:17px;padding:5px 15px">Связать устройство</span></span><span style="width:22px"></span></div>
+  <div class="dm-wrap">
+    <p class="dm-lead">На том телефоне, где «Иммерсия» стоит иконкой на экране, показан код из восьми знаков. Введи его сюда — и тот телефон узнает тебя.</p>
+    <input class="sv-in" id="sv-in" type="text" inputmode="text" autocapitalize="characters"
+           autocomplete="off" autocorrect="off" spellcheck="false" placeholder="XXXX XXXX" maxlength="9">
+    <button class="dm-big" id="sv-go" type="button">Связать</button>
+    <p class="dm-note" id="sv-msg">Код живёт десять минут. Не успела — на том телефоне появится новый.</p>
   </div>
 </section>
 
@@ -1362,7 +1397,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 17:02";
+const BUILD = "27.08 17:21";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1555,6 +1590,21 @@ const DIARY_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/diary";
    телефоне, и написать «практика открыта, а ты не заходила три дня» неоткуда.
    Ни текстов дневника, ни разговоров здесь нет, только факты действий.
    Копим в очередь и отправляем пачкой, чтобы не дёргать сеть на каждый шаг. */
+/* ---------- чем мы называемся серверу ----------
+   Внутри Телеграма нас называет он сам: подписывает пакет с её айди. С домашнего
+   экрана подписывать некому, и копия предъявляет свой ключ устройства, выданный
+   при связывании. Третьего способа нет — если нет ни того, ни другого, серверу
+   идти не с чем, и мы молча ничего не шлём. */
+const KL_KEY = "tishina_klyuch";
+const KLYUCH_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/klyuch";
+function klyuchEst(){ try{ return localStorage.getItem(KL_KEY) || ""; }catch(e){ return ""; } }
+function komuMy(){
+  const initData = (tg && tg.initData) || "";
+  if(initData) return { initData };
+  const k = klyuchEst();
+  return k ? { klyuch: k } : null;
+}
+
 const PULSE_URL = "https://botrtmarhpvqdozhouli.supabase.co/functions/v1/pulse";
 const PULSE_Q = "tishina_pulse";
 let pulseTimer = null;
@@ -1571,11 +1621,11 @@ function pulseFlush(){
   let q = [];
   try{ q = JSON.parse(localStorage.getItem(PULSE_Q) || "[]"); }catch(e){}
   if(!q.length) return;
-  const initData = (tg && tg.initData) || "";
-  if(!initData) return;                            /* вне телеграма подписи нет */
+  const kto = komuMy();
+  if(!kto) return;                                 /* назваться нечем */
   localStorage.removeItem(PULSE_Q);                /* при обрыве потеряем пачку — не беда */
   fetch(PULSE_URL, {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
-    body: JSON.stringify({initData, events:q, tz: -new Date().getTimezoneOffset()})
+    body: JSON.stringify(Object.assign({events:q, tz: -new Date().getTimezoneOffset()}, kto))
   }).catch(()=>{});
 }
 document.addEventListener("visibilitychange", ()=>{ if(document.hidden) pulseFlush(); });
@@ -1642,16 +1692,20 @@ function progKogda(){
 }
 let progTimer=null;
 function progSvesti(srazu){
-  const initData=(tg && tg.initData) || "";
-  if(!initData) return;                     /* вне телеграма подписи нет, сводить нечего */
+  const kto = komuMy();
+  if(!kto) return;                          /* назваться нечем — сводить не с чем */
   clearTimeout(progTimer);
   progTimer=setTimeout(()=>{
-    const telo=JSON.stringify({initData, events:[], progress:progSnimok(), wantProgress:true,
-                               tz:-new Date().getTimezoneOffset()});
+    const telo=JSON.stringify(Object.assign({events:[], progress:progSnimok(), wantProgress:true,
+                               tz:-new Date().getTimezoneOffset()}, kto));
     fetch(PULSE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:telo})
       .then(r=>r.json())
       .then(d=>{
-        if(!d || !d.progress) return;
+        if(!d) return;
+        /* Подписка, запомненная сервером. С домашнего экрана взять её больше
+           неоткуда: функция клуба требует подпись Телеграма. */
+        if(d.sub && !(tg && tg.initData)){ try{ subPrinyat(d.sub); }catch(e){} }
+        if(!d.progress) return;
         localStorage.setItem(PROG_SENT, String(Date.now()));
         if(progPrimenit(d.progress)){        /* пришло что-то новое с другого телефона */
           try{ renderStage(); renderMain(); }catch(e){}
@@ -2449,8 +2503,23 @@ async function subFetch(force){
     if(d && d.state){
       try{ localStorage.setItem(SUBKEY, JSON.stringify({t:Date.now(), v:d})); }catch(e){}
       subPaint();
+      /* Кладём ответ клуба на сервер: с домашнего экрана его не спросить —
+         функция клуба требует подпись Телеграма. Пусть лежит там до тех пор,
+         пока в неё не появится второй вход. */
+      try{
+        fetch(PULSE_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({initData, events:[], sub:d})}).catch(()=>{});
+      }catch(e){}
     }
   }catch(e){}
+}
+
+/* Подписка пришла не из клуба, а с нашего сервера — так её видит копия на
+   домашнем экране. Формат тот же, поэтому все экраны работают как обычно. */
+function subPrinyat(v){
+  if(!v || !v.state) return;
+  try{ localStorage.setItem(SUBKEY, JSON.stringify({t:Date.now(), v:v})); }catch(e){}
+  try{ subPaint(); }catch(e){}
 }
 
 /* ---------- profile ---------- */
@@ -3044,8 +3113,9 @@ function hsSposob(){
   return null;                                                  /* нечего предложить */
 }
 function hsPokazat(){
-  const w = $("hs-wrap"); if(!w) return;
-  w.hidden = !hsSposob();
+  const w = $("hs-wrap"), b = $("hs-btn"); if(!w) return;
+  if(b) b.hidden = !hsSposob();     /* поставить нечем или уже стоит — прячем */
+  w.hidden = false;                 /* «Связать устройство» нужна и после установки */
 }
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); hsProm = e; hsPokazat(); });
 window.addEventListener("appinstalled", () => { localStorage.setItem(HS_KEY, "1"); hsPokazat(); });
@@ -3094,19 +3164,96 @@ function hsNazhali(){
   const d = $("dm-done"); if(d) d.addEventListener("click", () => {
     localStorage.setItem(HS_KEY, "1"); hsPokazat(); haptic("success"); back();
   });
+  const sv = $("hs-svyaz"); if(sv) sv.addEventListener("click", () => {
+    haptic("light"); $("sv-msg").textContent =
+      "Код живёт десять минут. Не успела — на том телефоне появится новый.";
+    go("s-svyaz", true); setTimeout(() => { try{ $("sv-in").focus(); }catch(e){} }, 380);
+  });
+  const go2 = $("sv-go"); if(go2) go2.addEventListener("click", svyazVvod);
+  const inp = $("sv-in");
+  if(inp) inp.addEventListener("keydown", e => { if(e.key === "Enter") svyazVvod(); });
 })();
 
+/* Из Телеграма: она вводит код, который видит на другом телефоне. */
+function svyazVvod(){
+  const inp = $("sv-in"), msg = $("sv-msg");
+  const kod = String(inp.value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if(kod.length !== 8){ msg.textContent = "Код из восьми знаков — перепиши целиком."; return; }
+  msg.textContent = "Связываю…";
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"svyazat", initData:(tg && tg.initData) || "", kod})})
+   .then(r => r.json()).then(d => {
+     if(d && d.ok){
+       haptic("success"); inp.value = "";
+       msg.textContent = "Готово. Тот телефон уже открывается" + (d.metka ? " — " + d.metka : "") + ".";
+     }else{
+       haptic("error");
+       msg.textContent = (d && d.error) || "Не вышло. Проверь код и попробуй ещё раз.";
+     }
+   }).catch(() => { msg.textContent = "Нет связи. Попробуй ещё раз."; });
+}
+
+/* ---------- связывание устройства ----------
+   Сделано «кодом на экране», как у приставок, а не ссылкой с ключом. Причина:
+   на айфоне у Safari и у приложения с домашнего экрана РАЗНАЯ память. Ключ,
+   положенный в Safari, установленная копия не увидит, и ссылка бы не сработала.
+   А код видно глазами, и он проходит через любые границы. */
+let svyazId = null, svyazTimer = null, svyazDo = 0;
+
+function svyazPoprosit(){
+  const m = navigator.userAgent.match(/iPhone|iPad|Android|Windows|Macintosh/);
+  const metka = m ? m[0].replace("Macintosh","Mac") : "телефон";
+  const kd = $("vn-kod"); if(kd) kd.textContent = "· · · ·";
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"nachat", metka})})
+   .then(r => r.json()).then(d => {
+     if(!d || !d.kod){ if(kd) kd.textContent = "не вышло"; return; }
+     svyazId = d.id;
+     if(kd) kd.textContent = d.kod.slice(0,4) + " " + d.kod.slice(4);
+     svyazDo = Date.now() + 10*60*1000;
+     clearInterval(svyazTimer);
+     svyazTimer = setInterval(svyazSprosit, 3000);
+   }).catch(() => { if(kd) kd.textContent = "нет связи"; });
+}
+
+function svyazSprosit(){
+  if(!svyazId) return;
+  if(Date.now() > svyazDo){ clearInterval(svyazTimer); svyazPoprosit(); return; }  /* сам возьмёт новый */
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"sprosit", id: svyazId})})
+   .then(r => r.json()).then(d => {
+     if(!d) return;
+     if(d.state === "gotovo" && d.klyuch){
+       clearInterval(svyazTimer);
+       try{ localStorage.setItem(KL_KEY, d.klyuch); }catch(e){}
+       haptic("success");
+       $("vn-h").textContent = "Готово";
+       $("vn-p").textContent = "Открываю твои дни…";
+       $("vn-steps").innerHTML = ""; $("vn-act").innerHTML = "";
+       setTimeout(() => { location.reload(); }, 900);
+     }else if(d.state === "prosrochen"){
+       clearInterval(svyazTimer); svyazPoprosit();
+     }
+   }).catch(() => {});
+}
+
 /* Экран для случая, когда приложение открыли не из Телеграма: либо она в Safari
-   и пришла ставить иконку, либо иконка уже стоит и надо один раз войти. */
+   и пришла ставить иконку, либо иконка уже стоит и надо один раз связать. */
 function vneEkran(){
   const el = $("s-vne"); if(!el) return;
   if(naEkrane()){
-    $("vn-h").textContent = "Осталось войти";
+    $("vn-h").textContent = "Свяжи с Телеграмом";
     $("vn-p").textContent = "Один раз — чтобы приложение узнало твои дни, ступень и подписку.";
-    $("vn-steps").innerHTML = "";
-    $("vn-act").innerHTML = '<button class="dm-big" id="vn-go" type="button">Открыть в Телеграме</button>';
+    $("vn-steps").innerHTML =
+      '<div class="vn-kod" id="vn-kod">· · · ·</div>' +
+      '<p class="vn-kodp">Открой «Иммерсию» в Телеграме → <b>Профиль</b> → ' +
+      '<b>Связать устройство</b> → введи этот код</p>';
+    $("vn-act").innerHTML =
+      '<button class="dm-big" id="vn-go" type="button">Открыть Телеграм</button>' +
+      '<p class="vn-mel">Код живёт десять минут. Истечёт — появится новый сам.</p>';
     const g = $("vn-go");
     if(g) g.addEventListener("click", () => { location.href = BOT_LINK; });
+    svyazPoprosit();
   }else{
     $("vn-h").textContent = "Добавь на экран";
     $("vn-p").textContent = "Три шага — и «Иммерсия» будет открываться одним касанием.";
@@ -3118,7 +3265,21 @@ function vneEkran(){
 
 /* ---------- заставка при запуске ---------- */
 function afterSplash(){
-  if(!localStorage.getItem(PROFKEY)){ startOnboarding(); }
+  if(localStorage.getItem(PROFKEY)) return;
+  /* Анкеты нет. Но если серверу есть чем нас назвать — подпись Телеграма или
+     ключ устройства, — он вот-вот пришлёт её анкету, заполненную на другом
+     телефоне. Спрашивать заново незачем: ждём ответа секунды три, и только
+     если не пришло, знакомимся. Без этого копия на домашнем экране встречала
+     бы её онбордингом, хотя она в клубе третий месяц. */
+  if(komuMy()){
+    let zhdyom = 0;
+    const t = setInterval(() => {
+      if(localStorage.getItem(PROFKEY)){ clearInterval(t); try{ renderProfile(); }catch(e){} return; }
+      if(++zhdyom > 12){ clearInterval(t); startOnboarding(); }
+    }, 250);
+    return;
+  }
+  startOnboarding();
 }
 let spTimer=null, spHeld=0; const SP_HOLD=700;
 function spReset(){
@@ -3165,7 +3326,9 @@ function startSplash(){
   const s=$("s-splash"), vi=$("sp-intro"), kadr=document.querySelector(".sp-first");
   const LOOP_FROM=10.20, LOOP_TO=14.80;  /* конец плавно перетекает в эту точку */
   const STYK=2.50;                       /* здесь ролик совпадает с кадром-заставкой */
-  if(vneTelegrama()){ vneEkran(); return; }   /* открыли не из Телеграма — заставка ни к чему */
+  /* Ключ есть — приложение знает, кто она, и работает как обычно.
+     Ключа нет — сначала связывание, заставка потом. */
+  if(vneTelegrama() && !klyuchEst()){ vneEkran(); return; }
   s.classList.add("on");
 
   /* Кадр уже на экране — его показал CSS из первых девяти килобайт. Здесь только
