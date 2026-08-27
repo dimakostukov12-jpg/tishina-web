@@ -1397,7 +1397,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 17:21";
+const BUILD = "27.08 17:32";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -2865,16 +2865,19 @@ function myName(){
 function fitHead(){
   const hd=$("st-hd"), nm=$("st-name"), stg=$("st-stage");
   if(!hd||!nm||!stg) return;                          /* разметка сменилась — молча выходим */
-  const box=hd.firstElementChild;
-  nm.style.fontSize=""; stg.style.fontSize=""; box.style.padding="";
+  const box=hd.firstElementChild;                     /* .pill — золотая рамка, её padding и есть толщина */
+  const pin=box && box.querySelector(".pin");         /* .pin — тёмная плашка внутри, её и поджимаем */
+  nm.style.fontSize=""; stg.style.fontSize=""; if(pin) pin.style.padding="";
   const avail=hd.clientWidth-2;                       /* пара пикселей на скругление */
   if(!avail) return;                                  /* экран ещё не показан — мерить нечего */
   const wide=()=>box.scrollWidth>avail;
   let p=14; while(wide() && p>10.5){ p-=.5; stg.style.fontSize=p+"px"; }
   let n=17; while(wide() && n>12){ n-=.5; nm.style.fontSize=n+"px"; }
-  /* на 320 длинному имени не хватает и мелкого кегля — поджимаем поля рамки,
-     дальше имя само обрежется многоточием, за край не полезет */
-  if(wide()) box.style.padding="6px 11px";
+  /* На узком экране длинному имени не хватает и мелкого кегля — поджимаем поля
+     ВНУТРЕННЕЙ плашки, дальше имя само обрежется многоточием.
+     Раньше здесь стоял box (сама рамка): её padding — это толщина золотого
+     канта, и вместо поджатия полей рамка раздувалась в жирное кольцо. */
+  if(wide() && pin) pin.style.padding="6px 11px";
 }
 addEventListener("resize",()=>{ try{ fitHead(); }catch(e){} });
 /* тестовый просмотр ступеней: долгое нажатие на картинку включает и выключает,
