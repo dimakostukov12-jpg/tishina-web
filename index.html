@@ -12,7 +12,12 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="pwa/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- НЕ black-translucent. С ней айфон отдаёт приложению высоту БЕЗ строки
+     состояния, а рисует от самого верха: всё, что прижато к низу, повисает
+     выше края экрана, и под панелью остаётся пустое поле. Проверено на живом
+     телефоне трижды. С "black" система сама отводит место под строку, и низ
+     оказывается там, где надо. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Иммерсия">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <meta name="theme-color" content="#20140D">
@@ -59,7 +64,9 @@ html{
   animation:bgdrift 34s ease-in-out infinite alternate;}
 :root{--nizhe:0px;}
 body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не все андроиды — vh как запасной */font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden;background:transparent;}
-.safetop{height:env(safe-area-inset-top);}
+/* С домашнего экрана строка состояния своя, и системный отступ равен нулю —
+   заголовок упирался бы прямо в неё. Держим минимум сами. */
+.safetop{height:max(env(safe-area-inset-top), 0px);}
 @keyframes gspin{to{transform:rotate(360deg);}}
 
 /* ===== ЗАСТАВКА ПРИ ЗАПУСКЕ: видео-взрыв → бесшовный перелив + отпечаток ===== */
@@ -211,6 +218,7 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
 /* каждый экран скроллится ВНУТРИ себя (документ не скроллится) — поверх статичного фикс-фона, без пустот при оверскролле */
 .screen{display:none;position:fixed;inset:0;bottom:calc(var(--kb,0px) - var(--nizhe,0px));overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding-bottom:calc(86px + env(safe-area-inset-bottom));}
 .screen.active{display:block;}
+html.doma .safetop{height:max(env(safe-area-inset-top), 10px);}
 
 /* home */
 .home-hd{padding:26px 18px 16px;text-align:center;}
@@ -1423,7 +1431,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 19:06";
+const BUILD = "27.08 19:14";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3585,6 +3593,7 @@ function vneEkran(){
    нулём, и там не сдвинется ровно ничего. */
 function nizhePodognat(){
   let d = 0;
+  try{ document.documentElement.classList.toggle("doma", naEkrane()); }catch(e){}
   if(naEkrane()){
     try{
       const metka = document.createElement("div");
