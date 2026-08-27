@@ -1398,7 +1398,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 17:48";
+const BUILD = "27.08 17:55";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3145,14 +3145,15 @@ const nastoyashchiySafari = () => typeof navigator.standalone === "boolean";
 
 const SHAGI_IOS = [
   [IK.tochki, "Нажми <b>•••</b> рядом с адресом", "Внизу экрана. Если строка сверху — там же"],
-  [IK.plus,   "Выбери <b>«На экран „Домой“»</b>", "Пролистай меню, пункт со значком +"],
+  [IK.share,  "Выбери <b>«Поделиться»</b>", "Если сразу видишь «На экран „Домой“» — жми его"],
+  [IK.plus,   "Дальше <b>«На экран „Домой“»</b>", "Пролистай, пункт со значком +"],
   [IK.gal,    "Нажми <b>«Добавить»</b>", "Справа вверху"]
 ];
 /* Из встроенного браузера Телеграма добавить нельзя — сначала выйти в Safari. */
 const SHAGI_VYYTI = [
   [IK.tochki, "Нажми <b>•••</b> внизу", "Или «Поделиться» — смотря какой у тебя Телеграм"],
   [IK.safari, "Выбери <b>«Открыть в Safari»</b>", "Иконку ставит только он"],
-  [IK.plus,   "Там будет три шага", "Они появятся сами"]
+  [IK.plus,   "Там будет четыре шага", "Они появятся сами"]
 ];
 const SHAGI_PROCH = [
   [IK.tochki, "Открой меню браузера", "Три точки"],
@@ -3300,7 +3301,7 @@ function vneEkran(){
     $("vn-act").innerHTML = '<div class="vn-arrow">↓</div>';
   }else{
     $("vn-h").textContent = "Добавь на экран";
-    $("vn-p").textContent = "Три шага — и «Иммерсия» будет открываться одним касанием.";
+    $("vn-p").textContent = "Четыре шага — и «Иммерсия» будет открываться одним касанием.";
     $("vn-steps").innerHTML = shagiHTML(etoIOS() ? SHAGI_IOS : SHAGI_PROCH);
     $("vn-act").innerHTML = etoIOS() ? '<div class="vn-arrow">↓</div>' : '';
   }
