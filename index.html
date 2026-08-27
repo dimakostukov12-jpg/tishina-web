@@ -1416,7 +1416,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 18:47";
+const BUILD = "27.08 18:52";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -1448,9 +1448,18 @@ const $ = s => document.getElementById(s);
   const vv = window.visualViewport;
   if(!vv) return;
   let last = -1;
+  /* Клавиатура — это когда она ПИШЕТ. Без этой проверки в приложении с домашнего
+     экрана разница высот появляется сама по себе (экран во весь телефон, а
+     visualViewport считает без нижней безопасной зоны), код принимал её за
+     клавиатуру и поднимал таббар — под ним оставалась чёрная полоса. */
+  const pishet = () => {
+    const el = document.activeElement;
+    if(!el) return false;
+    return el.tagName === "TEXTAREA" || el.tagName === "INPUT" || el.isContentEditable === true;
+  };
   function apply(){
     const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-    const v = kb > 60 ? kb : 0;               /* мелкие колебания панелей не считаем */
+    const v = (pishet() && kb > 60) ? kb : 0;  /* мелкие колебания панелей не считаем */
     if(v === last) return;
     last = v;
     document.documentElement.style.setProperty("--kb", v + "px");
@@ -1481,6 +1490,9 @@ const $ = s => document.getElementById(s);
     try{ el.scrollIntoView({block: "center", behavior: "smooth"}); }catch(e){}
   }
   vv.addEventListener("resize", apply);
+  /* фокус приходит раньше, чем меняется высота, и уходит позже — пересчитываем на обоих */
+  addEventListener("focusin", () => setTimeout(apply, 50), true);
+  addEventListener("focusout", () => setTimeout(apply, 50), true);
   vv.addEventListener("scroll", apply);
   document.addEventListener("focusin", e => {
     const t = e.target;
