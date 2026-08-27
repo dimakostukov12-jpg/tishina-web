@@ -1416,7 +1416,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 18:46";
+const BUILD = "27.08 18:47";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3156,8 +3156,10 @@ function hsPokazat(){
   if(vy) vy.hidden = !est;
   if(est){
     const u = hsUstroystva[0], k = $("hs-kakoy");
-    if(k) k.textContent = (u.metka || "телефон") + (u.svyazano ? " · " + kogdaSvyazali(u.svyazano) : "")
-                        + (hsUstroystva.length > 1 ? " и ещё " + (hsUstroystva.length - 1) : "");
+    /* Показываем самое свежее. Считать их женщине незачем: при каждой установке
+       заводится своя копия, и число ей ничего не скажет. */
+    const imya = String(u.metka || "телефон").replace(" · с экрана", "");
+    if(k) k.textContent = imya + (u.svyazano ? " · " + kogdaSvyazali(u.svyazano) : "");
   }
 }
 
@@ -3180,7 +3182,10 @@ function hsProverit(){
   fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
     body: JSON.stringify({op:"spisok", initData})})
    .then(r => r.json()).then(d => {
-     hsUstroystva = (d && Array.isArray(d.ustroystva)) ? d.ustroystva : [];
+     /* Считаем только копии с домашнего экрана. Копия в браузере заводится
+        по дороге и сама по себе не значит, что иконка поставлена. */
+     const vse = (d && Array.isArray(d.ustroystva)) ? d.ustroystva : [];
+     hsUstroystva = vse.filter(x => x && x.s_ekrana);
      hsPokazat();
    }).catch(() => {});
 }
