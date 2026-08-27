@@ -1411,7 +1411,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 17:59";
+const BUILD = "27.08 18:12";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3361,13 +3361,13 @@ function vneEkran(){
         '<button class="vn-kopi" id="vn-kopi" type="button" hidden>Копировать</button>' +
       '</div>' +
       shagiHTML([
-        [IK.kopi,  "Скопируй код", "Кнопка справа от него"],
-        [IK.tg,    "Открой «Иммерсию» в Телеграме", "Кнопка ниже"],
-        [IK.chelo, "Профиль → <b>«Связать устройство»</b>", "Внизу, в разделе «Приложение»"],
-        [IK.gal,   "Вставь код и нажми <b>«Связать»</b>", "Через пару секунд этот экран сам откроется"]
+        [IK.kopi,  "Скопируй код", ""],
+        [IK.tg,    "Открой приложение в Телеграме", "Кнопка ниже"],
+        [IK.chelo, "Нажми <b>«Профиль»</b> в приложении", "Внизу справа"],
+        [IK.gal,   "Нажми <b>«Связать устройство»</b> и вставь код", "Дальше этот экран откроется сам"]
       ]);
     $("vn-act").innerHTML =
-      '<button class="dm-big" id="vn-go" type="button">Открыть Телеграм</button>' +
+      '<button class="dm-big" id="vn-go" type="button">Открыть в Telegram</button>' +
       '<p class="vn-mel">Код живёт десять минут. Истечёт — появится новый сам.</p>';
     const g = $("vn-go");
     if(g) g.addEventListener("click", () => {
