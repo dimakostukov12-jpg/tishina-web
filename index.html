@@ -1411,7 +1411,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 18:12";
+const BUILD = "27.08 18:23";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3196,11 +3196,23 @@ function hsNazhali(){
     return;
   }
   /* Никаких инструкций внутри приложения: иконку всё равно ставит только браузер,
-     туда и отправляем. Объяснение ждёт её там, где оно нужно. */
-  const u = APP_URL();
-  try{ if(tg && tg.openLink){ tg.openLink(u); hsSprosim(); return; } }catch(e){}
-  try{ window.open(u, "_blank"); hsSprosim(); return; }catch(e){}
-  location.href = u;
+     туда и отправляем. Объяснение ждёт её там, где оно нужно.
+
+     И берём с собой код, уже привязанный к ней: в Телеграме мы знаем, кто она,
+     а в браузере — нет. Копия обменяет код на ключ и сразу окажется своей.
+     Вводить ей ничего не придётся. */
+  const m = navigator.userAgent.match(/iPhone|iPad|Android|Windows|Macintosh/);
+  const metka = m ? m[0].replace("Macintosh", "Mac") : "телефон";
+  const uyti = u => {
+    try{ if(tg && tg.openLink){ tg.openLink(u); hsSprosim(); return; } }catch(e){}
+    try{ window.open(u, "_blank"); hsSprosim(); return; }catch(e){}
+    location.href = u;
+  };
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"vydat", initData:(tg && tg.initData) || "", metka})})
+   .then(r => r.json())
+   .then(d => uyti(d && d.kod ? APP_URL() + "&k=" + d.kod : APP_URL()))
+   .catch(() => uyti(APP_URL()));      /* без кода — просто инструкция, как раньше */
 }
 
 /* Она ушла в браузер. Когда вернётся — спросим одной строкой, получилось ли:
@@ -3246,6 +3258,30 @@ function svyazVvod(){
        msg.textContent = (d && d.error) || "Не вышло. Проверь код и попробуй ещё раз.";
      }
    }).catch(() => { msg.textContent = "Нет связи. Попробуй ещё раз."; });
+}
+
+/* Код приехал в адресе — меняем его на ключ. Ссылка одноразовая и живёт минуты,
+   а из адреса код сразу убираем: он не должен осесть в истории браузера. */
+function obmenKoda(kod){
+  const el = $("s-vne");
+  if(el){
+    $("vn-h").textContent = "Секунду";
+    $("vn-p").textContent = "Узнаю тебя…";
+    $("vn-steps").innerHTML = ""; $("vn-act").innerHTML = "";
+    el.classList.add("on");
+  }
+  const chisto = () => { try{ history.replaceState({}, "", location.pathname + "?ust=1"); }catch(e){} };
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"obmen", kod})})
+   .then(r => r.json()).then(d => {
+     chisto();
+     if(d && d.ok && d.klyuch){
+       try{ localStorage.setItem(KL_KEY, d.klyuch); }catch(e){}
+       location.reload();                 /* дальше приложение запустится своим */
+       return;
+     }
+     vneEkran();                          /* код не сработал — обычный путь с вводом */
+   }).catch(() => { chisto(); vneEkran(); });
 }
 
 /* ---------- связывание устройства ----------
@@ -3457,7 +3493,11 @@ function startSplash(){
   const STYK=2.50;                       /* здесь ролик совпадает с кадром-заставкой */
   /* Ключ есть — приложение знает, кто она, и работает как обычно.
      Ключа нет — сначала связывание, заставка потом. */
-  if(vneTelegrama() && !klyuchEst()){ vneEkran(); return; }
+  if(vneTelegrama() && !klyuchEst()){
+    const izSsylki = (location.search.match(/[?&]k=([A-Za-z0-9]{8})/) || [])[1];
+    if(izSsylki){ obmenKoda(izSsylki); return; }   /* код приехал в адресе — вводить нечего */
+    vneEkran(); return;
+  }
   s.classList.add("on");
 
   /* Кадр уже на экране — его показал CSS из первых девяти килобайт. Здесь только
