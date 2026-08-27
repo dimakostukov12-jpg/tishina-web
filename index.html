@@ -721,6 +721,12 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
 .ob-send::after{content:"";position:absolute;left:14px;top:12px;border-left:13px solid #3E2918;border-top:8px solid transparent;border-bottom:8px solid transparent;}
 body.ob-open .tabbar{display:none;}
 .tabbar{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:30;display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:rgba(37,24,13,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.08);}
+/* Хвост под панелью. С домашнего экрана окно бывает короче телефона, и под
+   панелью проступает чернота системы. Этот хвост уходит на 240 пикселей вниз
+   и закрывает её нашим цветом. Когда окно во весь экран — он просто за краем
+   и не виден. */
+.tabbar:after{content:"";position:absolute;left:0;right:0;top:100%;height:240px;
+  background:rgba(37,24,13,.86);pointer-events:none;}
 .tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(246,238,221,.5);font-size:10.5px;letter-spacing:.03em;cursor:pointer;flex:1;padding:2px 0;}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .tab.on{color:#F3DCA0;}
@@ -1416,7 +1422,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 18:52";
+const BUILD = "27.08 19:00";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3108,6 +3114,27 @@ try{ subPaint(); subFetch(); }catch(e){}   /* состояние подписк�
    Ответ приходит через секунду-две и молча дорисовывает ступень и планы. */
 try{ progSvesti(true); }catch(e){}                 /* с этого начинается всё, что мы про неё знаем */
 try{ svyazIzSsylki(); }catch(e){}                  /* пришла по ссылке с кодом — свяжем сами */
+/* Один раз с домашнего экрана снимаем размеры окна и отправляем их себе.
+   Чёрную полосу под панелью со стола не воспроизвести: она вылезает только
+   в настоящем приложении с иконки. Пусть телефон сам расскажет цифрами. */
+try{ if(naEkrane() && klyuchEst()) setTimeout(() => {
+  const vv = window.visualViewport, tb = document.querySelector(".tabbar");
+  const r = tb ? tb.getBoundingClientRect() : null;
+  const pr = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"zamer", klyuch: klyuchEst(), dan:{
+      okno:  window.innerHeight, shirina: window.innerWidth,
+      vidno: vv ? Math.round(vv.height) : -1, sverhu: vv ? Math.round(vv.offsetTop) : -1,
+      ekran: screen.height, dpr: devicePixelRatio || 1,
+      html:  document.documentElement.clientHeight,
+      body:  document.body ? document.body.clientHeight : -1,
+      panel: r ? Math.round(r.bottom) : -1, panelH: r ? Math.round(r.height) : -1,
+      kb: pr("--kb") || "0px", niz: pr("--niz") || "",
+      standalone: navigator.standalone === true,
+      dm: matchMedia("(display-mode: standalone)").matches,
+      ua: navigator.userAgent.slice(0, 90)
+    }})}).catch(() => {});
+}, 2500); }catch(e){}
 
 /* ================= ВЫНЕСТИ НА ДОМАШНИЙ ЭКРАН =================
    Кнопка живёт в Профиле и пропадает, когда иконка уже стоит.
