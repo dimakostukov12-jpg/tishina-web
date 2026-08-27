@@ -656,10 +656,19 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
 .sv-in::placeholder{color:rgba(246,238,221,.25);letter-spacing:.22em;}
 
 /* код связывания на экране установленной копии */
-.vn-kod{font:700 30px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.2em;
-  color:#F7ECC6;text-align:center;padding:15px 8px;border-radius:14px;
+.vn-kodwrap{display:flex;gap:8px;align-items:stretch;margin-bottom:12px;}
+.vn-kod{flex:1;min-width:0;font:700 clamp(22px,7vw,30px)/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.16em;color:#F7ECC6;text-align:center;padding:16px 6px;border-radius:14px;
   background:rgba(10,7,16,.6);border:1px solid rgba(233,201,131,.35);
-  text-shadow:0 0 22px rgba(233,201,131,.35);}
+  text-shadow:0 0 22px rgba(233,201,131,.35);display:flex;align-items:center;justify-content:center;
+  -webkit-user-select:all;user-select:all;}
+.vn-kopi{flex:0 0 auto;padding:0 15px;border-radius:14px;cursor:pointer;
+  border:1px solid rgba(233,201,131,.45);color:#F3DCA0;
+  background:linear-gradient(180deg,rgba(233,201,131,.18),rgba(233,201,131,.07));
+  font:600 12.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(0,0,0,0);
+  transition:background .25s,color .25s;}
+.vn-kopi.est{background:linear-gradient(180deg,#F3DCA0,#D9BC79);color:#241806;border-color:transparent;}
 .vn-kodp{font-size:13px;color:#C9C3BC;line-height:1.5;margin:12px 0 0;text-align:center;}
 .vn-kodp b{color:#F3DCA0;font-weight:600;}
 .vn-mel{font-size:11.5px;color:#9B958F;margin:10px 0 0;text-align:center;}
@@ -677,6 +686,10 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
 .vn-h{font-family:'Baskerville','Forum',Georgia,serif;font-size:21px;color:#F3DCA0;margin:0 0 8px;}
 .vn-p{font-size:14px;color:#C9C3BC;line-height:1.5;margin:0 0 16px;}
 .vn-steps{text-align:left;margin-bottom:14px;}
+.vn-steps .dm-step{padding:9px 11px;margin-bottom:7px;}
+.vn-steps .dm-step .t{font-size:13px;}
+.vn-steps .dm-step .ik{flex:0 0 26px;height:26px;border-radius:8px;}
+.vn-steps .dm-step .ik svg{width:15px;height:15px;}
 .vn-arrow{font-size:22px;color:#E7C983;opacity:.75;margin:2px 0 0;
   animation:vnDown 1.8s ease-in-out infinite;}
 @keyframes vnDown{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(5px);opacity:1}}
@@ -1398,7 +1411,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 17:55";
+const BUILD = "27.08 17:59";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3077,6 +3090,7 @@ try{ subPaint(); subFetch(); }catch(e){}   /* состояние подписк�
 /* Свод прогресса при каждом запуске: вдруг она слушала со второго телефона.
    Ответ приходит через секунду-две и молча дорисовывает ступень и планы. */
 try{ progSvesti(true); }catch(e){}                 /* с этого начинается всё, что мы про неё знаем */
+try{ svyazIzSsylki(); }catch(e){}                  /* пришла по ссылке с кодом — свяжем сами */
 
 /* ================= ВЫНЕСТИ НА ДОМАШНИЙ ЭКРАН =================
    Кнопка живёт в Профиле и пропадает, когда иконка уже стоит.
@@ -3135,7 +3149,10 @@ const IK = {
   share:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8.5 6.5 12 3l3.5 3.5"/><path d="M6 11H4.8v9.2h14.4V11H18"/></svg>',
   plus:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/></svg>',
   gal:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg>',
-  safari: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="m15.6 8.4-1.9 5.3-5.3 1.9 1.9-5.3z" fill="currentColor" stroke="none" opacity=".85"/></svg>'
+  safari: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="m15.6 8.4-1.9 5.3-5.3 1.9 1.9-5.3z" fill="currentColor" stroke="none" opacity=".85"/></svg>',
+  kopi:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 5.5h-9a2 2 0 0 0-2 2v9"/></svg>',
+  tg:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M20.5 4.2 3.7 10.6c-.8.3-.8 1.4 0 1.7l4.2 1.4 1.6 4.8c.2.7 1.1.9 1.6.3l2.2-2.4 4.2 3.1c.6.4 1.4.1 1.6-.6l2.6-13.4c.2-.8-.6-1.5-1.2-1.3z"/><path d="m8 13.7 9.6-6.4-6.1 7.2"/></svg>',
+  chelo:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c.6-3.7 3.6-5.8 7.2-5.8s6.6 2.1 7.2 5.8"/></svg>'
 };
 
 /* Настоящий Safari или встроенный браузер внутри Телеграма — вопрос важный:
@@ -3236,7 +3253,58 @@ function svyazVvod(){
    на айфоне у Safari и у приложения с домашнего экрана РАЗНАЯ память. Ключ,
    положенный в Safari, установленная копия не увидит, и ссылка бы не сработала.
    А код видно глазами, и он проходит через любые границы. */
-let svyazId = null, svyazTimer = null, svyazDo = 0;
+let svyazId = null, svyazTimer = null, svyazDo = 0, svyazKod = "";
+
+/* Мини-приложение живёт в @Kostukovdima_bot — им же подписан initData.
+   BOT_LINK ведёт в бот клуба (оплаты), и «Связать устройство» там нет. */
+const MINIAPP_BOT = "https://t.me/Kostukovdima_bot";
+
+/* Копирование: женщине не надо переписывать восемь знаков глазами.
+   На айфоне буфер доступен только по касанию — поэтому кнопка, а не автомат. */
+function kopirovat(txt, knopka){
+  const gotovo = () => {
+    knopka.textContent = "Скопировано"; knopka.classList.add("est");
+    try{ haptic("success"); }catch(e){}
+    setTimeout(() => { knopka.textContent = "Копировать"; knopka.classList.remove("est"); }, 1800);
+  };
+  const starym = () => {                       /* старые Safari про clipboard не знают */
+    try{
+      const i = document.createElement("input");
+      i.value = txt; i.setAttribute("readonly", "");
+      i.style.cssText = "position:fixed;opacity:0;left:0;top:0;font-size:16px";
+      document.body.appendChild(i);
+      i.select(); i.setSelectionRange(0, txt.length);
+      document.execCommand("copy");
+      document.body.removeChild(i);
+      gotovo();
+    }catch(e){}
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(gotovo, starym); return;
+    }
+  }catch(e){}
+  starym();
+}
+
+/* Если Телеграм открыл нас ссылкой, в которой лежит код, — связываем сами,
+   вводить ей ничего не надо. Заработает, когда у бота включат главное
+   мини-приложение (BotFather → Bot Settings → Configure Mini App). Пока
+   выключено — ссылка просто открывает бота, и это ничего не ломает. */
+function svyazIzSsylki(){
+  let p = "";
+  try{ p = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || ""; }catch(e){}
+  const kod = String(p).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if(kod.length !== 8) return;
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"svyazat", initData:(tg && tg.initData) || "", kod})})
+   .then(r => r.json()).then(d => {
+     if(!d || !d.ok) return;
+     try{ haptic("success"); setTab("profile"); go("s-svyaz", true); }catch(e){}
+     const m = $("sv-msg");
+     if(m) m.textContent = "Готово. Тот телефон уже открывается" + (d.metka ? " — " + d.metka : "") + ".";
+   }).catch(() => {});
+}
 
 function svyazPoprosit(){
   const m = navigator.userAgent.match(/iPhone|iPad|Android|Windows|Macintosh/);
@@ -3246,8 +3314,13 @@ function svyazPoprosit(){
     body: JSON.stringify({op:"nachat", metka})})
    .then(r => r.json()).then(d => {
      if(!d || !d.kod){ if(kd) kd.textContent = "не вышло"; return; }
-     svyazId = d.id;
+     svyazId = d.id; svyazKod = d.kod;
      if(kd) kd.textContent = d.kod.slice(0,4) + " " + d.kod.slice(4);
+     const kp = $("vn-kopi"); if(kp) kp.hidden = false;
+     const tgb = $("vn-go");
+     /* Код кладём и в ссылку: если у бота включат главное мини-приложение,
+        связывание станет в одно касание, вводить ничего не придётся. */
+     if(tgb) tgb.dataset.url = MINIAPP_BOT + "?startapp=" + d.kod;
      svyazDo = Date.now() + 10*60*1000;
      clearInterval(svyazTimer);
      svyazTimer = setInterval(svyazSprosit, 3000);
@@ -3283,14 +3356,25 @@ function vneEkran(){
     $("vn-h").textContent = "Свяжи с Телеграмом";
     $("vn-p").textContent = "Один раз — чтобы приложение узнало твои дни, ступень и подписку.";
     $("vn-steps").innerHTML =
-      '<div class="vn-kod" id="vn-kod">· · · ·</div>' +
-      '<p class="vn-kodp">Открой «Иммерсию» в Телеграме → <b>Профиль</b> → ' +
-      '<b>Связать устройство</b> → введи этот код</p>';
+      '<div class="vn-kodwrap">' +
+        '<div class="vn-kod" id="vn-kod">· · · ·</div>' +
+        '<button class="vn-kopi" id="vn-kopi" type="button" hidden>Копировать</button>' +
+      '</div>' +
+      shagiHTML([
+        [IK.kopi,  "Скопируй код", "Кнопка справа от него"],
+        [IK.tg,    "Открой «Иммерсию» в Телеграме", "Кнопка ниже"],
+        [IK.chelo, "Профиль → <b>«Связать устройство»</b>", "Внизу, в разделе «Приложение»"],
+        [IK.gal,   "Вставь код и нажми <b>«Связать»</b>", "Через пару секунд этот экран сам откроется"]
+      ]);
     $("vn-act").innerHTML =
       '<button class="dm-big" id="vn-go" type="button">Открыть Телеграм</button>' +
       '<p class="vn-mel">Код живёт десять минут. Истечёт — появится новый сам.</p>';
     const g = $("vn-go");
-    if(g) g.addEventListener("click", () => { location.href = BOT_LINK; });
+    if(g) g.addEventListener("click", () => {
+      location.href = g.dataset.url || MINIAPP_BOT;
+    });
+    const kp = $("vn-kopi");
+    if(kp) kp.addEventListener("click", () => { if(svyazKod) kopirovat(svyazKod, kp); });
     svyazPoprosit();
   }else if(etoIOS() && !nastoyashchiySafari()){
     /* Она во встроенном браузере — Телеграма или другого приложения.
