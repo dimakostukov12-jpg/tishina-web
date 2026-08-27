@@ -1467,7 +1467,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 20:24";
+const BUILD = "27.08 20:25";
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -3747,6 +3747,8 @@ function closeSplash(){
   const s=$("s-splash"); if(!s.classList.contains("on")) return;
   if(spTimer){clearInterval(spTimer);spTimer=null;}
   spReset(); haptic("success");
+  /* низ страницы перестаёт быть чёрным и снова красится в цвет панели */
+  try{ document.documentElement.classList.remove("zast"); }catch(e){}
   afterSplash();                       /* приложение уже под заставкой — ей есть куда растворяться */
   s.classList.add("fade");
   setTimeout(()=>{ s.classList.remove("on","fade","looping");
@@ -3795,6 +3797,9 @@ function startSplash(){
     if(!naEkrane()){ ustanovkaEkran(); return; }
   }
   s.classList.add("on");
+  /* пока заставка на экране, полоса под краем окна должна быть её чернотой,
+     а не цветом панели: панели там ещё нет */
+  try{ document.documentElement.classList.add("zast"); }catch(e){}
 
   /* Кадр уже на экране — его показал CSS из первых девяти килобайт. Здесь только
      добавляем дыхание, когда он приехал целиком, и лишь после этого пускаем в
