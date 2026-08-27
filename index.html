@@ -635,14 +635,14 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
   -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .dm-note{font-size:12px;color:#9B958F;line-height:1.5;margin:18px 0 0;}
 
-.hs-vopros{display:flex;align-items:center;gap:8px;margin-top:9px;padding:9px 12px;
-  border-radius:13px;background:rgba(22,14,9,.7);border:1px solid rgba(233,201,131,.16);}
-.hs-vopros span{flex:1;font-size:13px;color:#C9C3BC;}
-.hs-otv{padding:7px 13px;border-radius:10px;border:1px solid rgba(233,201,131,.4);
-  background:rgba(233,201,131,.12);color:#F3DCA0;cursor:pointer;
-  font:600 12.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
-.hs-otv.gh{border-color:rgba(233,201,131,.16);background:none;color:rgba(246,238,221,.5);}
+.hs-est{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:16px;
+  background:rgba(22,14,9,.7);border:1px solid rgba(143,191,152,.28);}
+.hs-gal{flex:0 0 34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:rgba(143,191,152,.14);color:#9FD3A8;}
+.hs-gal svg{width:17px;height:17px;}
+.hs-est .hs-tx b{color:#EAE7E4;font-size:14px;font-weight:600;}
+.hs-est .hs-tx i{color:rgba(246,238,221,.5);}
+.hs-lnk.gh{border-color:rgba(233,201,131,.12);color:rgba(246,238,221,.42);}
 .hs-lnk{display:block;width:100%;margin-top:8px;padding:11px;border-radius:13px;background:none;
   border:1px solid rgba(233,201,131,.2);color:rgba(233,201,131,.85);cursor:pointer;
   font:500 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -1189,12 +1189,12 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
         <span class="hs-tx"><b>Вынести на экран «Домой»</b><i>Открывать сразу, одним касанием</i></span>
         <span class="hs-go">›</span>
       </button>
-      <div class="hs-vopros" id="hs-vopros" hidden>
-        <span>Иконка появилась?</span>
-        <button class="hs-otv" id="hs-da" type="button">Да</button>
-        <button class="hs-otv gh" id="hs-net" type="button">Пока нет</button>
+      <div class="hs-est" id="hs-est" hidden>
+        <span class="hs-gal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></span>
+        <span class="hs-tx"><b>Иммерсия на домашнем экране</b><i id="hs-kakoy"></i></span>
       </div>
       <button class="hs-lnk" id="hs-svyaz" type="button">Связать устройство</button>
+      <button class="hs-lnk gh" id="hs-vyyti" type="button" hidden>Выйти на всех устройствах</button>
     </div>
     <div class="st-lb">Разделы</div>
     <div class="st-tiles">
@@ -1416,7 +1416,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 18:41";
+const BUILD = "27.08 18:46";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -2542,7 +2542,7 @@ function subPrinyat(v){
 }
 
 /* ---------- profile ---------- */
-function renderProfile(){ try{ renderStage(); }catch(e){} try{ subFetch(); }catch(e){} try{ hsPokazat(); }catch(e){} }
+function renderProfile(){ try{ renderStage(); }catch(e){} try{ subFetch(); }catch(e){} try{ hsPokazat(); hsProverit(); }catch(e){} }
 
 /* ---------- календарь практики (синхронно с реальной датой) ---------- */
 const DAYSKEY="tishina_days";
@@ -3139,10 +3139,50 @@ function hsSposob(){
   if(etoIOS()) return "ios";
   return null;                                                  /* нечего предложить */
 }
+/* Сколько у неё связанных устройств — знает сервер, и это единственная правда.
+   Раньше приложение спрашивало её саму: «иконка появилась? да / пока нет».
+   Спрашивать больше не надо. */
+let hsUstroystva = null;                       /* null — ещё не спрашивали */
+
 function hsPokazat(){
-  const w = $("hs-wrap"), b = $("hs-btn"); if(!w) return;
-  if(b) b.hidden = !hsSposob();     /* поставить нечем или уже стоит — прячем */
-  w.hidden = false;                 /* «Связать устройство» нужна и после установки */
+  const w = $("hs-wrap"), b = $("hs-btn"), e = $("hs-est"),
+        sv = $("hs-svyaz"), vy = $("hs-vyyti");
+  if(!w) return;
+  w.hidden = false;
+  const est = Array.isArray(hsUstroystva) && hsUstroystva.length > 0;
+  if(b)  b.hidden  = est || !hsSposob();       /* стоит, или ставить нечем */
+  if(sv) sv.hidden = est;                      /* связывать больше нечего */
+  if(e)  e.hidden  = !est;
+  if(vy) vy.hidden = !est;
+  if(est){
+    const u = hsUstroystva[0], k = $("hs-kakoy");
+    if(k) k.textContent = (u.metka || "телефон") + (u.svyazano ? " · " + kogdaSvyazali(u.svyazano) : "")
+                        + (hsUstroystva.length > 1 ? " и ещё " + (hsUstroystva.length - 1) : "");
+  }
+}
+
+const HS_MES = ["января","февраля","марта","апреля","мая","июня",
+                "июля","августа","сентября","октября","ноября","декабря"];
+function kogdaSvyazali(iso){
+  const d = new Date(iso); if(isNaN(d)) return "";
+  const den = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const raz = Math.round((den(new Date()) - den(d)) / 86400000);
+  if(raz <= 0) return "связан сегодня";
+  if(raz === 1) return "связан вчера";
+  return "связан " + d.getDate() + " " + HS_MES[d.getMonth()];
+}
+
+/* Спрашиваем сервер, а не женщину. Без подписи Телеграма спрашивать нечем —
+   но в браузере этот блок и не показывается. */
+function hsProverit(){
+  const initData = (tg && tg.initData) || "";
+  if(!initData) return;
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"spisok", initData})})
+   .then(r => r.json()).then(d => {
+     hsUstroystva = (d && Array.isArray(d.ustroystva)) ? d.ustroystva : [];
+     hsPokazat();
+   }).catch(() => {});
 }
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); hsProm = e; hsPokazat(); });
 window.addEventListener("appinstalled", () => { localStorage.setItem(HS_KEY, "1"); hsPokazat(); });
@@ -3220,21 +3260,24 @@ function hsNazhali(){
    .catch(() => uyti(APP_URL()));      /* без кода — просто инструкция, как раньше */
 }
 
-/* Она ушла в браузер. Когда вернётся — спросим одной строкой, получилось ли:
-   узнать это сами мы не можем, у браузера и у приложения на экране разная память. */
+/* Она ушла в браузер ставить иконку. Вернётся — перепроверим у сервера, не
+   появилось ли устройство: спрашивать её саму больше не нужно. */
 function hsSprosim(){
-  const w = $("hs-vopros"); if(!w) return;
-  w.hidden = false;
+  let n = 0;
+  const t = setInterval(() => { if(++n > 20){ clearInterval(t); return; } hsProverit(); }, 3000);
 }
 
 (function hsSvyazat(){
   const b = $("hs-btn");   if(b) b.addEventListener("click", hsNazhali);
-  const da = $("hs-da");   if(da) da.addEventListener("click", () => {
-    localStorage.setItem(HS_KEY, "1"); haptic("success");
-    $("hs-vopros").hidden = true; hsPokazat();
-  });
-  const net = $("hs-net"); if(net) net.addEventListener("click", () => {
-    haptic("light"); $("hs-vopros").hidden = true;
+  const vy = $("hs-vyyti"); if(vy) vy.addEventListener("click", () => {
+    if(!confirm("Выйти на всех устройствах? Иконка на экране перестанет тебя узнавать — связать можно будет заново.")) return;
+    haptic("light"); vy.textContent = "Выхожу…";
+    fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({op:"otozvat", initData:(tg && tg.initData) || ""})})
+     .then(r => r.json()).then(() => {
+       hsUstroystva = []; vy.textContent = "Выйти на всех устройствах";
+       haptic("success"); hsPokazat();
+     }).catch(() => { vy.textContent = "Выйти на всех устройствах"; });
   });
   const sv = $("hs-svyaz"); if(sv) sv.addEventListener("click", () => {
     haptic("light"); $("sv-msg").textContent =
