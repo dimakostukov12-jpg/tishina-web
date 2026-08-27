@@ -63,7 +63,7 @@ html{
   background-attachment:fixed;
   animation:bgdrift 34s ease-in-out infinite alternate;}
 body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не все андроиды — vh как запасной */font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden;background:transparent;}
-#s-splash, #s-vne{bottom:calc(0px - var(--niz,0px));}
+html #s-splash, html #s-vne{bottom:calc(0px - var(--niz,0px));}
 .safetop{height:env(safe-area-inset-top);}
 @keyframes gspin{to{transform:rotate(360deg);}}
 
@@ -221,7 +221,11 @@ html.doma body{
 /* Опускаем ТОЛЬКО панель и полноэкранные слои. Содержимое экранов не трогаем:
    его низ и так закрыт панелью, а лишний сдвиг спрятал бы последнюю строку.
    Величину считает код (--niz), и она никогда не больше того, чего не хватает. */
-.tabbar{bottom:calc(var(--kb,0px) - var(--niz,0px));}
+/* html впереди — не для красоты. Без него это правило стоит в стилях ВЫШЕ
+   основного описания .tabbar, и то перебивает его при равной силе. Считался
+   сдвиг верно, а применялся в никуда: панель как висела, так и висела.
+   С html сила выше, и правило работает независимо от порядка. */
+html .tabbar{bottom:calc(var(--kb,0px) - var(--niz,0px));}
 @keyframes swim{from{transform:translate3d(-4%,3%,0) scale(1.06) rotate(-.6deg);}
                 to  {transform:translate3d(5%,-4%,0) scale(1.16) rotate(.8deg);}}
 @keyframes swimb{from{transform:translate3d(6%,-3%,0) scale(1.22) rotate(1deg);}
@@ -1456,7 +1460,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 19:57";
+const BUILD = "27.08 20:09";
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -3709,15 +3713,20 @@ function domaOtmetit(){
 function nizPodognat(){
   let sdvig = 0;
   try{
-    if(naEkrane() && document.body){
-      const proba = document.createElement("div");
-      proba.style.cssText = "position:fixed;left:-9999px;top:0;padding-top:env(safe-area-inset-top)";
-      document.body.appendChild(proba);
-      const sverhu = parseFloat(getComputedStyle(proba).paddingTop) || 0;
-      document.body.removeChild(proba);
-      const nedodali = Math.max(0, Math.round(((screen && screen.height) || 0) - (window.innerHeight || 0)));
-      sdvig = Math.min(Math.round(sverhu), nedodali);
-      if(!(sdvig > 0) || sdvig > 120) sdvig = 0;      /* мусорным числам тут не место */
+    /* Только айфон и только с домашнего экрана, только в вертикальном виде.
+       Там строка состояния прозрачная: система рисует нас от самого верха,
+       а высоту окна отдаёт БЕЗ неё. Значит внизу ровно столько незанятого,
+       сколько экран длиннее окна. У Димы 874 − 812 = 62.
+
+       На Android так считать нельзя: там окно тоже короче экрана, но система
+       сама сдвигает его вниз, и незанятого места внизу нет.
+
+       Раньше я домножал это ещё и на env(safe-area-inset-top) и брал меньшее.
+       На живом айфоне оно оказалось нулём — и весь сдвиг обнулялся вместе
+       с ним. Проверка, которая всё чинила «на всякий случай», ничего не чинила. */
+    if(etoIOS() && naEkrane() && window.innerHeight > window.innerWidth){
+      const nedodali = Math.round(((screen && screen.height) || 0) - (window.innerHeight || 0));
+      if(nedodali > 0 && nedodali <= 120) sdvig = nedodali;
     }
   }catch(e){}
   try{ document.documentElement.style.setProperty("--niz", sdvig + "px"); }catch(e){}
