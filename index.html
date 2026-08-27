@@ -1431,7 +1431,31 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 19:14";
+const BUILD = "27.08 19:18";
+
+/* ---------- копия на экране не должна застревать на старой сборке ----------
+   Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
+   Поэтому спрашиваем version.txt мимо кэша и, если на сервере другая сборка,
+   перезагружаемся один раз — с новым хвостом в адресе, чтобы страница точно
+   пришла свежая, а не из памяти. */
+(function(){
+  const METKA = "tishina_sborka";
+  setTimeout(() => {
+    fetch("version.txt?t=" + Date.now(), {cache: "no-store"})
+      .then(r => r.text())
+      .then(t => {
+        const na_servere = String(t || "").trim();
+        if(!na_servere || na_servere === BUILD) return;
+        let bylo = null;
+        try{ bylo = sessionStorage.getItem(METKA); }catch(e){}
+        if(bylo === na_servere) return;          /* уже перезагружались ради неё */
+        try{ sessionStorage.setItem(METKA, na_servere); }catch(e){}
+        const a = location.pathname + location.search.replace(/[?&]v=[^&]*/g, "")
+                + (location.search ? "&" : "?") + "v=" + encodeURIComponent(na_servere);
+        location.replace(a);
+      }).catch(() => {});
+  }, 1500);
+})();
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
