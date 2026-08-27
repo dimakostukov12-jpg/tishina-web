@@ -305,7 +305,7 @@ html.doma .safetop{height:max(env(safe-area-inset-top), 10px);}
 .st-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#C9A24B,#F3E1AC);
   transition:width .6s ease;}
 .st-upto{font-size:11.5px;color:#C0A793;margin-top:7px;}
-.st-ver{font-size:9.5px;color:rgba(246,238,221,.3);margin-top:14px;letter-spacing:.06em;}
+.st-ver{font-size:9.5px;color:rgba(246,238,221,.3);margin-top:14px;letter-spacing:.04em;line-height:1.5;}
 .st-lb{font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:rgba(246,238,221,.42);
   margin-top:20px;}
 .st-strip{display:flex;gap:5px;margin-top:9px;}
@@ -1431,7 +1431,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 19:18";
+const BUILD = "27.08 19:22";
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -2984,8 +2984,24 @@ function renderStage(){
   /* Номер сборки показываем всегда, мелко и тускло. Без него нельзя понять,
      обновился телефон или сидит на старой версии, а это первый вопрос при
      любом «у меня по-другому». */
-  try{ $("st-ver").textContent = "сборка "+BUILD+(stageTest ? (" · "+DEV.label) : "")
-        + (progKogda() ? (" · свод "+progKogda()) : " · свод не приходил"); }catch(e){}
+  try{
+    /* Вторая строчка — размеры окна. Пустое поле под панелью со стола не
+       воспроизвести, а по этим числам сразу видно, где теряются точки:
+       считает ли себя приложение открытым с экрана и докуда достаёт низ. */
+    let razmery = "";
+    try{
+      const tb = document.querySelector(".tabbar");
+      const r = tb ? tb.getBoundingClientRect() : null;
+      const dm = matchMedia("(display-mode: standalone)").matches;
+      razmery = " · " + (naEkrane() ? "дома" : "в окне")
+        + " (dm:" + (dm ? "1" : "0") + " ns:" + (navigator.standalone === true ? "1" : navigator.standalone === false ? "0" : "-") + ")"
+        + " · окно " + Math.round(window.innerHeight) + "/" + Math.round((screen && screen.height) || 0)
+        + " · низ " + (r ? Math.round(r.bottom) : "?")
+        + " · ниже " + (getComputedStyle(document.documentElement).getPropertyValue("--nizhe") || "?").trim();
+    }catch(e){}
+    $("st-ver").textContent = "сборка "+BUILD+(stageTest ? (" · "+DEV.label) : "")
+        + (progKogda() ? (" · свод "+progKogda()) : " · свод не приходил") + razmery;
+  }catch(e){}
   $("st-days").textContent=sinceDays();
   $("st-mins").textContent=listenedMin();
   $("st-tasks").textContent=tasksDone();
