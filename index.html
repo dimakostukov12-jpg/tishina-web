@@ -573,7 +573,11 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
 .lrow.press{transform:scale(.965);background:rgba(38,25,15,.86);}
 .lrow.pop{box-shadow:0 0 0 1.5px rgba(243,220,160,.35),0 10px 24px rgba(0,0,0,.4);}
 .cframe{flex:0 0 43%;border-radius:13px;padding:1.9px;box-shadow:0 0 8px rgba(233,201,131,.5),0 0 16px rgba(233,201,131,.22),0 6px 16px rgba(0,0,0,.35);}
-.cov{position:relative;z-index:1;overflow:hidden;width:100%;aspect-ratio:1168/880;background-size:cover;background-position:center;border-radius:11px;}
+/* background-color обязателен: обложки лежат отдельными файлами, и пока картинка
+   не приехала, сквозь прозрачную рамку светил золотой фон страницы — казалось,
+   что плитка сама светится. Теперь там спокойная темнота под цвет строки. */
+.cov{position:relative;z-index:1;overflow:hidden;width:100%;aspect-ratio:1168/880;
+  background-color:#160E09;background-size:cover;background-position:center;border-radius:11px;}
 .cov::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-shadow:inset 0 0 12px 3px rgba(21,14,8,.38);}
 .rt{flex:1;display:flex;flex-direction:column;gap:9px;min-width:0;}
 .rdesc{font-size:13.5px;color:#E8E5E2;line-height:1.42;}
@@ -1264,7 +1268,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 15:12";
+const BUILD = "27.08 15:32";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -2996,11 +3000,32 @@ function startSplash(){
   };
   if(kadr){
     const im=new Image();
-    im.onload=()=>{ if(!s.classList.contains("igraet")) kadr.classList.add("est"); zavesti(); };
-    im.onerror=zavesti;
+    im.onload=()=>{ if(!s.classList.contains("igraet")) kadr.classList.add("est"); };
     im.src="splash-first.jpg";
   }
-  setTimeout(zavesti, 2500);          /* кадр застрял — ролик всё равно заводим */
+
+  /* Обложки разделов лежат отдельными файлами — так страница весит мегабайт
+     вместо пяти. Но просить их только в момент открытия раздела нельзя: пока
+     картинка едет, в рамке пусто. Тянем заранее и тихо, пока она смотрит на
+     заставку, — к моменту, когда откроет «Деньги», всё уже лежит в телефоне. */
+  const OBLOZHKI = ["och.598f0499.jpg", "sam.1df4a2ab.jpg", "mag.832e3c59.jpg", "zdr.acbe59c0.jpg", "den.40d2ec55.jpg", "bog.25f6c697.jpg", "emerg.55fa6875.jpg", "och-0.16dae2d7.jpg", "och-1.a14f6fba.jpg", "och-2.2047ce03.jpg", "sam-0.925eacf7.jpg", "sam-1.2a8c33fa.jpg", "mag-0.1a915218.jpg", "mag-1.9044a6cc.jpg", "bog-0.a382d99f.jpg", "bog-1.a13c0fcf.jpg", "den-0.0e4bc2ff.jpg", "den-1.582a19e0.jpg", "em-0.09896a4f.jpg", "em-1.9819a0ef.jpg", "em-2.ac4f27d6.jpg", "em-3.80a11716.jpg", "em-4.e3d2d22f.jpg", "em-5.94f81d3b.jpg", "em-6.f20df06d.jpg"];
+  function podgruzitOblozhki(potom){
+    if(!OBLOZHKI.length){ potom(); return; }
+    let dan=0, i=0;
+    const sled=()=>{
+      if(i>=OBLOZHKI.length) return;
+      const n=i++, im=new Image();
+      const gotov=()=>{ if(++dan>=OBLOZHKI.length) potom(); sled(); };
+      im.onload=gotov; im.onerror=gotov;
+      im.src="cov/"+OBLOZHKI[n];
+    };
+    for(let k=0;k<4;k++) sled();     /* по четыре разом: канал занят, но не забит */
+  }
+
+  /* Порядок нарочно такой: страница → кадр заставки → обложки → ролик.
+     Обложки нужнее ролика — их она увидит сразу, как войдёт. */
+  podgruzitOblozhki(zavesti);
+  setTimeout(zavesti, 20000);        /* но и без обложек ролик рано или поздно заводим */
 
   /* Ролик пускаем, только когда есть чем доиграть. Раньше play() дёргался уже на
      loadedmetadata — то есть когда приехал один заголовок: на слабом канале ролик
