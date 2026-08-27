@@ -1416,7 +1416,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 18:35";
+const BUILD = "27.08 18:41";
 const $ = s => document.getElementById(s);
 
 /* ---------- свежесть сборки ----------
@@ -3275,7 +3275,12 @@ function obmenKoda(kod){
     $("vn-steps").innerHTML = ""; $("vn-act").innerHTML = "";
     el.classList.add("on");
   }
-  const chisto = () => { try{ history.replaceState({}, "", location.pathname + "?ust=1"); }catch(e){} };
+  const chisto = () => {
+    /* Код из адреса убираем: он отработал, и в истории ему не место. Пометку
+       оставляем ту, что была, — по ней приложение понимает, откуда открыли. */
+    const hvost = naEkrane() ? "?dom=1" : "?ust=1";
+    try{ history.replaceState({}, "", location.pathname + hvost); }catch(e){}
+  };
   fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
     body: JSON.stringify({op:"obmen", kod})})
    .then(r => r.json()).then(d => {
@@ -3410,6 +3415,20 @@ function ustanovkaEkran(){
   let n = 0;
   const t = setInterval(() => { if(imya() || ++n > 14){ clearInterval(t); narisovat(); } }, 300);
   el.classList.add("on");
+
+  /* И главное. Иконка с домашнего экрана не увидит ключ, который лежит здесь:
+     память у них разная — проверено на живом айфоне. Зато адрес страницы, с
+     которой ставят иконку, система запоминает. Поэтому кладём в адрес код для
+     будущей иконки: она родится уже знающей женщину, и связывать ничего не
+     придётся. Код одноразовый, живёт сутки и после первого запуска мёртв. */
+  const m = navigator.userAgent.match(/iPhone|iPad|Android|Windows|Macintosh/);
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"peredat", klyuch: klyuchEst(),
+                          metka: (m ? m[0].replace("Macintosh","Mac") : "телефон") + " · с экрана"})})
+   .then(r => r.json()).then(d => {
+     if(!d || !d.kod) return;
+     try{ history.replaceState({}, "", location.pathname + "?dom=1&k=" + d.kod); }catch(e){}
+   }).catch(() => {});
 }
 
 /* Экран для случая, когда приложение открыли не из Телеграма: либо она в Safari
@@ -3532,7 +3551,9 @@ function startSplash(){
      Ключа нет — сначала связывание, заставка потом. */
   if(vneTelegrama()){
     const izSsylki = (location.search.match(/[?&]k=([A-Za-z0-9]{8})/) || [])[1];
-    if(izSsylki && !klyuchEst()){ obmenKoda(izSsylki); return; }  /* код в адресе — вводить нечего */
+    /* Код в адресе — вводить нечего. Так приходит и иконка: её адрес система
+       запомнила со страницы установки, вместе с кодом. */
+    if(izSsylki && !klyuchEst()){ obmenKoda(izSsylki); return; }
     if(!klyuchEst()){ vneEkran(); return; }        /* не знаем её: иконке — связать, браузеру — инструкция */
     /* Ключ есть. В браузере её дело — поставить иконку, само приложение здесь
        ни к чему. С домашнего экрана — работаем как обычно. */
