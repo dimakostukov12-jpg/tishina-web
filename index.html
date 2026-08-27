@@ -63,6 +63,7 @@ html{
   background-attachment:fixed;
   animation:bgdrift 34s ease-in-out infinite alternate;}
 body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не все андроиды — vh как запасной */font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden;background:transparent;}
+#s-splash, #s-vne{bottom:calc(0px - var(--niz,0px));}
 .safetop{height:env(safe-area-inset-top);}
 @keyframes gspin{to{transform:rotate(360deg);}}
 
@@ -217,14 +218,10 @@ html.doma body{
    верха: панель и экраны повисают выше края ровно на высоту строки. Опускаем
    их на неё же — величину сообщает сам айфон. В Телеграме правило не работает:
    класса doma там нет, и не сдвинется ничего. */
-/* НИЗ НЕ ТРОГАЕМ. Здесь стояло правило, опускавшее панель на высоту строки
-   состояния. Оно понадобилось, когда айфон считал высоту окна без неё. После
-   переустановки система начала отдавать эти числа иначе, и то же правило
-   вытолкнуло панель за край экрана: подпись обрезалась.
-
-   Вывод простой: подгонять низ вслепую нельзя — величина зависит от того,
-   как именно система в этот раз посчитала окно. Низ оставляем системе,
-   она ставит его правильно. */
+/* Опускаем ТОЛЬКО панель и полноэкранные слои. Содержимое экранов не трогаем:
+   его низ и так закрыт панелью, а лишний сдвиг спрятал бы последнюю строку.
+   Величину считает код (--niz), и она никогда не больше того, чего не хватает. */
+.tabbar{bottom:calc(var(--kb,0px) - var(--niz,0px));}
 @keyframes swim{from{transform:translate3d(-4%,3%,0) scale(1.06) rotate(-.6deg);}
                 to  {transform:translate3d(5%,-4%,0) scale(1.16) rotate(.8deg);}}
 @keyframes swimb{from{transform:translate3d(6%,-3%,0) scale(1.22) rotate(1deg);}
@@ -1459,7 +1456,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 19:53";
+const BUILD = "27.08 19:57";
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -3047,7 +3044,7 @@ function renderStage(){
         + " (dm:" + (dm ? "1" : "0") + " ns:" + (navigator.standalone === true ? "1" : navigator.standalone === false ? "0" : "-") + ")"
         + " · окно " + Math.round(window.innerHeight) + "/" + Math.round((screen && screen.height) || 0)
         + " · низ " + (r ? Math.round(r.bottom) : "?")
-        + " · верх " + getComputedStyle(document.documentElement).getPropertyValue("padding-top");
+        + " · сдвиг " + (getComputedStyle(document.documentElement).getPropertyValue("--niz") || "?").trim();
     }catch(e){}
     $("st-ver").textContent = "сборка "+BUILD+(stageTest ? (" · "+DEV.label) : "")
         + (progKogda() ? (" · свод "+progKogda()) : " · свод не приходил") + razmery;
@@ -3692,7 +3689,40 @@ function vneEkran(){
    только сам айфон, и он отдаёт её через env(safe-area-inset-top). */
 function domaOtmetit(){
   try{ document.documentElement.classList.toggle("doma", naEkrane()); }catch(e){}
+  nizPodognat();
 }
+
+/* Насколько опустить панель. Два числа, и берём МЕНЬШЕЕ — поэтому за край
+   уехать невозможно в принципе.
+
+   Первое: сколько экрана нам не отдали. screen.height минус высота окна.
+   На айфоне Димы это 874 − 812 = 62 — ровно коричневая полоса под панелью.
+
+   Второе: перекрывает ли строка состояния наше содержимое, то есть
+   env(safe-area-inset-top). Если она больше нуля — значит окно начинается
+   от самого верха экрана, и незанятое место осталось внизу: его и добираем.
+   Если ноль — система сама отвела место под строку, внизу ничего не потеряно,
+   и двигать нельзя. Прошлый раз я двигал именно в этом случае и вытолкнул
+   панель за экран.
+
+   Меньшее из двух: нельзя сдвинуть больше, чем реально не хватает. */
+function nizPodognat(){
+  let sdvig = 0;
+  try{
+    if(naEkrane() && document.body){
+      const proba = document.createElement("div");
+      proba.style.cssText = "position:fixed;left:-9999px;top:0;padding-top:env(safe-area-inset-top)";
+      document.body.appendChild(proba);
+      const sverhu = parseFloat(getComputedStyle(proba).paddingTop) || 0;
+      document.body.removeChild(proba);
+      const nedodali = Math.max(0, Math.round(((screen && screen.height) || 0) - (window.innerHeight || 0)));
+      sdvig = Math.min(Math.round(sverhu), nedodali);
+      if(!(sdvig > 0) || sdvig > 120) sdvig = 0;      /* мусорным числам тут не место */
+    }
+  }catch(e){}
+  try{ document.documentElement.style.setProperty("--niz", sdvig + "px"); }catch(e){}
+}
+
 domaOtmetit();
 addEventListener("resize", () => setTimeout(domaOtmetit, 60));
 addEventListener("orientationchange", () => setTimeout(domaOtmetit, 300));
