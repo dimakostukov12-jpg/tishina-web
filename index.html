@@ -1438,7 +1438,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "28.08 09:15";
+const BUILD = "28.08 18:03";
 const NA_EKRAN = false;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -2563,10 +2563,35 @@ function subScreen(){
    Закрываем приложение только когда клуб ответил прямо: подписки нет.
    Молчание, ошибка сети и «неизвестно» замок не включают — женщина не должна
    остаться без практик из-за нашего сбоя. */
+
+/* Но «подписки нет» — тоже не всегда правда. Клуб ищет женщину по телеграм-айди
+   и на неизвестного отвечает 404; ровно так же он ответит на живого человека,
+   пока сервис перезапускают или переливают базу. Сюда это приезжает неотличимо
+   от настоящей отмены — и замок захлопывается перед той, кто заплатила.
+   Проверено 28.08.2026: одного такого ответа хватало, чтобы женщине с подпиской
+   до 2027 года показать «Нужна подписка».
+
+   Поэтому помним последнее честное «активна». Пока её оплаченный срок ещё идёт
+   и с того ответа не прошли сутки — молчим и ждём следующего ответа клуба.
+   Сутки лишнего доступа стоят дешевле, чем запертая дверь перед оплатившей. */
+const SUBOKKEY = "tishina_sub_ok";
+const SUB_ZHDEM = 24*60*60*1000;
+function subOkZapomnit(v){
+  if(!v || v.state!=="active") return;
+  try{ localStorage.setItem(SUBOKKEY, JSON.stringify({t:Date.now(), until:v.until||""})); }catch(e){}
+}
+function subMorgnul(){
+  let z=null; try{ z=JSON.parse(localStorage.getItem(SUBOKKEY)||"null"); }catch(e){}
+  if(!z || !z.t) return false;                       /* честного «активна» не видели */
+  if(Date.now()-z.t > SUB_ZHDEM) return false;       /* сутки прошли — верим клубу */
+  const segodnya=new Date().toISOString().slice(0,10);
+  return !!(z.until && z.until >= segodnya);         /* оплаченный срок ещё не вышел */
+}
+
 function subLock(){
   const el=$("s-lock"); if(!el) return;
   const v=(subLoad()||{}).v;
-  const locked = LOCK_ON && !!(v && v.state==="none" && tg && tg.initData);
+  const locked = LOCK_ON && !!(v && v.state==="none" && tg && tg.initData) && !subMorgnul();
   el.classList.toggle("on", locked);
   document.body.classList.toggle("locked", locked);
   if(locked){
@@ -2602,6 +2627,7 @@ async function subFetch(force){
     }
     if(d && d.state){
       try{ localStorage.setItem(SUBKEY, JSON.stringify({t:Date.now(), v:d})); }catch(e){}
+      subOkZapomnit(d);                       /* честное «активна» — точка опоры для замка */
       subPaint();
       /* Кладём ответ клуба на сервер: с домашнего экрана его не спросить —
          функция клуба требует подпись Телеграма. Пусть лежит там до тех пор,
@@ -2619,6 +2645,7 @@ async function subFetch(force){
 function subPrinyat(v){
   if(!v || !v.state) return;
   try{ localStorage.setItem(SUBKEY, JSON.stringify({t:Date.now(), v:v})); }catch(e){}
+  try{ subOkZapomnit(v); }catch(e){}
   try{ subPaint(); }catch(e){}
 }
 
@@ -2644,8 +2671,13 @@ function sinceDays(){
     if(vKlube && (!d || vKlube < d)){ d=vKlube; localStorage.setItem(SINCEKEY,d); }
   }catch(e){}
   if(!d){ d=ymdOf(new Date()); localStorage.setItem(SINCEKEY,d); }
+  /* Считаем ЦЕЛЫЕ прошедшие сутки, а не округляем. С Math.round счётчик
+     перещёлкивал в полдень: женщина ставила приложение утром, а к обеду того же
+     дня видела «2 дня в пути». Замерено 28.08.2026. Первый день — всегда первый,
+     до самой полуночи. Даты берём по её часам, поэтому смена дня совпадает
+     с той, что она видит в телефоне. */
   const a=new Date(d+"T00:00:00"), b=new Date();
-  return Math.max(1, Math.round((b-a)/86400000)+1);
+  return Math.max(1, Math.floor((b-a)/86400000)+1);
 }
 function listenedMin(){ return Math.floor((parseFloat(localStorage.getItem(MINKEY)||"0")||0)/60); }
 let _lastT=0, _acc=0, _pAcc=0;
