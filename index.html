@@ -6,12 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Иммерсия</title>
-<!-- Чтобы приложение можно было вынести на домашний экран. Манифест нужен Android
-     (без него браузер не предложит установку), apple-touch-icon — айфону: он берёт
-     иконку отсюда, а не из манифеста, и скругляет углы сам. -->
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="pwa/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<!-- «На домашний экран» временно выключено, см. NA_EKRAN в build_app.py -->
 <!-- Прозрачная строка состояния: только с ней фон приложения виден до самого
      верха. Её обратная сторона — айфон отдаёт высоту БЕЗ строки, а рисует от
      самого верха, и всё прижатое к низу повисает выше края ровно на её высоту.
@@ -205,22 +200,7 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
    полоса другая, а растворяется всё равно плавно.
 
    Только на body: он рисует по всей странице, а не по безопасной зоне. */
-/* Полосу под краем окна красит ЗАЛИВКА страницы — и только она.
-   Разобрано по пикселям: коробка body кончается на границе окна (у Димы 812-я
-   точка), и всё, что нарисовано на body, туда не достаёт. Картинки на html
-   тоже: они позиционируются по коробке html, а она той же высоты.
-   А вот background-color растягивается на весь холст целиком — включая те
-   62 точки, до которых больше ничего не дотягивается. Значит красить надо её.
 
-   Берём тон, каким панель рисуется на экране: rgba(37,24,13,.86) поверх фона
-   даёт rgb(36,23,13). Полоса становится продолжением панели, а не заплатой. */
-html.doma{background-color:#24170D;}
-/* Страховка сверху. Если на каком-то айфоне наши слои не дотянутся до самого
-   верха, там проступит эта же заливка — тёплая и светлая, плашкой. Поэтому
-   держим на body тёмную растушёвку: коробка body до верха достаёт всегда. */
-html.doma body{
-  background-image:linear-gradient(180deg,#06050B 0,#0A0810 46%,rgba(10,8,16,0) 100%);
-  background-repeat:no-repeat;background-size:100% 104px;background-position:top center;}
 /* Пока идёт заставка — её чернота: панели там ещё нет, и коричневое под чёрным
    видео читалось бы латкой. */
 html.doma.zast{background-color:#05040A;}
@@ -1237,20 +1217,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <div class="st-lb">Все ступени</div>
     <div class="st-strip" id="st-strip"></div>
     <div class="st-ver" id="st-ver"></div>
-    <div id="hs-wrap" hidden>
-      <div class="st-lb">Приложение</div>
-      <button class="hs-btn" id="hs-btn" type="button">
-        <span class="hs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="3"/><path d="M12 8v7M8.7 11.4 12 8l3.3 3.4"/></svg></span>
-        <span class="hs-tx"><b>Вынести на экран «Домой»</b><i>Открывать сразу, одним касанием</i></span>
-        <span class="hs-go">›</span>
-      </button>
-      <div class="hs-est" id="hs-est" hidden>
-        <span class="hs-gal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></span>
-        <span class="hs-tx"><b>Иммерсия на домашнем экране</b><i id="hs-kakoy"></i></span>
-      </div>
-      <button class="hs-lnk" id="hs-svyaz" type="button">Связать устройство</button>
-      <button class="hs-lnk gh" id="hs-vyyti" type="button" hidden>Выйти на всех устройствах</button>
-    </div>
+
     <div class="st-lb">Разделы</div>
     <div class="st-tiles">
       <div class="st-tile max art t-max" id="tile-max"><span class="st-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="13" rx="2.4"/><path d="M8 21h8"/><path d="M12 17.5V21"/><path d="M7.6 13.4V8.6l2.6 3 2.6-3v4.8"/></svg></span>
@@ -1471,7 +1438,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "27.08 21:06";
+const BUILD = "28.08 09:15";
+const NA_EKRAN = false;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -3063,19 +3031,10 @@ function renderStage(){
     /* Вторая строчка — размеры окна. Пустое поле под панелью со стола не
        воспроизвести, а по этим числам сразу видно, где теряются точки:
        считает ли себя приложение открытым с экрана и докуда достаёт низ. */
-    let razmery = "";
-    try{
-      const tb = document.querySelector(".tabbar");
-      const r = tb ? tb.getBoundingClientRect() : null;
-      const dm = matchMedia("(display-mode: standalone)").matches;
-      razmery = " · " + (naEkrane() ? "дома" : "в окне")
-        + " (dm:" + (dm ? "1" : "0") + " ns:" + (navigator.standalone === true ? "1" : navigator.standalone === false ? "0" : "-") + ")"
-        + " · окно " + Math.round(window.innerHeight) + "/" + Math.round((screen && screen.height) || 0)
-        + " · низ " + (r ? Math.round(r.bottom) : "?")
-        + " · полоса " + Math.max(0, Math.round(((screen&&screen.height)||0) - window.innerHeight)) + "px";
-    }catch(e){}
+    /* Диагностика размеров окна убрана вместе с «на домашний экран»: она была
+       нужна, чтобы ловить полосу под панелью. Вернётся, когда вернёмся к задаче. */
     $("st-ver").textContent = "сборка "+BUILD+(stageTest ? (" · "+DEV.label) : "")
-        + (progKogda() ? (" · свод "+progKogda()) : " · свод не приходил") + razmery;
+        + (progKogda() ? (" · свод "+progKogda()) : " · свод не приходил");
   }catch(e){}
   $("st-days").textContent=sinceDays();
   $("st-mins").textContent=listenedMin();
@@ -3298,6 +3257,7 @@ const etoIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
    доехал — плохая связь, блокировка, — объекта tg нет вовсе, и гадать не будем:
    пусть приложение работает как обычно, а не пугает её лишним экраном. */
 function vneTelegrama(){
+  if(!NA_EKRAN) return false;      /* функция выключена — ведём себя как раньше */
   if(naEkrane()) return true;
   /* Пометка в адресе: её ставим сами, отправляя женщину в браузер за иконкой.
      Работает даже если скрипт Телеграма не доехал — а он приходит с telegram.org
