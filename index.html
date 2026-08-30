@@ -14,8 +14,8 @@
 <!-- Прозрачная строка состояния: только с ней фон приложения виден до самого
      верха. Её обратная сторона — айфон отдаёт высоту БЕЗ строки, а рисует от
      самого верха, и всё прижатое к низу повисает выше края ровно на её высоту.
-     Эту высоту он сам сообщает через env(safe-area-inset-top) — на неё и
-     опускаем низ, см. правило html.doma ниже. -->
+     Эту высоту он сам сообщает через env(safe-area-inset-top). Вёрстку под
+     standalone переделываем заново (30.08.2026), старых правил больше нет. -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Иммерсия">
 <meta name="theme-color" content="#20140D">
@@ -210,42 +210,10 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
    полоса другая, а растворяется всё равно плавно.
 
    Только на body: он рисует по всей странице, а не по безопасной зоне. */
-/* Полосу под краем окна красит ЗАЛИВКА страницы — и только она.
-   Разобрано по пикселям: коробка body кончается на границе окна (у Димы 812-я
-   точка), и всё, что нарисовано на body, туда не достаёт. Картинки на html
-   тоже: они позиционируются по коробке html, а она той же высоты.
-   А вот background-color растягивается на весь холст целиком — включая те
-   62 точки, до которых больше ничего не дотягивается. Значит красить надо её.
 
-   Берём тон, каким панель рисуется на экране: rgba(37,24,13,.86) поверх фона
-   даёт rgb(36,23,13). Полоса становится продолжением панели, а не заплатой. */
-html.doma{background-color:#24170D;}
-/* Страховка сверху. Если на каком-то айфоне наши слои не дотянутся до самого
-   верха, там проступит эта же заливка — тёплая и светлая, плашкой. Поэтому
-   держим на body тёмную растушёвку: коробка body до верха достаёт всегда. */
-html.doma body{
-  background-image:linear-gradient(180deg,#06050B 0,#0A0810 46%,rgba(10,8,16,0) 100%);
-  background-repeat:no-repeat;background-size:100% 104px;background-position:top center;}
-/* Пока идёт заставка — её чернота: панели там ещё нет, и коричневое под чёрным
-   видео читалось бы латкой. */
-html.doma.zast{background-color:#05040A;}
-
-/* Ниже — единственная поправка для копии с домашнего экрана. Там айфон при
-   прозрачной строке состояния считает высоту окна БЕЗ неё, а рисует от самого
-   верха: панель и экраны повисают выше края ровно на высоту строки. Опускаем
-   их на неё же — величину сообщает сам айфон. В Телеграме правило не работает:
-   класса doma там нет, и не сдвинется ничего. */
-/* ПАНЕЛЬ НЕ ДВИГАЕМ — и вот почему, чтобы никто не начал заново.
-
-   Замер по пикселям живого экрана: ниже границы окна (у Димы это 812-я точка
-   при экране в 874) НЕ РИСУЕТСЯ НИЧЕГО нашего. Там виден только фон страницы.
-   Когда я опустил панель на 62 точки, её иконки поехали вниз, а подписи под
-   ними попали в эту невидимую зону и просто исчезли.
-
-   Значит полосу внизу закрывать надо не сдвигом, а цветом: красим её ровно
-   в тот тон, каким рисуется панель, и она становится её продолжением.
-   Панель на экране рендерится как rgb(36,23,13) — это её rgba(37,24,13,.86)
-   поверх фона страницы. Его и берём. */
+/* Вся вёрстка под экран «Домой» убрана 30.08.2026 — переделываем standalone
+   заново. Здесь раньше были standalone-правила и разбор полосы внизу; их больше
+   нет. Кнопки «вынести/связать» и связывание не трогаем. */
 @keyframes swim{from{transform:translate3d(-4%,3%,0) scale(1.06) rotate(-.6deg);}
                 to  {transform:translate3d(5%,-4%,0) scale(1.16) rotate(.8deg);}}
 @keyframes swimb{from{transform:translate3d(6%,-3%,0) scale(1.22) rotate(1deg);}
@@ -779,8 +747,8 @@ html.doma.zast{background-color:#05040A;}
 .ob-send::after{content:"";position:absolute;left:14px;top:12px;border-left:13px solid #3E2918;border-top:8px solid transparent;border-bottom:8px solid transparent;}
 body.ob-open .tabbar{display:none;}
 .tabbar{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:30;display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:rgba(37,24,13,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.08);}
-/* Хвост под панелью убран: ниже края окна он всё равно не рисуется — там виден
-   только фон страницы, и красит полосу теперь он (см. html.doma body). */
+/* Панель прижата к низу окна. Как ведёт себя низ с домашнего экрана —
+   разбираем заново, отдельной вёрстки под standalone здесь больше нет. */
 .tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(246,238,221,.5);font-size:10.5px;letter-spacing:.03em;cursor:pointer;flex:1;padding:2px 0;}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .tab.on{color:#F3DCA0;}
@@ -1476,7 +1444,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "30.08 12:53";
+const BUILD = "30.08 13:00";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3823,59 +3791,6 @@ function domaOtmetit(){
 domaOtmetit();
 addEventListener("resize", () => setTimeout(domaOtmetit, 60));
 addEventListener("orientationchange", () => setTimeout(domaOtmetit, 300));
-
-/* ---------- ВРЕМЕННЫЙ замер геометрии (флаг DIAG) ----------
-   Показывает настоящие размеры окна, экрана и безопасных зон прямо на экране.
-   Нужен, чтобы чинить полосу внизу по фактам, а не гадать со стола. Видно только
-   с домашнего экрана или по ?diag=1 — женщина в Телеграме его не встретит.
-   Убираем, поставив DIAG=False в build_app.py. */
-const DIAG = true;
-function zamerPokazat(){
-  if(!DIAG) return;
-  if(!(naEkrane() || /[?&]diag=1/.test(location.search))) return;
-  try{
-    let box = document.getElementById("diagbox");
-    if(!box){
-      box = document.createElement("div"); box.id = "diagbox";
-      box.style.cssText = "position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 6px);"
-        + "z-index:99999;background:rgba(6,4,10,.92);color:#F3DCA0;font:600 12px/1.5 ui-monospace,Menlo,monospace;"
-        + "padding:10px 12px;border:1px solid rgba(233,201,131,.4);border-radius:10px;white-space:pre;"
-        + "box-shadow:0 8px 30px rgba(0,0,0,.6);pointer-events:auto;";
-      box.addEventListener("click", () => box.remove());   /* тап — скрыть */
-      document.body.appendChild(box);
-    }
-    /* безопасные зоны — читаем через пробник с padding env(...) */
-    let pr = document.getElementById("diagprobe");
-    if(!pr){
-      pr = document.createElement("div"); pr.id = "diagprobe";
-      pr.style.cssText = "position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;"
-        + "padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);";
-      document.body.appendChild(pr);
-    }
-    const cs = getComputedStyle(pr);
-    const sat = parseFloat(cs.paddingTop)||0, sab = parseFloat(cs.paddingBottom)||0,
-          sal = parseFloat(cs.paddingLeft)||0, sar = parseFloat(cs.paddingRight)||0;
-    const vv = window.visualViewport || {};
-    const tb = document.querySelector(".tabbar");
-    const tr = tb ? tb.getBoundingClientRect() : null;
-    const de = document.documentElement;
-    const r = n => Math.round(n||0);
-    box.textContent =
-      "screen   " + r(screen.width) + " x " + r(screen.height) + "  dpr " + (window.devicePixelRatio||0) + "\n" +
-      "inner    " + r(innerWidth) + " x " + r(innerHeight) + "\n" +
-      "client   " + r(de.clientWidth) + " x " + r(de.clientHeight) + "\n" +
-      "visualVP " + r(vv.width) + " x " + r(vv.height) + "  offTop " + r(vv.offsetTop) + "\n" +
-      "safe     top " + r(sat) + "  bot " + r(sab) + "  L " + r(sal) + "  R " + r(sar) + "\n" +
-      "tabbar   низ " + (tr ? r(tr.bottom) : "—") + "   зазор до экрана " + (tr ? r(screen.height - tr.bottom) : "—") + "\n" +
-      "режим    standalone " + (navigator.standalone===true) + "  dm " + matchMedia("(display-mode: standalone)").matches + "\n" +
-      "сборка   " + BUILD + "   (тап, чтобы скрыть)";
-  }catch(e){}
-}
-if(DIAG){
-  setTimeout(zamerPokazat, 1200); setTimeout(zamerPokazat, 4000); setTimeout(zamerPokazat, 9000);
-  addEventListener("resize", () => setTimeout(zamerPokazat, 200));
-  addEventListener("orientationchange", () => setTimeout(zamerPokazat, 400));
-}
 
 /* ---------- заставка при запуске ---------- */
 function afterSplash(){
