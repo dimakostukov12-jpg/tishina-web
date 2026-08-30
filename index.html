@@ -210,9 +210,13 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
    полоса другая, а растворяется всё равно плавно.
 
    Только на body: он рисует по всей странице, а не по безопасной зоне. */
-html.doma,html.doma body{height:100vh;height:100dvh;}
-html.doma .tabbar{padding-bottom:10px;}
-html.doma .screen{padding-bottom:74px;}
+html.doma body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;}
+html.doma .screen{position:relative;inset:auto;bottom:auto;flex:1 1 auto;min-height:0;padding-bottom:14px;}
+html.doma .mn{padding-bottom:16px;}
+html.doma .tabbar{position:relative;left:auto;right:auto;bottom:auto;padding-bottom:10px;}
+html.doma .safetop{height:max(env(safe-area-inset-top),44px);}
+html.doma.zast{background:#000;}
+html.doma.zast .tabbar{visibility:hidden;}
 /* Вся вёрстка под экран «Домой» убрана 30.08.2026 — переделываем standalone
    заново. Здесь раньше были standalone-правила и разбор полосы внизу; их больше
    нет. Кнопки «вынести/связать» и связывание не трогаем. */
@@ -1446,7 +1450,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "30.08 13:51";
+const BUILD = "30.08 14:21";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
