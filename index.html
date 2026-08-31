@@ -1493,7 +1493,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 16:04";
+const BUILD = "31.08 16:11";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -2393,11 +2393,22 @@ $("d-play").onclick=()=>{ if(!curId)return; haptic("medium"); openPlayer(curId);
 /* Правка инсайта — докнутый к низу редактор, как правка дневника (#s-vd.editing).
    Поле d-note живёт в докнутом низу, вне скролла экрана: iOS не утаскивает его. */
 function dNoteEdit(on){
-  $("s-detail").classList.toggle("editing", on);
+  const sd=$("s-detail");
+  sd.classList.toggle("editing", on);
   /* фокус — СИНХРОННО в том же касании, иначе iOS не поднимет клавиатуру;
      preventScroll — чтобы браузер не дёрнул layout при фокусе */
   if(on){ const t=$("d-note"); try{ t.focus({preventScroll:true}); }catch(e){ try{ t.focus(); }catch(_){} } }
-  else { try{ $("d-note").blur(); }catch(e){} }
+  else {
+    try{ $("d-note").blur(); }catch(e){}
+    /* выйти на карточку «Мои инсайты», а НЕ в начало страницы: при смене режима
+       (flex→block) прокрутка сбрасывается, поэтому подводим карточку к верху сами.
+       Ставим и сразу, и после закрытия клавиатуры (её анимация ещё двигает layout). */
+    const toInsight = ()=>{ try{
+      const panel = $("d-noteopen").closest(".dp-panel");
+      if(panel) sd.scrollTop += panel.getBoundingClientRect().top - sd.getBoundingClientRect().top - 12;
+    }catch(e){} };
+    requestAnimationFrame(toInsight); setTimeout(toInsight,120); setTimeout(toInsight,360);
+  }
 }
 $("d-noteopen").onclick=()=>{ if(!curId)return; haptic('light'); dNoteEdit(true); };
 $("d-noteclose").onclick=()=>{ haptic('light'); dNoteEdit(false); };
