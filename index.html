@@ -456,6 +456,9 @@ html.doma .screen{padding-bottom:88px;}
    ложилась ровно на его верхнюю грань, и рамки сливались в одну линию */
 #s-talk{display:none;padding-bottom:calc(76px + env(safe-area-inset-bottom));overflow:hidden;}
 #s-talk.active{display:flex;flex-direction:column;}
+/* всё, кроме ленты, прибито (flex:none) — чтобы при клавиатуре бар ввода
+   стоял мёртво над ней и не колбасился, как поле правки в дневнике */
+#s-talk .safetop,#s-talk .topbar,.tk-chips,.tk-bar,.tk-rec{flex:none;}
 .tk-chat{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:none;
   -webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px;
   padding:8px 16px 4px;}
@@ -644,7 +647,16 @@ html.doma .screen{padding-bottom:88px;}
 .hs-go{color:#E7C983;font-size:20px;opacity:.7;}
 
 /* экран с инструкцией */
-.dm-wrap{padding:4px 18px 30px;max-width:520px;margin:0 auto;}
+/* Экран «Связать» — та же схема, что рабочая правка дневника (#s-vd.editing):
+   flex-колонка, экран НЕ скроллится (overflow:hidden — иначе iOS при открытии
+   клавиатуры сам дёргает фикс-слой и вёрстка «уплывает»), пояснение скроллится
+   в середине, а поле кода с кнопкой прибиты к низу над клавиатурой (flex:none). */
+#s-svyaz{overflow:hidden;padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+#s-svyaz.active{display:flex;flex-direction:column;}
+#s-svyaz .safetop,#s-svyaz .topbar{flex:none;}
+.dm-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch;padding-top:2px;}
+.dm-foot{flex:none;padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+.dm-wrap{padding:4px 18px 8px;max-width:520px;margin:0 auto;}
 .dm-lead{font-size:14.5px;color:#C9C3BC;line-height:1.5;margin:0 0 18px;}
 .dm-step{display:flex;gap:12px;align-items:flex-start;padding:13px;border-radius:14px;
   background:rgba(22,14,9,.78);border:1px solid rgba(233,201,131,.16);margin-bottom:10px;}
@@ -1246,12 +1258,16 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
   <div class="safetop"></div>
   <div class="topbar"><span class="back" data-back>‹</span><span class="pill"><span class="gsp"></span>
     <span class="pin" style="font-size:17px;padding:5px 15px">Связать устройство</span></span><span style="width:22px"></span></div>
-  <div class="dm-wrap">
-    <p class="dm-lead">На том телефоне, где «Иммерсия» стоит иконкой на экране, показан код из восьми знаков. Введи его сюда — и тот телефон узнает тебя.</p>
-    <input class="sv-in" id="sv-in" type="text" inputmode="text" autocapitalize="characters"
-           autocomplete="off" autocorrect="off" spellcheck="false" placeholder="XXXX XXXX" maxlength="9">
-    <button class="dm-big" id="sv-go" type="button">Связать</button>
-    <p class="dm-note" id="sv-msg">Код живёт 10 минут. Если не успела — вернись и возьми новый.</p>
+  <div class="dm-scroll">
+    <div class="dm-wrap"><p class="dm-lead">На том телефоне, где «Иммерсия» стоит иконкой на экране, показан код из восьми знаков. Введи его сюда — и тот телефон узнает тебя.</p></div>
+  </div>
+  <div class="dm-foot">
+    <div class="dm-wrap">
+      <input class="sv-in" id="sv-in" type="text" inputmode="text" autocapitalize="characters"
+             autocomplete="off" autocorrect="off" spellcheck="false" placeholder="XXXX XXXX" maxlength="9">
+      <button class="dm-big" id="sv-go" type="button">Связать</button>
+      <p class="dm-note" id="sv-msg">Код живёт 10 минут. Если не успела — вернись и возьми новый.</p>
+    </div>
   </div>
 </section>
 
@@ -1448,7 +1464,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 15:17";
+const BUILD = "31.08 15:33";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1548,8 +1564,9 @@ const $ = s => document.getElementById(s);
     const el = document.activeElement;
     if(!el || (el.tagName !== "TEXTAREA" && el.tagName !== "INPUT")) return;
     /* поля, которые сами стоят над клавиатурой (правка дневника, «Поговорить»,
-       онбординг), листать не надо — иначе экран дёргается впустую */
-    if(el.closest(".vd-edit") || el.closest(".tk-bar") || el.closest(".ob-inputbar")) return;
+       онбординг, «Связать»), листать не надо — иначе экран дёргается впустую */
+    if(el.closest(".vd-edit") || el.closest(".tk-bar") || el.closest(".ob-inputbar")
+       || el.closest("#s-svyaz")) return;
 
     /* Если под полем в той же панели есть кнопка (инсайты — «Сохранить»),
        центрировать поле нельзя: кнопка останется под клавиатурой. Подводим
