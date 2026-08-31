@@ -1498,7 +1498,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 18:12";
+const BUILD = "31.08 21:48";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1779,7 +1779,7 @@ function setTab(tab){
   try{                                          /* сбой отрисовки больше не блокирует переход */
     if(tab==="main") renderMain();
     if(tab==="fav") renderFav();
-    if(tab==="talk"){ tkRender(); setTimeout(tkScroll,60); }
+    if(tab==="talk"){ tkRender(); setTimeout(tkScroll,60); tkServerLoad(); }
     if(tab==="profile"){ renderProfile(); try{ progSvesti(true); }catch(e){} }
     if(tab==="vd") vdOpen();
   }catch(e){}
@@ -2967,21 +2967,46 @@ function tkChips(){
     $("tk-chips").appendChild(b);
   });
 }
+/* Кто пишет: в Телеграме — подпись, с рабочего стола — ключ устройства (тот, что
+   даётся при «Связать устройство»). Так «Поговорить» работает и там, и там. */
+function tkAuth(){
+  const initData = (tg && tg.initData) || "";
+  if(initData) return { initData };
+  const k = klyuchEst();
+  return k ? { klyuch: k } : {};
+}
+/* Переписка живёт на СЕРВЕРЕ (у неё в аккаунте). При открытии подтягиваем её —
+   тогда разговор один и тот же с телефона и из Телеграма и восстановим после
+   переустановки. Локальное — быстрый кэш; сервер побеждает, если в нём что-то есть. */
+async function tkServerLoad(){
+  if(!TALK_URL) return;
+  const auth = tkAuth();
+  if(!auth.initData && !auth.klyuch) return;      /* некому — оставляем локальное */
+  try{
+    const r = await fetch(TALK_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(Object.assign({load:true}, auth))});
+    if(!r.ok) return;
+    const d = await r.json();
+    if(Array.isArray(d.messages) && d.messages.length){ tkSave(d.messages); tkRender(); tkScroll(); }
+  }catch(e){}
+}
 let tkBusy=false;
 async function tkAsk(history){
   /* Сюда встанет модель. Сервер сам подставит системный промпт и ключ. */
   if(!TALK_URL) return null;
   const r=await fetch(TALK_URL,{
     method:"POST", headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({ initData: (tg && tg.initData) || "", messages: history })
+    body:JSON.stringify(Object.assign({ messages: history }, tkAuth()))
   });
   if(r.status===401){
     let why=""; try{ why=(await r.json()).error||""; }catch(e){}
-    return why==="bad-signature"
-      ? "Приложение открыто из одного бота, а сервер сверяет подпись другого. "
-        + "Дима, это чинится токеном — я знаю, что делать."
-      : "Этот разговор работает только внутри Telegram: в браузере подпись не проверить. "
-        + "Открой «Иммерсию» из бота.";
+    if(why==="bad-signature")
+      return "Приложение открыто из одного бота, а сервер сверяет подпись другого. "
+        + "Дима, это чинится токеном — я знаю, что делать.";
+    if(why==="bad-key")
+      return "Это устройство отвязали от аккаунта. Свяжи заново: Профиль → «Связать устройство».";
+    return "Чтобы говорить с этого устройства, свяжи его с аккаунтом: "
+      + "Профиль → «Связать устройство». Или открой «Иммерсию» из бота в Телеграме.";
   }
   if(!r.ok) throw new Error("bad status "+r.status);
   return (await r.json()).reply;
