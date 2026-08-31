@@ -1448,7 +1448,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 12:44";
+const BUILD = "31.08 12:53";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1538,7 +1538,16 @@ const $ = s => document.getElementById(s);
   };
   function apply(){
     const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
-    const v = (pishet() && kb > 60) ? kb : 0;  /* мелкие колебания панелей не считаем */
+    /* Поле кода на «Связать устройство» (.dm-wrap) стоит ВЫСОКО на экране, и оно,
+       и кнопка «Связать» и так над клавиатурой — сдвигать ничего не надо. Но при
+       фокусе Телеграм/iOS подкручивают вьюпорт, vv.offsetTop меняется, и kb
+       выходил слишком большим: панель с контентом уезжали вверх, под ними зияла
+       пустота до клавиатуры (IMG_2694/2695). Поэтому для поля кода --kb держим 0:
+       панель просто уходит под клавиатуру (она там не нужна), поле остаётся вверху.
+       Остальным полям (дневник, «Поговорить», онбординг) поведение не трогаем. */
+    const ae = document.activeElement;
+    const vKode = ae && ae.closest && ae.closest(".dm-wrap");
+    const v = (pishet() && kb > 60 && !vKode) ? kb : 0;  /* мелкие колебания панелей не считаем */
     if(v === last) return;
     last = v;
     document.documentElement.style.setProperty("--kb", v + "px");
