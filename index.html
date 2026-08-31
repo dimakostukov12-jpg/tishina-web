@@ -1448,7 +1448,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "30.08 15:14";
+const BUILD = "31.08 12:44";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1548,8 +1548,12 @@ const $ = s => document.getElementById(s);
     const el = document.activeElement;
     if(!el || (el.tagName !== "TEXTAREA" && el.tagName !== "INPUT")) return;
     /* поля, которые сами стоят над клавиатурой (правка дневника, «Поговорить»,
-       онбординг), листать не надо — иначе экран дёргается впустую */
-    if(el.closest(".vd-edit") || el.closest(".tk-bar") || el.closest(".ob-inputbar")) return;
+       онбординг, ВВОД КОДА на «Связать устройство»), листать не надо — иначе
+       экран дёргается впустую. Поле кода и так высоко над клавиатурой; принуди-
+       тельный scrollIntoView не находил, куда двигать внутри короткого экрана,
+       и толкал весь фикс-слой — вёрстка «съезжала криво». Как в онбординге. */
+    if(el.closest(".vd-edit") || el.closest(".tk-bar") || el.closest(".ob-inputbar")
+       || el.closest(".dm-wrap")) return;
 
     /* Если под полем в той же панели есть кнопка (инсайты — «Сохранить»),
        центрировать поле нельзя: кнопка останется под клавиатурой. Подводим
