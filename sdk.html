@@ -1493,7 +1493,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 17:08";
+const BUILD = "31.08 17:23";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1610,7 +1610,7 @@ const $ = s => document.getElementById(s);
   const lockWin = () => { if(window.scrollY || window.scrollX){ try{ window.scrollTo(0,0); }catch(e){} } };
   function apply(){
     lockWin();
-    const kb = (function(){var _t=window.Telegram&&window.Telegram.WebApp;if(_t&&_t.viewportStableHeight){return Math.max(0,Math.round(_t.viewportStableHeight-_t.viewportHeight));}return Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));})();
+    const kb = (function(){var _t=window.Telegram&&window.Telegram.WebApp;if(_t&&_t.initData&&_t.viewportStableHeight){return Math.max(0,Math.round(_t.viewportStableHeight-_t.viewportHeight));}return Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));})();
     const v = (pishet() && kb > 60) ? kb : 0;  /* мелкие колебания панелей не считаем */
     if(v === last) return;
     last = v;
@@ -1665,7 +1665,7 @@ const $ = s => document.getElementById(s);
 })();
 const byId = {}; ALL_SECS.forEach(s=>s.items.forEach(it=>byId[it.id]={...it, secTitle:s.title}));
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-(function(){ if(!tg) return; var R=document.documentElement;
+(function(){ if(!tg || !tg.initData) return; var R=document.documentElement;
   var px=function(n){ return Math.max(0,Math.round(+n||0))+'px'; };
   function geom(){ try{ var sa=tg.safeAreaInset||{}, ca=tg.contentSafeAreaInset||{};
     R.style.setProperty('--tg-ct', px((sa.top||0)+(ca.top||0)));
