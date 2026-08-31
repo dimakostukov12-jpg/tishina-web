@@ -1493,7 +1493,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 16:11";
+const BUILD = "31.08 16:24";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1596,7 +1596,15 @@ const $ = s => document.getElementById(s);
       const c = document.getElementById("ob-chat"); if(c) c.scrollTop = c.scrollHeight;
     }
   }
+  /* Приложение — фикс-слой, ОКНУ скроллиться незачем. iOS/Телеграм при ПОВТОРНОМ
+     фокусе иногда прокручивает сам документ (поле ввода ни в одном экране не лежит
+     внутри скролла, поэтому «показать» его iOS может только сдвинув всё окно) —
+     весь экран уезжает вверх («перескок»), а заодно ломается расчёт --kb, ведь он
+     зависит от vv.offsetTop. Возвращаем окно в ноль — и перескок исчезает, и высота
+     считается верно. Держим лок отдельной функцией — зовём и на скролл, и на фокус. */
+  const lockWin = () => { if(window.scrollY || window.scrollX){ try{ window.scrollTo(0,0); }catch(e){} } };
   function apply(){
+    lockWin();
     const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
     const v = (pishet() && kb > 60) ? kb : 0;  /* мелкие колебания панелей не считаем */
     if(v === last) return;
@@ -1634,10 +1642,16 @@ const $ = s => document.getElementById(s);
     try{ el.scrollIntoView({block: "center", behavior: "smooth"}); }catch(e){}
   }
   vv.addEventListener("resize", apply);
-  /* фокус приходит раньше, чем меняется высота, и уходит позже — пересчитываем на обоих */
-  addEventListener("focusin", () => setTimeout(apply, 50), true);
+  /* Окну скроллиться незачем — любое смещение (в т.ч. iOS-скролл при фокусе) гасим. */
+  window.addEventListener("scroll", lockWin, {passive:true});
+  /* Фокус приходит раньше, чем меняется высота, а при ПОВТОРНОМ фокусе Телеграм
+     обновляет вьюпорт с задержкой и рывками. Поэтому: сбрасываем кэш (last=-1) и
+     пересчитываем несколько раз — ловим устоявшуюся высоту в ЛЮБОЙ заход, первый он
+     или пятый. Без сброса кэша apply мог вернуться раньше времени со старым значением. */
+  const kick = () => { lockWin(); last = -1; apply(); };
+  addEventListener("focusin", () => { kick(); setTimeout(kick, 60); setTimeout(kick, 200); setTimeout(kick, 450); }, true);
   addEventListener("focusout", () => setTimeout(apply, 50), true);
-  vv.addEventListener("scroll", apply);
+  vv.addEventListener("scroll", () => { lockWin(); apply(); });
   document.addEventListener("focusin", e => {
     const t = e.target;
     if(t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT")) setTimeout(intoView, 340);
