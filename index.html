@@ -744,8 +744,11 @@ html.doma .screen{padding-bottom:88px;}
 @media(prefers-reduced-motion:reduce){.sp-logo,.sp-tag,.sp-calls,.sp-btn{animation-duration:.01s!important;}
   .sp-glow{animation:none;}}
 
-#s-onboard{position:fixed;inset:0;bottom:var(--kb,0px);z-index:100;display:none;flex-direction:column;background:linear-gradient(160deg,#352315,#130C07);}
-.ob-inner{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:calc(20px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));}
+#s-onboard{position:fixed;inset:0;bottom:var(--kb,0px);z-index:100;display:none;flex-direction:column;overflow:hidden;background:linear-gradient(160deg,#352315,#130C07);}
+/* min-height:0 обязателен: без него эта flex-обёртка не ужимается под высоту
+   экрана при открытой клавиатуре и выталкивает полосу ввода вниз, под клавиатуру
+   (как и .ob-chat ниже — та же причина). Единое правило полей ввода. */
+.ob-inner{position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:calc(20px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));}
 .ob-brand{font-family:'Baskerville','Forum',Georgia,serif;font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:#E7C983;text-align:center;margin-bottom:16px;}
 /* min-height:0 — как в .tk-chat: без него лента не сжимается и выталкивает
    полосу ввода за нижний край экрана, под клавиатуру */
@@ -1464,7 +1467,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 15:33";
+const BUILD = "31.08 15:48";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1552,6 +1555,21 @@ const $ = s => document.getElementById(s);
     if(!el) return false;
     return el.tagName === "TEXTAREA" || el.tagName === "INPUT" || el.isContentEditable === true;
   };
+  /* Мессенджер: когда клавиатура выезжает (или прячется) и лента сжимается,
+     её надо прокрутить до самого низа — чтобы был виден КОНЕЦ последней реплики,
+     а не середина переписки. Касается «Поговорить» и чата онбординга.
+     Ручное листание истории (палец по самой ленте) сюда не приходит — apply
+     дёргается только на клавиатуру/вьюпорт, поэтому читать историю оно не мешает. */
+  function pinChat(){
+    const talk = document.getElementById("s-talk");
+    if(talk && talk.classList.contains("active")){
+      const c = document.getElementById("tk-chat"); if(c) c.scrollTop = c.scrollHeight;
+    }
+    const ob = document.getElementById("s-onboard");
+    if(ob && getComputedStyle(ob).display !== "none"){
+      const c = document.getElementById("ob-chat"); if(c) c.scrollTop = c.scrollHeight;
+    }
+  }
   function apply(){
     const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
     const v = (pishet() && kb > 60) ? kb : 0;  /* мелкие колебания панелей не считаем */
@@ -1559,6 +1577,10 @@ const $ = s => document.getElementById(s);
     last = v;
     document.documentElement.style.setProperty("--kb", v + "px");
     if(v) setTimeout(intoView, 60);
+    /* прокрутка после переразметки — ловим и мгновение, и конец анимации вьюпорта */
+    requestAnimationFrame(pinChat);
+    setTimeout(pinChat, 130);
+    setTimeout(pinChat, 340);
   }
   function intoView(){
     const el = document.activeElement;
