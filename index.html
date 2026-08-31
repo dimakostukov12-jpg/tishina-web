@@ -55,6 +55,11 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#20140D;over
    лежат ниже фона body и раньше почти не работали. Теперь фон рисует канва,
    а картинка ложится поверх него. */
 html{
+  /* Общий подъём тона и яркости — вариант «Ярко и живо» (принято Димой 31.08.2026).
+     Ставим на корень (=вьюпорт), поэтому поднимает РАЗОМ и интерфейс, и обложки, и
+     сияния — палитрой обложки не поднять. Тёмное «погружение» сохраняется, но на
+     низкой яркости телефона больше не тускло. Тюнится/снимается одной строкой. */
+  filter:brightness(1.15) saturate(1.14) contrast(1.03);
   background-image:
     radial-gradient(at 78% 10%, rgba(214,175,92,.55), transparent 52%),
     radial-gradient(at 16% 28%, rgba(172,115,64,.52), transparent 54%),
@@ -1493,7 +1498,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 17:28";
+const BUILD = "31.08 18:12";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
