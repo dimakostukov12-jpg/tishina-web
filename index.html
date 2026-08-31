@@ -64,7 +64,7 @@ html{
   background-attachment:fixed;
   animation:bgdrift 34s ease-in-out infinite alternate;}
 body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не все андроиды — vh как запасной */font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden;background:transparent;}
-.safetop{height:env(safe-area-inset-top);}
+.safetop{height:var(--tg-ct, env(safe-area-inset-top));}
 @keyframes gspin{to{transform:rotate(360deg);}}
 
 /* ===== ЗАСТАВКА ПРИ ЗАПУСКЕ: видео-взрыв → бесшовный перелив + отпечаток ===== */
@@ -122,7 +122,7 @@ body{min-height:100vh;min-height:100dvh;color:#F2E9E0;   /* dvh знают не 
 @keyframes spFade{to{opacity:1;}}
 
 /* ---- кнопка-отпечаток: без обрамления, компактная, внизу ---- */
-.sp-ui{position:absolute;left:0;right:0;bottom:calc(38px + env(safe-area-inset-bottom));
+.sp-ui{position:absolute;left:0;right:0;bottom:calc(38px + var(--tg-cb, env(safe-area-inset-bottom)));
   display:flex;flex-direction:column;align-items:center;gap:14px;}
 .sp-btn{position:relative;border:0;padding:6px;background:none;cursor:pointer;
   -webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:rgba(0,0,0,0);
@@ -238,7 +238,7 @@ html.doma .screen{padding-bottom:88px;}
 
 /* screens */
 /* каждый экран скроллится ВНУТРИ себя (документ не скроллится) — поверх статичного фикс-фона, без пустот при оверскролле */
-.screen{display:none;position:fixed;inset:0;bottom:var(--kb,0px);overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding-bottom:calc(86px + env(safe-area-inset-bottom));}
+.screen{display:none;position:fixed;inset:0;bottom:var(--kb,0px);overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding-bottom:calc(86px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .screen.active{display:block;}
 
 /* home */
@@ -337,7 +337,7 @@ html.doma .screen{padding-bottom:88px;}
 .st-th.past{opacity:.7;filter:grayscale(.2);}
 /* ---------- голосовой дневник ---------- */
 #s-vd{display:none;} #s-vd.active{display:block;}
-.vd-body{padding:6px 16px calc(84px + env(safe-area-inset-bottom));}
+.vd-body{padding:6px 16px calc(84px + var(--tg-cb, env(safe-area-inset-bottom)));}
 /* шапка дневника: тот же медальон, что во всех разделах, но отступы уже
    есть у .vd-body — свои горизонтальные обнуляем, иначе поля удвоятся */
 .vd-hd{padding:10px 0 2px;}
@@ -408,7 +408,7 @@ html.doma .screen{padding-bottom:88px;}
    нижняя строка экрана всегда меню, а «Отмена» и «Сохранить» живут внутри
    самого поля ввода. Иначе кнопки ложились поверх текста. */
 #s-vd.active.editing{display:flex;flex-direction:column;overflow:hidden;
-  padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+  padding-bottom:calc(76px + var(--tg-cb, env(safe-area-inset-bottom)));}
 #s-vd.editing .safetop{flex:none;}
 #s-vd.editing .vd-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:none;
   -webkit-overflow-scrolling:touch;padding-bottom:10px;}
@@ -454,7 +454,7 @@ html.doma .screen{padding-bottom:88px;}
 /* --- «Поговорить»: переписка --- */
 /* 76px — высота таббара плюс воздух: при 60px нижняя граница поля ввода
    ложилась ровно на его верхнюю грань, и рамки сливались в одну линию */
-#s-talk{display:none;padding-bottom:calc(76px + env(safe-area-inset-bottom));overflow:hidden;}
+#s-talk{display:none;padding-bottom:calc(76px + var(--tg-cb, env(safe-area-inset-bottom)));overflow:hidden;}
 #s-talk.active{display:flex;flex-direction:column;}
 /* всё, кроме ленты, прибито (flex:none) — чтобы при клавиатуре бар ввода
    стоял мёртво над ней и не колбасился, как поле правки в дневнике */
@@ -651,11 +651,11 @@ html.doma .screen{padding-bottom:88px;}
    flex-колонка, экран НЕ скроллится (overflow:hidden — иначе iOS при открытии
    клавиатуры сам дёргает фикс-слой и вёрстка «уплывает»), пояснение скроллится
    в середине, а поле кода с кнопкой прибиты к низу над клавиатурой (flex:none). */
-#s-svyaz{overflow:hidden;padding-bottom:calc(76px + env(safe-area-inset-bottom));}
+#s-svyaz{overflow:hidden;padding-bottom:calc(76px + var(--tg-cb, env(safe-area-inset-bottom)));}
 #s-svyaz.active{display:flex;flex-direction:column;}
 #s-svyaz .safetop,#s-svyaz .topbar{flex:none;}
 .dm-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch;padding-top:2px;}
-.dm-foot{flex:none;padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+.dm-foot{flex:none;padding-bottom:calc(10px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .dm-wrap{padding:4px 18px 8px;max-width:520px;margin:0 auto;}
 .dm-lead{font-size:14.5px;color:#C9C3BC;line-height:1.5;margin:0 0 18px;}
 .dm-step{display:flex;gap:12px;align-items:flex-start;padding:13px;border-radius:14px;
@@ -726,7 +726,7 @@ html.doma .screen{padding-bottom:88px;}
 #s-vne.on{display:block;}
 .vn-shade{position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(10,7,16,.3) 0%,rgba(10,7,16,.84) 50%,rgba(10,7,16,.98) 100%);}
-.vn-in{position:absolute;left:0;right:0;bottom:0;padding:0 22px calc(26px + env(safe-area-inset-bottom));
+.vn-in{position:absolute;left:0;right:0;bottom:0;padding:0 22px calc(26px + var(--tg-cb, env(safe-area-inset-bottom)));
   max-width:460px;margin:0 auto;text-align:center;}
 .vn-logo{font-family:'Baskerville','Forum',Georgia,serif;font-size:26px;letter-spacing:.3em;
   padding-left:.3em;color:#F7ECC6;margin:0 0 8px;text-shadow:0 0 26px rgba(233,201,131,.45);}
@@ -748,7 +748,7 @@ html.doma .screen{padding-bottom:88px;}
 /* min-height:0 обязателен: без него эта flex-обёртка не ужимается под высоту
    экрана при открытой клавиатуре и выталкивает полосу ввода вниз, под клавиатуру
    (как и .ob-chat ниже — та же причина). Единое правило полей ввода. */
-.ob-inner{position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:calc(20px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));}
+.ob-inner{position:relative;z-index:1;flex:1;min-height:0;display:flex;flex-direction:column;max-width:520px;margin:0 auto;width:100%;padding:calc(20px + var(--tg-ct, env(safe-area-inset-top))) 18px calc(14px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .ob-brand{font-family:'Baskerville','Forum',Georgia,serif;font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:#E7C983;text-align:center;margin-bottom:16px;}
 /* min-height:0 — как в .tk-chat: без него лента не сжимается и выталкивает
    полосу ввода за нижний край экрана, под клавиатуру */
@@ -765,7 +765,7 @@ html.doma .screen{padding-bottom:88px;}
 .ob-send{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;flex:0 0 auto;background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 60%,#C89E4C);position:relative;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-appearance:none;appearance:none;box-shadow:0 0 12px rgba(243,220,160,.5);}
 .ob-send::after{content:"";position:absolute;left:14px;top:12px;border-left:13px solid #3E2918;border-top:8px solid transparent;border-bottom:8px solid transparent;}
 body.ob-open .tabbar{display:none;}
-.tabbar{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:30;display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:rgba(37,24,13,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.08);}
+.tabbar{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:30;display:flex;justify-content:space-around;align-items:center;padding:8px 0 calc(8px + var(--tg-cb, env(safe-area-inset-bottom)));background:rgba(37,24,13,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.08);}
 /* Панель прижата к низу окна. Как ведёт себя низ с домашнего экрана —
    разбираем заново, отдельной вёрстки под standalone здесь больше нет. */
 .tab{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(246,238,221,.72);font-size:10.5px;letter-spacing:.03em;cursor:pointer;flex:1;padding:2px 0;}
@@ -780,7 +780,7 @@ body.ob-open .tabbar{display:none;}
    плашки пока рисуется градиентом; когда придут настоящие, меняется одна
    строка css — background-image на файл. */
 #s-main{display:none;} #s-main.active{display:block;}
-.mn{padding:6px 16px calc(84px + env(safe-area-inset-bottom));}
+.mn{padding:6px 16px calc(84px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .mn-hi{font-family:'Baskerville','Forum',Georgia,serif;font-size:25px;color:#F4E7D6;line-height:1.12;}
 .mn-hi span{display:block;font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   font-size:11px;letter-spacing:.02em;color:#B49F89;margin-top:4px;}
@@ -853,7 +853,7 @@ body.ob-open .tabbar{display:none;}
 
 /* экран с видео */
 #s-start{display:none;} #s-start.active{display:block;}
-.sv-body{padding:4px 16px calc(84px + env(safe-area-inset-bottom));}
+.sv-body{padding:4px 16px calc(84px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .sv-box{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(233,201,131,.3);
   background:#0E0906;box-shadow:0 10px 26px rgba(0,0,0,.45);}
 .sv-video{display:block;width:100%;aspect-ratio:9/16;max-height:62vh;background:#0E0906;object-fit:contain;}
@@ -877,7 +877,7 @@ html.narrow .mn-t{font-size:18px;} html.narrow .mn-s{max-width:70%;}
 #s-sub{display:none;} #s-sub.active{display:block;}
 /* шапка как везде: стрелка слева, медальон рядом. Плашка тоже нажимается */
 #s-sub .pill{cursor:pointer;}
-.sb-body{padding:6px 16px calc(84px + env(safe-area-inset-bottom));}
+.sb-body{padding:6px 16px calc(84px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .sb-card{position:relative;border-radius:18px;padding:2px;overflow:hidden;isolation:isolate;
   margin-top:10px;transform:translateZ(0);box-shadow:0 0 16px rgba(233,201,131,.26);}
 .sb-card::before{content:"";position:absolute;inset:-60%;z-index:0;
@@ -973,7 +973,7 @@ html.short .st-stats{margin-top:11px;}
 @keyframes f4{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-34%,-24%) scale(1.24)}}
 @keyframes pulse{0%,100%{box-shadow:0 0 18px rgba(243,220,160,.55),0 6px 18px rgba(0,0,0,.5);transform:scale(1)}50%{box-shadow:0 0 34px rgba(243,220,160,.9),0 6px 22px rgba(0,0,0,.5);transform:scale(1.05)}}
 @media(prefers-reduced-motion:reduce){#s-player.living .blob{animation-play-state:paused;}.playbtn.playing{animation:none;}}
-.p-top{position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 6px;}
+.p-top{position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:calc(12px + var(--tg-ct, env(safe-area-inset-top))) 16px 6px;}
 .p-crumb{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(246,238,221,.55);}
 .p-scroll{position:relative;z-index:2;flex:1;overflow-y:auto;padding:4px 20px 6px;-webkit-overflow-scrolling:touch;}
 .pframe{margin-top:6px;border-radius:20px;padding:2.5px;box-shadow:0 0 16px rgba(233,201,131,.5),0 0 36px rgba(233,201,131,.26),0 18px 50px rgba(0,0,0,.55);}
@@ -983,7 +983,7 @@ html.short .st-stats{margin-top:11px;}
 .mtitle{font-family:'Baskerville','Forum',Georgia,serif;font-size:30px;color:#F3DCA0;text-transform:uppercase;letter-spacing:.03em;text-shadow:0 0 16px rgba(233,197,131,.4);margin:18px 0 4px;}
 .meta{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,238,221,.6);margin-bottom:14px;}
 .desc{font-size:14.5px;color:#E8E5E2;line-height:1.55;}
-.player{position:relative;z-index:3;padding:14px 22px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(20,13,8,.5) 20%,rgba(20,13,8,.78));border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);}
+.player{position:relative;z-index:3;padding:14px 22px calc(16px + var(--tg-cb, env(safe-area-inset-bottom)));background:linear-gradient(transparent,rgba(20,13,8,.5) 20%,rgba(20,13,8,.78));border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);}
 .bar{position:relative;height:8px;border-radius:5px;background:rgba(255,255,255,.16);cursor:pointer;touch-action:none;}
 .bar::before{content:"";position:absolute;left:0;right:0;top:-18px;bottom:-18px;}/* большая зона захвата пальцем */
 .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#E7C983,#F3DCA0);border-radius:5px;}
@@ -1012,10 +1012,10 @@ html.short .st-stats{margin-top:11px;}
 /* --- экран медитации со сферой из частиц --- */
 #s-player{background:linear-gradient(158deg,#27190E,#150E08);}
 .pcv{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;}
-.p-top{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 18px 6px;}
+.p-top{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:10px;padding:calc(12px + var(--tg-ct, env(safe-area-inset-top))) 18px 6px;}
 .p-top .back{font-size:30px;color:#F3DCA0;cursor:pointer;line-height:1;}
 .p-top .heart{margin-left:auto;width:44px;height:44px;}
-.p-titlewrap{position:absolute;top:calc(56px + env(safe-area-inset-top));left:0;right:0;z-index:3;text-align:center;pointer-events:none;padding:0 22px;}
+.p-titlewrap{position:absolute;top:calc(56px + var(--tg-ct, env(safe-area-inset-top)));left:0;right:0;z-index:3;text-align:center;pointer-events:none;padding:0 22px;}
 .pt-eyebrow{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(230,192,121,.85);}
 .pt-title{font-family:'Baskerville','Forum',Georgia,serif;font-size:26px;color:#F3DCA0;margin-top:4px;letter-spacing:.02em;text-shadow:0 0 16px rgba(233,197,131,.4);}
 .core{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:3;display:flex;align-items:center;justify-content:center;}
@@ -1027,7 +1027,7 @@ html.short .st-stats{margin-top:11px;}
 .pz.playing{animation:pulsePause 2.6s ease-in-out infinite;}
 @keyframes pulsePause{0%,100%{transform:scale(1);box-shadow:0 0 20px rgba(243,220,160,.55),0 4px 16px rgba(0,0,0,.5)}50%{transform:scale(1.1);box-shadow:0 0 36px rgba(243,220,160,1),0 4px 16px rgba(0,0,0,.5)}}
 @keyframes haloB{0%,100%{transform:scale(.86);opacity:.5}50%{transform:scale(1.16);opacity:.85}}
-.pbottom{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:0 26px calc(24px + env(safe-area-inset-bottom));}
+.pbottom{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:0 26px calc(24px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .ctrls{display:flex;align-items:center;justify-content:center;gap:58px;margin-top:16px;}
 .skip{display:flex;align-items:center;gap:3px;color:#F3DCA0;opacity:.92;cursor:pointer;background:none;border:0;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;appearance:none;}
 .skip .a{font-size:26px;line-height:1;}
@@ -1065,7 +1065,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 #s-detail.editing .d-topbar{flex:none;}
 #s-detail.editing .d-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch;}
 .d-noteedit{display:none;}
-#s-detail.editing .d-noteedit{display:block;flex:none;padding:8px 16px calc(10px + env(safe-area-inset-bottom));
+#s-detail.editing .d-noteedit{display:block;flex:none;padding:8px 16px calc(10px + var(--tg-cb, env(safe-area-inset-bottom)));
   background:linear-gradient(180deg,rgba(20,12,8,0),rgba(20,12,8,.72) 30%);}
 #s-detail.editing .d-noteedit .dp-ta{min-height:80px;
   max-height:min(38vh, calc(100vh - var(--kb,0px) - 150px));
@@ -1106,7 +1106,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 .dp-rep-name{font-size:12.5px;font-weight:600;color:#F7ECC6;}
 .dp-rep-txt{font-size:12.5px;line-height:1.5;color:#E4E1DE;}
 .dp-more{align-items:center;justify-content:center;gap:7px;font-size:12px;color:#E7C983;border:1px dashed rgba(233,201,131,.34);border-radius:12px;padding:11px;background:rgba(233,201,131,.04);cursor:pointer;margin-top:13px;display:flex;}
-.dbottom{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px 24px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(20,13,8,.5) 30%,rgba(20,13,8,.82));backdrop-filter:blur(8px);}
+.dbottom{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px 24px calc(18px + var(--tg-cb, env(safe-area-inset-bottom)));background:linear-gradient(transparent,rgba(20,13,8,.5) 30%,rgba(20,13,8,.82));backdrop-filter:blur(8px);}
 .dbottom .playbtn{width:72px;height:72px;}
 .dbottom .heart{position:absolute;right:22px;width:52px;height:52px;}
 
@@ -1493,7 +1493,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 16:44";
+const BUILD = "31.08 17:28";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1610,7 +1610,7 @@ const $ = s => document.getElementById(s);
   const lockWin = () => { if(window.scrollY || window.scrollX){ try{ window.scrollTo(0,0); }catch(e){} } };
   function apply(){
     lockWin();
-    const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    const kb = (function(){var _t=window.Telegram&&window.Telegram.WebApp;if(_t&&_t.initData&&_t.viewportStableHeight){return Math.max(0,Math.round(_t.viewportStableHeight-_t.viewportHeight));}return Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));})();
     const v = (pishet() && kb > 60) ? kb : 0;  /* мелкие колебания панелей не считаем */
     if(v === last) return;
     last = v;
@@ -1665,6 +1665,14 @@ const $ = s => document.getElementById(s);
 })();
 const byId = {}; ALL_SECS.forEach(s=>s.items.forEach(it=>byId[it.id]={...it, secTitle:s.title}));
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+(function(){ if(!tg || !tg.initData) return; var R=document.documentElement;
+  var px=function(n){ return Math.max(0,Math.round(+n||0))+'px'; };
+  function geom(){ try{ var sa=tg.safeAreaInset||{}, ca=tg.contentSafeAreaInset||{};
+    R.style.setProperty('--tg-ct', px((sa.top||0)+(ca.top||0)));
+    R.style.setProperty('--tg-cb', px((sa.bottom||0)+(ca.bottom||0))); }catch(e){} }
+  geom();
+  try{ tg.onEvent('safeAreaChanged',geom); tg.onEvent('contentSafeAreaChanged',geom); tg.onEvent('viewportChanged',geom); }catch(e){}
+})();
 
 /* ---------- что за телефон ----------
    Ширину экрана css видит и сам, а вот систему — нет, и от неё зависят вещи,
@@ -3896,7 +3904,7 @@ function vneEkran(){
    строке считает высоту окна без неё, а рисует от самого верха.
    Раньше здесь был самозамер невидимой меткой — он всегда давал ноль, потому
    что мерил от края ОКНА, а окно само по себе короче экрана. Величину знает
-   только сам айфон, и он отдаёт её через env(safe-area-inset-top). */
+   только сам айфон, и он отдаёт её через var(--tg-ct, env(safe-area-inset-top)). */
 function domaOtmetit(){
   try{ document.documentElement.classList.toggle("doma", naEkrane()); }catch(e){}
 }
