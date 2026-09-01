@@ -6,6 +6,16 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Иммерсия</title>
+<!-- PWA: чтобы приложение можно было добавить на экран «Домой» КАК ОТДЕЛЬНУЮ
+     ВЕБ-СТРАНИЦУ (standalone, вне Телеграма). manifest — Android, apple-touch-icon —
+     айфону. Файлы manifest.json и pwa/* лежат на tishina-web. status-bar
+     black-translucent — контент край-в-край под строкой состояния (максимально
+     похоже на fullscreen). Всё это НЕ действует внутри Телеграма. -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="pwa/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Иммерсия">
 <!-- Постер заставки просим первым делом: он весит 7 КБ и приходит почти мгновенно,
      пока браузер ещё разбирает пятимегабайтные стили ниже. Без этого экран
      висит коричневым до самого конца разбора. -->
@@ -1314,7 +1324,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "01.09 20:28";
+const BUILD = "01.09 20:39";
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
    Адрес у иконки один и тот же, и браузер честно отдаёт ей страницу из памяти.
@@ -3243,15 +3253,14 @@ press($("tile-home"), dobavitNaEkran);   /* добавить мини-прило
    никакого отдельного standalone, браузера и подгонки геометрии. */
 function dobavitNaEkran(){
   try{ haptic("light"); }catch(e){}
-  try{
-    if(!tg || !tg.addToHomeScreen) throw 0;   /* нет объекта/метода (браузер) */
-    tg.addToHomeScreen();                       /* на <8.0 бросит — уйдём в catch */
-  }catch(e){
-    try{ tg && tg.showPopup && tg.showPopup({
-      title:"Нужен Телеграм посвежее",
-      message:"Кнопка добавляет «Иммерсию» на экран «Домой». Работает в Телеграме 8.0 и новее — обнови приложение, и всё заработает.",
-      buttons:[{type:"ok"}]}); }catch(e2){}
-  }
+  /* Нужно, чтобы иконка открывала приложение КАК ОТДЕЛЬНУЮ ВЕБ-СТРАНИЦУ (standalone),
+     а не мини-приложение внутри Телеграма. Сам добавить с экрана Телеграм не умеет —
+     открываем приложение в браузере (Safari), а там «Поделиться» → «На экран „Домой“».
+     С иконки страница откроется standalone (по PWA-метам в <head>). */
+  const url = location.origin + location.pathname;
+  try{ if(tg && tg.openLink){ tg.openLink(url); return; } }catch(e){}
+  try{ window.open(url, "_blank"); return; }catch(e){}
+  location.href = url;
 }
 
 /* кнопки подписки: продление и отмена уходят в бота — оплату держит он */
