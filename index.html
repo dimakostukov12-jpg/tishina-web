@@ -521,7 +521,10 @@ html.doma .screen{padding-bottom:88px;}
   background:rgba(20,13,8,.93);transition:background .2s;}
 .st-tile>*{position:relative;z-index:1;}
 .st-tile:active{transform:scale(.965);}
-.st-tile:active::after{background:rgba(41,27,17,.93);}
+/* при нажатии только подкрашиваем ::after, НЕ сокращённым `background` — иначе
+   у плиток-обложек сбрасывался background-image в none, и из-под них вспыхивал
+   золотой конический градиент ::before (баг «золотое свечение при тапе»). */
+.st-tile:active::after{background-color:rgba(41,27,17,.93);}
 .st-ic{display:block;width:22px;color:#E0AE72;}
 .st-ic svg{width:100%;display:block;}
 .st-tn{display:block;font-size:13px;color:#EFE5DA;margin-top:9px;}
@@ -1488,7 +1491,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "01.09 20:46";
+const BUILD = "01.09 20:55";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
