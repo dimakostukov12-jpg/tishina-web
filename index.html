@@ -1488,7 +1488,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "31.08 22:08";
+const BUILD = "01.09 18:13";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1829,12 +1829,15 @@ function zvukIzPamyati(f){
 async function zvukSprosit(f){
   const gotovaya = zvukIzPamyati(f);
   if(gotovaya) return { url: gotovaya };
+  /* В Телеграме — по подписи; с рабочего стола (иконка «Домой») подписи нет,
+     предъявляем ключ устройства — тот же, что и для «Поговорить»/прогресса. */
   const initData = (tg && tg.initData) || "";
-  if(!initData) return { prichina: "ne-telegram" };
+  const kl = initData ? "" : klyuchEst();
+  if(!initData && !kl) return { prichina: "ne-telegram" };
   try{
     const r = await fetch(ZVUK_URL, { method:"POST",
       headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ initData, fajl: f }) });
+      body: JSON.stringify({ initData, klyuch: kl, fajl: f }) });
     const d = await r.json().catch(()=>null);
     if(r.ok && d && d.url){
       try{ localStorage.setItem(ZVKEY(f), JSON.stringify({url:d.url, do:d.do})); }catch(e){}
