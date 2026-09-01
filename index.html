@@ -1488,7 +1488,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "01.09 18:17";
+const BUILD = "01.09 18:49";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3178,7 +3178,19 @@ $("ob-send").onclick=obSend;
 $("ob-input").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); obSend(); } });
 $("ob-input").addEventListener("input",function(){ this.style.height="auto"; this.style.height=Math.min(120,this.scrollHeight)+"px"; });
 
-if(tg){ try{tg.ready();tg.expand();tg.setHeaderColor&&tg.setHeaderColor('#20140D');tg.setBackgroundColor&&tg.setBackgroundColor('#20140D');tg.setBottomBarColor&&tg.setBottomBarColor('#20140D');}catch(e){}
+/* Настоящий полноэкранный режим Телеграма (Bot API 8.0+): приложение рисуется
+   край-в-край, под шапку. Под защитой — где не поддерживается, тихо всё как было
+   (fallback на expand). Из-под шапки контент уводит наша safe-area (--tg-ct).
+   Работает ТОЛЬКО внутри Телеграма; на standalone (рабочий стол) не влияет. */
+function fsKick(t){ try{
+  if(t.requestFullscreen && (!t.isVersionAtLeast || t.isVersionAtLeast('8.0'))){
+    try{ t.disableVerticalSwipes && t.disableVerticalSwipes(); }catch(e){}
+    var k=function(){ try{ t.requestFullscreen(); }catch(e){} };
+    k(); setTimeout(k,300); setTimeout(k,1000);
+    try{ t.onEvent && t.onEvent('fullscreenFailed', function(){ try{ t.expand(); }catch(e){} }); }catch(e){}
+  }
+}catch(e){} }
+if(tg){ try{tg.ready();tg.expand();fsKick(tg);tg.setHeaderColor&&tg.setHeaderColor('#20140D');tg.setBackgroundColor&&tg.setBackgroundColor('#20140D');tg.setBottomBarColor&&tg.setBottomBarColor('#20140D');}catch(e){}
   /* приложение книжное: поворот запираем, чтобы экран не ложился набок.
      lockOrientation есть с Bot API 8.0 — на старых клиентах просто не сработает,
      поэтому кегль отдельно защищён через text-size-adjust. */
