@@ -1491,7 +1491,7 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "01.09 20:55";
+const BUILD = "02.09 18:00";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3607,9 +3607,9 @@ const IK = {
 const nastoyashchiySafari = () => typeof navigator.standalone === "boolean";
 
 const SHAGI_IOS = [
-  [IK.tochki, "Нажми <b>•••</b> рядом с адресом", "Внизу экрана. Если строка сверху — там же"],
-  [IK.share,  "Выбери <b>«Поделиться»</b>", "Если сразу видишь «На экран „Домой“» — жми его"],
-  [IK.plus,   "Дальше <b>«На экран „Домой“»</b>", "Пролистай, пункт со значком +"],
+  [IK.tochki, "Открой меню браузера", "Три точки"],
+  [IK.share,  "Выбери <b>«Поделиться»</b>", ""],
+  [IK.plus,   "Нажми <b>На экран «Домой»</b>", "Пролистай, пункт со значком +"],
   [IK.gal,    "Нажми <b>«Добавить»</b>", "Справа вверху"]
 ];
 /* Из встроенного браузера Телеграма добавить нельзя — сначала выйти в Safari. */
@@ -3869,35 +3869,19 @@ function ustanovkaEkran(){
 function vneEkran(){
   const el = $("s-vne"); if(!el) return;
   if(naEkrane()){
-    /* Кода на виду нет. Она нажимает одну кнопку — дальше связываем сами.
-       Ввод руками спрятан за тихой ссылкой: он нужен, только если первый
-       путь почему-то не сработал. */
+    /* Связываем ТОЛЬКО по коду: показываем код сразу, она копирует его и
+       вставляет в приложении в Телеграме. Никакой кнопки «Открыть в Telegram»,
+       ничего не «узнаётся» само. */
     $("vn-h").textContent = "Осталось связать";
-    $("vn-p").textContent = "Один раз — чтобы приложение узнало твои дни, ступень и подписку.";
+    $("vn-p").textContent = "Свяжи по коду — и приложение узнает твои дни, ступень и подписку.";
     $("vn-steps").innerHTML =
-      shagiHTML([
-        [IK.tg,    "Нажми кнопку ниже", "Откроется Телеграм"],
-        [IK.chelo, "Открой «Иммерсию» и вернись сюда", "Связывание пройдёт само"],
-        [IK.gal,   "Готово", "Экран сменится твоими днями. Не вышло — ссылка ниже"]
-      ]) +
-      '<div class="vn-ruch" id="vn-ruch" hidden>' +
-        '<div class="vn-kodwrap">' +
-          '<div class="vn-kod" id="vn-kod">· · · ·</div>' +
-          '<button class="vn-kopi" id="vn-kopi" type="button" hidden>Копировать</button>' +
-        '</div>' +
-        '<p class="vn-kodp">Открой «Иммерсию» в Телеграме → <b>Профиль</b> → ' +
-        '<b>Связать устройство</b> → вставь код</p>' +
-      '</div>';
-    $("vn-act").innerHTML =
-      '<button class="dm-big" id="vn-go" type="button">Открыть в Telegram</button>' +
-      '<button class="vn-tiho" id="vn-tiho" type="button">Не получилось? Связать по коду</button>';
-    const g = $("vn-go");
-    if(g) g.addEventListener("click", () => { location.href = g.dataset.url || MINIAPP_BOT; });
-    const th = $("vn-tiho");
-    if(th) th.addEventListener("click", () => {
-      const r = $("vn-ruch"); if(!r) return;
-      r.hidden = false; th.hidden = true; haptic("light");
-    });
+      '<div class="vn-kodwrap">' +
+        '<div class="vn-kod" id="vn-kod">· · · ·</div>' +
+        '<button class="vn-kopi" id="vn-kopi" type="button" hidden>Копировать</button>' +
+      '</div>' +
+      '<p class="vn-kodp">Скопируй код. Открой «Иммерсию» в Телеграме → <b>Профиль</b> → ' +
+      '<b>Связать устройство</b> → вставь этот код. Потом вернись сюда — и всё заработает.</p>';
+    $("vn-act").innerHTML = "";
     const kp = $("vn-kopi");
     if(kp) kp.addEventListener("click", () => { if(svyazKod) kopirovat(svyazKod, kp); });
     svyazPoprosit();
@@ -3909,8 +3893,8 @@ function vneEkran(){
     $("vn-steps").innerHTML = shagiHTML(SHAGI_VYYTI);
     $("vn-act").innerHTML = '<div class="vn-arrow">↓</div>';
   }else{
-    $("vn-h").textContent = "Добавь на экран";
-    $("vn-p").textContent = "Четыре шага — и «Иммерсия» будет открываться одним касанием.";
+    $("vn-h").textContent = "Добавь приложение на рабочий стол";
+    $("vn-p").textContent = "";
     $("vn-steps").innerHTML = shagiHTML(etoIOS() ? SHAGI_IOS : SHAGI_PROCH);
     $("vn-act").innerHTML = etoIOS() ? '<div class="vn-arrow">↓</div>' : '';
   }
