@@ -1568,8 +1568,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 19:10";
-const APP_VERSION = "03.09 19:10";
+const BUILD = "03.09 19:24";
+const APP_VERSION = "03.09 19:24";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -2225,20 +2225,28 @@ async function vdDone(){
   const blob=new Blob(vdChunks,{type}); vdRec=null; vdChunks=[];
   const secs=vdSec;
   $("s-vd").classList.remove("rec");
-  if(blob.size<1200){ return; }                       /* случайное касание */
+  if(blob.size<1200){ $("vd-hint").textContent="Записи почти нет — нажми и говори чуть дольше."; return; }
   vdBusy=true;
   $("s-vd").classList.add("done"); vdWave(24,false);
   $("vd-hint").textContent="расшифровываю…";
-  let text="";
+  let text="", err="";
   try{
     const r=await fetch(VOICE_URL,{method:"POST",
       headers:{"Content-Type":type,"x-init-data":encodeURIComponent((tg&&tg.initData)||"")},
       body:blob});
-    const d=await r.json(); text=(d&&d.text||"").trim();
-  }catch(e){}
+    const d=await r.json(); text=(d&&d.text||"").trim(); err=(d&&d.error)||"";
+    try{ console.log("[vd] voice", r.status, "type="+type, "size="+blob.size, "err="+err, "len="+text.length); }catch(_e){}
+  }catch(e){ err="net"; }
   if(!text){
     vdBusy=false; $("s-vd").classList.remove("done");
-    $("vd-hint").textContent="Не разобрал запись. Попробуй ещё раз.";
+    let m="Не разобрал запись. Попробуй ещё раз.";
+    if(err==="no-initdata")        m="Голос работает только внутри Telegram — открой «Иммерсию» из бота.";
+    else if(err==="bad-signature") m="Подпись не сошлась — открой приложение из бота в Telegram.";
+    else if(err==="too-short")     m="Слишком коротко — говори чуть подольше.";
+    else if(err==="too-big")       m="Запись слишком большая — до пяти минут.";
+    else if(err==="net")           m="Связь пропала — попробуй ещё раз.";
+    else if(err==="stt-failed")    m="Не разобрал запись (расшифровка не удалась). Попробуй ещё раз.";
+    $("vd-hint").textContent=m;
     return;
   }
   const d=await vdApi("save",{text, dur:secs});
