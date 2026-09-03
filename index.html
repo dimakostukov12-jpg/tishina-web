@@ -1568,8 +1568,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 20:03";
-const APP_VERSION = "03.09 20:03";
+const BUILD = "03.09 20:09";
+const APP_VERSION = "03.09 20:09";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3864,11 +3864,9 @@ function hsNazhali(){
     try{ window.open(u, "_blank"); hsSprosim(); return; }catch(e){}
     location.href = u;
   };
-  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({op:"vydat", initData:(tg && tg.initData) || "", metka})})
-   .then(r => r.json())
-   .then(d => uyti(d && d.kod ? APP_URL() + "&k=" + d.kod : APP_URL()))
-   .catch(() => uyti(APP_URL()));      /* без кода — просто инструкция, как раньше */
+  /* Только по коду: код в адрес НЕ кладём — иконка со стола покажет свежий код
+     сама, женщина введёт его в Телеграме. Здесь лишь отправляем в браузер за иконкой. */
+  uyti(APP_URL());
 }
 
 /* Она ушла в браузер ставить иконку. Вернётся — перепроверим у сервера, не
@@ -3980,20 +3978,7 @@ function kopirovat(txt, knopka){
    вводить ей ничего не надо. Заработает, когда у бота включат главное
    мини-приложение (BotFather → Bot Settings → Configure Mini App). Пока
    выключено — ссылка просто открывает бота, и это ничего не ломает. */
-function svyazIzSsylki(){
-  let p = "";
-  try{ p = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || ""; }catch(e){}
-  const kod = String(p).toUpperCase().replace(/[^A-Z0-9]/g, "");
-  if(kod.length !== 8) return;
-  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({op:"svyazat", initData:(tg && tg.initData) || "", kod})})
-   .then(r => r.json()).then(d => {
-     if(!d || !d.ok) return;
-     try{ haptic("success"); setTab("profile"); go("s-svyaz", true); }catch(e){}
-     const m = $("sv-msg");
-     if(m) m.textContent = "Готово. Тот телефон уже открывается" + (d.metka ? " — " + d.metka : "") + ".";
-   }).catch(() => {});
-}
+function svyazIzSsylki(){ /* авто-связывание по ссылке (start_param) выключено: связываем ТОЛЬКО по коду вручную */ }
 
 function svyazPoprosit(){
   const m = navigator.userAgent.match(/iPhone|iPad|Android|Windows|Macintosh/);
@@ -4059,19 +4044,8 @@ function ustanovkaEkran(){
   const t = setInterval(() => { if(imya() || ++n > 14){ clearInterval(t); narisovat(); } }, 300);
   el.classList.add("on");
 
-  /* И главное. Иконка с домашнего экрана не увидит ключ, который лежит здесь:
-     память у них разная — проверено на живом айфоне. Зато адрес страницы, с
-     которой ставят иконку, система запоминает. Поэтому кладём в адрес код для
-     будущей иконки: она родится уже знающей женщину, и связывать ничего не
-     придётся. Код одноразовый, живёт сутки и после первого запуска мёртв. */
-  const m = navigator.userAgent.match(/iPhone|iPad|Android|Windows|Macintosh/);
-  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({op:"peredat", klyuch: klyuchEst(),
-                          metka: (m ? m[0].replace("Macintosh","Mac") : "телефон") + " · с экрана"})})
-   .then(r => r.json()).then(d => {
-     if(!d || !d.kod) return;
-     try{ history.replaceState({}, "", location.pathname + "?dom=1&k=" + d.kod); }catch(e){}
-   }).catch(() => {});
+  /* Код в адрес больше НЕ кладём и Safari→иконка (peredat) не передаём:
+     связывание только по коду, который иконка со стола покажет сама. */
 }
 
 /* Экран для случая, когда приложение открыли не из Телеграма: либо она в Safari
