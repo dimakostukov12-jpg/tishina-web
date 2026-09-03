@@ -783,8 +783,8 @@ body.ob-open .tabbar{display:none;}
 .tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .tab.on{color:#F3DCA0;}
 .tab.on svg{filter:drop-shadow(0 0 6px rgba(243,220,160,.5));}
-/* вертикальные разделители между вкладками (вариант 6) */
-.tab+.tab::before{content:"";position:absolute;left:0;top:22%;height:56%;width:1px;background:rgba(233,201,131,.16);}
+/* вертикальные разделители между вкладками: короткие, у иконок — не пересекают подписи */
+.tab+.tab::before{content:"";position:absolute;left:0;top:20%;height:28%;width:1px;background:rgba(233,201,131,.24);}
 .hide{display:none!important;}
 
 /* ——— вкладка «Дни»: календарь любви к себе (двойное кольцо) ——— */
@@ -1542,8 +1542,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 <nav class="tabbar" id="tabbar">
   <div class="tab on" data-tab="main"><svg viewBox="0 0 24 24"><path d="M4 11.2 12 4.5l8 6.7"/><path d="M6.2 10.4V19h11.6v-8.6"/><path d="M10 19v-4.4h4V19"/></svg>Главная</div>
   <div class="tab" data-tab="home"><svg viewBox="0 0 24 24"><path d="M12 20c5-2 7-7 7-13-6 0-11 2-13 7"/><path d="M5 20c0-5 3-9 7-11"/></svg>Медитации</div>
-  <div class="tab" data-tab="dni"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M4 9.5H20"/><path d="M8 3V6"/><path d="M16 3V6"/></svg>Дни</div>
-  <div class="tab" data-tab="vd"><svg viewBox="0 0 24 24"><rect x="9" y="2.6" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg>Дневник</div>
+  <div class="tab" data-tab="dni"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M4 9.5H20"/><path d="M8 3V6"/><path d="M16 3V6"/></svg>Календарь</div>
   <div class="tab" data-tab="talk"><svg viewBox="0 0 24 24"><path d="M20.5 11.3c0 3.8-3.8 6.9-8.5 6.9-1 0-2-.14-2.9-.4L4 19.6l1.35-3.3C4.2 15 3.5 13.2 3.5 11.3c0-3.8 3.8-6.9 8.5-6.9s8.5 3.1 8.5 6.9z"/><path d="M12 8.1l.85 2.05 2.05.85-2.05.85L12 13.9l-.85-2.05-2.05-.85 2.05-.85z"/></svg>Поговорить</div>
   <div class="tab" data-tab="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Профиль</div>
 </nav>
@@ -1561,8 +1560,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 10:51";
-const APP_VERSION = "03.09 10:51";
+const BUILD = "03.09 10:59";
+const APP_VERSION = "03.09 10:59";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
