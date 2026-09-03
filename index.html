@@ -796,18 +796,18 @@ body.ob-open .tabbar{display:none;}
 .dni-ar{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid rgba(233,201,131,.22);display:flex;align-items:center;justify-content:center;color:#C9AC98;cursor:pointer;}
 .dni-ar svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .dni-ar.off{opacity:.28;pointer-events:none;}
-.dni-wk{flex:none;display:grid;grid-template-columns:repeat(7,1fr);margin:14px 18px 8px;}
+.dni-wk{flex:none;display:grid;grid-template-columns:repeat(7,1fr);margin:14px 18px 4px;}
 .dni-wk span{text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8f7c68;}
 .dni-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:0 16px;}
 .dni-scroll::-webkit-scrollbar{width:0;}
-.dni-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px 5px;padding:2px 0 6px;}
+.dni-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:12px 5px;padding:14px 0 6px;}
 .dni-day{appearance:none;-webkit-appearance:none;background:none;border:0;padding:0;font:inherit;cursor:pointer;position:relative;display:block;aspect-ratio:1;color:#cbbdac;-webkit-tap-highlight-color:rgba(0,0,0,0);}
 .dni-day.empty{visibility:hidden;pointer-events:none;}
 .dni-day.fut .dni-dn,.dni-day.off .dni-dn{color:#4e4235;}
 .dni-ring{position:absolute;inset:6%;border-radius:50%;z-index:1;border:1px solid rgba(233,201,131,.16);}
 .dni-ring.on{border-color:rgba(233,201,131,.55);box-shadow:inset 0 0 0 3px rgba(11,6,3,.92),0 0 0 4px rgba(233,201,131,.15);}
-.dni-cr{position:absolute;left:50%;top:-7px;transform:translateX(-50%);z-index:4;width:15px;height:9px;filter:drop-shadow(0 0 2px rgba(233,201,131,.5));}
-.dni-cr path,.dni-cr rect,.dni-cr circle{fill:url(#dni-gg);}
+.dni-cr{position:absolute;left:50%;top:-11px;transform:translateX(-50%);z-index:4;width:20px;height:15px;filter:drop-shadow(0 1px 2px rgba(180,120,40,.55));}
+.dni-cr path,.dni-cr rect,.dni-cr circle{fill:#F1DBA0;}
 .dni-dn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;font-size:14px;line-height:1;}
 .dni-td{position:absolute;left:50%;bottom:15%;transform:translateX(-50%);z-index:3;display:flex;gap:3px;height:4px;align-items:center;}
 .dni-td i{width:4px;height:4px;border-radius:50%;display:block;}
@@ -1557,8 +1557,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 10:27";
-const APP_VERSION = "03.09 10:27";
+const BUILD = "03.09 10:37";
+const APP_VERSION = "03.09 10:37";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3490,7 +3490,9 @@ const DNI_IC={
  d:'<svg viewBox="0 0 24 24"><path d="M6 4H16A3 3 0 0 1 19 7V21H9A3 3 0 0 1 6 18Z"/><path d="M9 21A3 3 0 0 1 6 18A3 3 0 0 1 9 15H19"/></svg>',
  c:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2.4"/><circle cx="12" cy="9" r="1.5"/><path d="M9 14H15"/></svg>',
  t:'<svg viewBox="0 0 24 24"><path d="M5 5H19V15H10L5 19Z"/></svg>'};
-const DNI_CROWN='<svg class="dni-cr" viewBox="0 0 26 16"><path d="M3 14 4.6 5.4 9 9.8 13 3l4 6.8 4.4-4.4L23 14Z"/><rect x="3.2" y="13.1" width="19.6" height="1.9" rx=".9"/><circle cx="4.6" cy="5.4" r="1.05"/><circle cx="13" cy="3" r="1.2"/><circle cx="21.4" cy="5.4" r="1.05"/></svg>';
+/* корона: чистый путь (все координаты абсолютные) + сплошная золотая заливка —
+   iOS WebKit не красит фигуру-путь градиентом objectBoundingBox (рисовал только палочку-основание) */
+const DNI_CROWN='<svg class="dni-cr" viewBox="0 0 24 18"><path d="M3.6 15 L2.2 5.4 L7.2 10.2 L12 3.2 L16.8 10.2 L21.8 5.4 L20.4 15 Z"/><rect x="3.2" y="13.6" width="17.6" height="2.8" rx="1.2"/><circle cx="2.2" cy="5.4" r="1.5"/><circle cx="12" cy="3.2" r="1.7"/><circle cx="21.8" cy="5.4" r="1.5"/></svg>';
 
 function dniAll(){ try{return JSON.parse(localStorage.getItem(DNIKEY)||"{}");}catch(e){return {};} }
 function dniLog(kind,meta,day){
