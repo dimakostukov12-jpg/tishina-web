@@ -1568,8 +1568,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 20:09";
-const APP_VERSION = "03.09 20:09";
+const BUILD = "03.09 20:18";
+const APP_VERSION = "03.09 20:18";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3989,6 +3989,9 @@ function svyazPoprosit(){
    .then(r => r.json()).then(d => {
      if(!d || !d.kod){ if(kd) kd.textContent = "не вышло"; return; }
      svyazId = d.id; svyazKod = d.kod;
+     /* id/код держим в localStorage: iOS закрывает копию, пока вводят код в Телеграме,
+        и при возврате надо ДОЗАБРАТЬ ключ по этому устройству, а не заводить новый код. */
+     try{ localStorage.setItem("tishina_svyaz_id", d.id); localStorage.setItem("tishina_svyaz_kod", d.kod); }catch(e){}
      if(kd) kd.textContent = d.kod.slice(0,4) + " " + d.kod.slice(4);
      const kp = $("vn-kopi"); if(kp) kp.hidden = false;
      const tgb = $("vn-go");
@@ -4003,23 +4006,37 @@ function svyazPoprosit(){
 
 function svyazSprosit(){
   if(!svyazId) return;
-  if(Date.now() > svyazDo){ clearInterval(svyazTimer); svyazPoprosit(); return; }  /* сам возьмёт новый */
+  if(Date.now() > svyazDo){ clearInterval(svyazTimer); svyazZabyt(); svyazPoprosit(); return; }  /* сам возьмёт новый */
   fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
     body: JSON.stringify({op:"sprosit", id: svyazId})})
    .then(r => r.json()).then(d => {
      if(!d) return;
      if(d.state === "gotovo" && d.klyuch){
-       clearInterval(svyazTimer);
+       clearInterval(svyazTimer); svyazZabyt();
        try{ localStorage.setItem(KL_KEY, d.klyuch); }catch(e){}
        haptic("success");
        $("vn-h").textContent = "Готово";
        $("vn-p").textContent = "Открываю твои дни…";
        $("vn-steps").innerHTML = ""; $("vn-act").innerHTML = "";
        setTimeout(() => { location.reload(); }, 900);
-     }else if(d.state === "prosrochen"){
-       clearInterval(svyazTimer); svyazPoprosit();
+     }else if(d.state === "prosrochen" || d.state === "net" || d.state === "uzhe_vydan"){
+       /* код истёк / устройство пропало / ключ уже выдан и нам не достанется — свежий код */
+       clearInterval(svyazTimer); svyazZabyt(); svyazPoprosit();
      }
    }).catch(() => {});
+}
+function svyazZabyt(){ try{ localStorage.removeItem("tishina_svyaz_id"); localStorage.removeItem("tishina_svyaz_kod"); }catch(e){} }
+/* Возврат на иконку (её закрыли, пока вводили код в Телеграме): не заводим новый код,
+   а дозабираем ключ по уже созданному устройству — показываем прежний код и опрашиваем
+   sprosit. Связали в Телеграме — ключ придёт сразу же. */
+function svyazVozobnovit(){
+  let sid="", skod="";
+  try{ sid=localStorage.getItem("tishina_svyaz_id")||""; skod=localStorage.getItem("tishina_svyaz_kod")||""; }catch(e){}
+  if(!sid){ svyazPoprosit(); return; }
+  svyazId=sid; svyazKod=skod; svyazDo=Date.now()+10*60*1000;
+  const kd=$("vn-kod"); if(kd && skod) kd.textContent = skod.slice(0,4)+" "+skod.slice(4);
+  const kp=$("vn-kopi"); if(kp && skod) kp.hidden=false;
+  clearInterval(svyazTimer); svyazTimer=setInterval(svyazSprosit,3000); svyazSprosit();
 }
 
 /* Она в браузере, и мы её уже узнали по ключу из ссылки. Само приложение ей
@@ -4068,7 +4085,7 @@ function vneEkran(){
     $("vn-act").innerHTML = "";
     const kp = $("vn-kopi");
     if(kp) kp.addEventListener("click", () => { if(svyazKod) kopirovat(svyazKod, kp); });
-    svyazPoprosit();
+    svyazVozobnovit();
   }else if(etoIOS() && !nastoyashchiySafari()){
     /* Она во встроенном браузере — Телеграма или другого приложения.
        Отсюда иконку не добавить вообще, сначала надо выйти в Safari. */
