@@ -1568,8 +1568,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 19:36";
-const APP_VERSION = "03.09 19:36";
+const BUILD = "03.09 19:44";
+const APP_VERSION = "03.09 19:44";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1639,10 +1639,16 @@ const $ = s => document.getElementById(s);
         if(!v) return;
         v = v.trim();
         /* только настоящая метка «ДД.ММ ЧЧ:ММ» — не принимаем страницу ошибки за версию */
-        if(v && /^\d{2}\.\d{2} \d{2}:\d{2}$/.test(v) && v !== BUILD && !sessionStorage.getItem("verjump")){
-          sessionStorage.setItem("verjump", v);
-          location.replace(location.pathname + "?v=" + encodeURIComponent(v));
-        }
+        if(!(/^\d{2}\.\d{2} \d{2}:\d{2}$/.test(v) && v !== BUILD)) return;
+        /* Пауза между самообновлениями: не чаще раза в 10 минут — чтобы человек
+           спокойно пользовался и сворачивал приложение, а не ловил перезагрузку.
+           Метку времени держим в localStorage: она переживает переоткрытие копии
+           с домашнего экрана (sessionStorage там сбрасывается каждый заход). */
+        var now = Date.now(), last = 0;
+        try{ last = parseInt(localStorage.getItem("verjump_at")||"0",10)||0; }catch(e){}
+        if(now - last < 10*60*1000) return;
+        try{ localStorage.setItem("verjump_at", String(now)); }catch(e){}
+        location.replace(location.pathname + "?v=" + encodeURIComponent(v));
       }).catch(()=>{});
   }catch(e){}
 })();
