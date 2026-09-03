@@ -1568,8 +1568,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 19:44";
-const APP_VERSION = "03.09 19:44";
+const BUILD = "03.09 19:50";
+const APP_VERSION = "03.09 19:50";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3662,6 +3662,18 @@ try{ subPaint(); subFetch(); }catch(e){}   /* состояние подписк�
    Ответ приходит через секунду-две и молча дорисовывает ступень и планы. */
 try{ progSvesti(true); }catch(e){}                 /* с этого начинается всё, что мы про неё знаем */
 try{ svyazIzSsylki(); }catch(e){}                  /* пришла по ссылке с кодом — свяжем сами */
+/* Самолечение копии со стола: ключ мог протухнуть/отвязаться или прийти пустым при
+   кривой передаче. Тогда всё, что тянется по ключу (история «Поговорить», прогресс,
+   дневник, голос), молча не грузится, а пересвязаться со стола негде. Один раз
+   проверяем ключ; если не годится — сбрасываем и показываем «Осталось связать». */
+try{ if(naEkrane() && klyuchEst()){
+  fetch(KLYUCH_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({op:"proverit", klyuch: klyuchEst()})})
+   .then(r=>r.json()).then(d=>{ if(d && d.valid===false){
+     try{ localStorage.removeItem(KL_KEY); }catch(e){}
+     try{ vneEkran(); }catch(e){}
+   } }).catch(()=>{});
+} }catch(e){}
 /* Один раз с домашнего экрана снимаем размеры окна и отправляем их себе.
    Чёрную полосу под панелью со стола не воспроизвести: она вылезает только
    в настоящем приложении с иконки. Пусть телефон сам расскажет цифрами. */
