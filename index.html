@@ -1568,8 +1568,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 12:21";
-const APP_VERSION = "03.09 12:21";
+const BUILD = "03.09 19:10";
+const APP_VERSION = "03.09 19:10";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3367,7 +3367,7 @@ function renderStage(){
   const zakryto=zakrytoPraktik();
   const idx=stageTest || Math.min(STAGES.length, zakryto+1);
   const st=STAGES[idx-1];
-  const src="stage-"+idx+".jpg?v=3";   /* v=3 — новые персонажи в 4к: без метки телефон достаёт старую картинку из кэша */
+  const src="stage-"+idx+".jpg?v=4";   /* v=4 — на проде stage-*.jpg раньше отдавали 404 и телефон закэшировал «нет файла» по ?v=3; новая метка = новый адрес, картинка скачивается заново */
   $("st-pad").style.background = st.side
     ? "linear-gradient(180deg,"+st.side+" 0 46%,"+st.bot+" 72%,transparent 100%)" : "";
   if($("st-art").dataset.src!==src){ $("st-art").dataset.src=src;
