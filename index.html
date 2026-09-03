@@ -598,17 +598,13 @@ html.doma .screen{padding-bottom:88px;}
   line-height:1.26;text-align:center;text-wrap:balance;margin:12px 0 0;}
 .cd-rule{width:32px;height:1px;margin:11px auto 0;
   background:linear-gradient(90deg,transparent,rgba(233,201,131,.6),transparent);}
-/* верхняя трактовка — на тёмной подложке, чтобы читалась на ярком фоне карты */
-.cd-text{font-size:12.5px;line-height:1.58;color:#E6D8C6;text-align:left;
-  margin:12px auto 0;max-width:34ch;
-  background:rgba(8,5,3,.5);border:1px solid rgba(233,201,131,.1);border-radius:14px;padding:14px 16px;}
-/* «Сегодня» — золотая плашка-действие (вариант 7) */
-.cd-today{margin:12px auto 0;max-width:34ch;text-align:left;padding:14px 16px;border-radius:14px;
-  background:linear-gradient(180deg,rgba(233,201,131,.2),rgba(233,201,131,.07));
-  border:1px solid rgba(233,201,131,.38);
-  font-size:12.5px;line-height:1.58;color:#EFE6D6;}
-.cd-tlab{display:block;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:#F3E1AC;font-weight:700;margin-bottom:5px;}
-.cd-tlab::before{content:"\25B8 ";}
+/* трактовка и «Действие» — широкие тёмные подложки во всю ширину, чтобы читались на ярком фоне */
+.cd-text{font-size:13px;line-height:1.6;color:#E6D8C6;text-align:left;margin:12px 0 0;
+  background:rgba(8,5,3,.5);border:1px solid rgba(233,201,131,.1);border-radius:15px;padding:15px 18px;}
+.cd-today{margin:12px 0 0;text-align:left;padding:15px 18px;border-radius:15px;
+  background:rgba(8,5,3,.5);border:1px solid rgba(233,201,131,.1);border-left:3px solid var(--gold2);
+  font-size:13px;line-height:1.6;color:#E6D8C6;}
+.cd-tlab{display:block;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#F3E1AC;font-weight:700;margin-bottom:6px;}
 .cd-date{margin-left:auto;font-size:10px;letter-spacing:.18em;text-transform:uppercase;
   color:#A8917C;padding-right:4px;}
 #s-section .topbar{padding:16px 14px 0;}
@@ -1384,7 +1380,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
         <div class="cd-title" id="cd-title"></div>
         <div class="cd-rule"></div>
         <p class="cd-text" id="cd-text"></p>
-        <div class="cd-today" id="cd-today"><span class="cd-tlab">Сегодня</span><span id="cd-today-tx"></span></div>
+        <div class="cd-today" id="cd-today"><span class="cd-tlab">Действие</span><span id="cd-today-tx"></span></div>
       </div>
     </div>
   </div>
@@ -1572,8 +1568,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 12:16";
-const APP_VERSION = "03.09 12:16";
+const BUILD = "03.09 12:21";
+const APP_VERSION = "03.09 12:21";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
