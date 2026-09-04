@@ -219,7 +219,7 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
 
    Только на body: он рисует по всей странице, а не по безопасной зоне. */
 html.doma .tabbar{padding-bottom:24px;}
-html.doma .screen{padding-bottom:110px;}
+html.doma .screen{padding-bottom:var(--barpad, 110px);}
 /* Вся вёрстка под экран «Домой» убрана 30.08.2026 — переделываем standalone
    заново. Здесь раньше были standalone-правила и разбор полосы внизу; их больше
    нет. Кнопки «вынести/связать» и связывание не трогаем. */
@@ -243,7 +243,7 @@ html.doma .screen{padding-bottom:110px;}
 
 /* screens */
 /* каждый экран скроллится ВНУТРИ себя (документ не скроллится) — поверх статичного фикс-фона, без пустот при оверскролле */
-.screen{display:none;position:fixed;inset:0;bottom:var(--kb,0px);overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding-bottom:calc(108px + var(--tg-cb, env(safe-area-inset-bottom)));}
+.screen{display:none;position:fixed;inset:0;bottom:var(--kb,0px);overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding-bottom:var(--barpad, calc(108px + var(--tg-cb, env(safe-area-inset-bottom))));}
 .screen.active{display:block;}
 
 /* home */
@@ -459,7 +459,7 @@ html.doma .screen{padding-bottom:110px;}
 /* --- «Поговорить»: переписка --- */
 /* 76px — высота таббара плюс воздух: при 60px нижняя граница поля ввода
    ложилась ровно на его верхнюю грань, и рамки сливались в одну линию */
-#s-talk{display:none;padding-bottom:calc(92px + var(--tg-cb, env(safe-area-inset-bottom)));overflow:hidden;}
+#s-talk{display:none;padding-bottom:var(--barpad, calc(92px + var(--tg-cb, env(safe-area-inset-bottom))));overflow:hidden;}
 #s-talk.active{display:flex;flex-direction:column;}
 /* всё, кроме ленты, прибито (flex:none) — чтобы при клавиатуре бар ввода
    стоял мёртво над ней и не колбасился, как поле правки в дневнике */
@@ -802,7 +802,7 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 
 /* ——— вкладка «Дни»: календарь любви к себе (двойное кольцо) ——— */
 /* экран сам притемняет яркую аврору-фон, чтобы кольца и цифры читались как в макете (тёмный минимализм) */
-#s-dni{overflow:hidden;padding-bottom:calc(90px + var(--tg-cb, env(safe-area-inset-bottom)));background:linear-gradient(180deg,rgba(14,8,4,.52) 0%,rgba(10,6,3,.80) 52%,rgba(9,5,3,.88) 100%);}
+#s-dni{overflow:hidden;padding-bottom:var(--barpad, calc(90px + var(--tg-cb, env(safe-area-inset-bottom))));background:linear-gradient(180deg,rgba(14,8,4,.52) 0%,rgba(10,6,3,.80) 52%,rgba(9,5,3,.88) 100%);}
 #s-dni.active{display:flex;flex-direction:column;}
 .dni-defs{position:absolute;}
 .dni-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 18px 2px;}
@@ -1574,8 +1574,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "04.09 08:24";
-const APP_VERSION = "04.09 08:24";
+const BUILD = "04.09 09:00";
+const APP_VERSION = "04.09 09:00";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1756,6 +1756,29 @@ const $ = s => document.getElementById(s);
     if(t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT")) setTimeout(intoView, 340);
   });
   apply();
+})();
+
+/* Отступ снизу под плавающий бар считаем АВТОМАТИЧЕСКИ по его реальной высоте.
+   Фикс-пиксель ложился криво: у разных телефонов разный home-indicator, высота бара
+   и масштаб шрифта. Меряем, сколько бар реально занимает снизу (высота + его отступ +
+   safe-area), добавляем запас и кладём в --barpad; все экраны берут из него
+   padding-bottom (с фикс-пикселем как запасным вариантом, пока JS не посчитал).
+   При печати (kb-open) бар спрятан — тогда не меряем, иначе получим мусор. */
+(function(){
+  const ZAPAS = 24;
+  function barPad(){
+    if(document.documentElement.classList.contains("kb-open")) return;
+    const bar = document.querySelector(".tabbar"); if(!bar) return;
+    const r = bar.getBoundingClientRect(); if(r.height < 20) return;   /* бар ещё не отрисован */
+    const occ = Math.max(0, Math.round(window.innerHeight - r.top));   /* высота бара + его низ + safe */
+    document.documentElement.style.setProperty("--barpad", (occ + ZAPAS) + "px");
+  }
+  window.__barPad = barPad;
+  addEventListener("load", () => { barPad(); setTimeout(barPad, 300); setTimeout(barPad, 1000); });
+  addEventListener("resize", barPad);
+  addEventListener("orientationchange", () => setTimeout(barPad, 300));
+  try{ if(document.fonts && document.fonts.ready) document.fonts.ready.then(barPad); }catch(e){}
+  setTimeout(barPad, 1500);   /* добор: после раскрытия приложения и загрузки шрифтов */
 })();
 const byId = {}; ALL_SECS.forEach(s=>s.items.forEach(it=>byId[it.id]={...it, secTitle:s.title}));
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
