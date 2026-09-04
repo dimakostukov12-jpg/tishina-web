@@ -928,7 +928,8 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 
 /* ===== МЕДИТАЦИЯ ПО ТАЙМЕРУ ===== */
 #s-timer.active{display:block;}
-.tm-sub{text-align:center;color:#C7B49B;font-size:13px;margin:10px 18px 0;line-height:1.5;}
+.tm-sub{text-align:center;color:#C7B49B;font-size:13px;margin:10px 22px 0;line-height:1.55;}
+#s-timer.running .tm-sub{display:none;}
 .tm-ring{position:relative;width:min(74vw,268px);height:min(74vw,268px);margin:20px auto 4px;}
 .tm-ring svg{width:100%;height:100%;transform:rotate(-90deg);}
 .tm-out{fill:none;stroke:rgba(233,201,131,.22);stroke-width:1;}
@@ -1357,7 +1358,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
   <div class="safetop"></div>
   <div class="topbar"><span class="back" data-back>‹</span>
     <span class="pill"><span class="gsp"></span><span class="pin" style="font-size:15px;padding:6px 16px;white-space:nowrap">Медитация по таймеру</span></span></div>
-  <div class="tm-sub" id="tm-sub">Побудь в тишине. Гонг откроет и закроет практику.</div>
+  <div class="tm-sub" id="tm-sub">Выбери комфортный для себя тайминг для медитации на концентрацию внимания. Здесь не будет голоса — только твои мысли и точка, на которой ты сосредотачиваешь внимание.</div>
   <div class="tm-ring">
     <svg viewBox="0 0 300 300">
       <defs><linearGradient id="tmgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6E7BC"/><stop offset="1" stop-color="#C9A24B"/></linearGradient></defs>
@@ -1662,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "04.09 14:02";
-const APP_VERSION = "04.09 14:02";
+const BUILD = "04.09 14:09";
+const APP_VERSION = "04.09 14:09";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3766,8 +3767,8 @@ function tmBuild(){
   const sl=$("tm-sounds");
   TM_SND.forEach(s=>{const el=document.createElement('div');el.className='tm-snd';el.innerHTML='<span class="ic">'+s.i+'</span><span class="tx"><b>'+s.n+'</b><span>'+s.t+'</span></span>';el.onclick=()=>tmSelSound(s.id,el,sl);sl.appendChild(el);});
   $("tm-mode").addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tmMode=b.dataset.mode;[...$("tm-mode").children].forEach(c=>c.classList.remove('on'));b.classList.add('on');
-    if(tmMode==='sound'){sl.classList.remove('hide');sl.style.maxHeight='420px';if(!tmSound&&sl.children[0])tmSelSound(TM_SND[0].id,sl.children[0],sl);$("tm-sub").textContent='Выбери, что будет звучать всю практику.';}
-    else{sl.classList.add('hide');sl.style.maxHeight='0';tmSound=null;[...sl.children].forEach(c=>c.classList.remove('on'));tmStopBed();$("tm-sub").textContent='Побудь в тишине. Гонг откроет и закроет практику.';}});
+    if(tmMode==='sound'){sl.classList.remove('hide');sl.style.maxHeight='420px';if(!tmSound&&sl.children[0])tmSelSound(TM_SND[0].id,sl.children[0],sl);}
+    else{sl.classList.add('hide');sl.style.maxHeight='0';tmSound=null;[...sl.children].forEach(c=>c.classList.remove('on'));tmStopBed();}});
   $("tm-start").onclick=tmBegin; $("tm-pause").onclick=tmTogglePause; $("tm-stop").onclick=tmReset;
   $("tm-done-ok").onclick=()=>{$("tm-done").classList.remove('on');tmReset();};
 }
