@@ -219,7 +219,7 @@ _t.setBottomBarColor&&_t.setBottomBarColor('#20140D');_t.expand&&_t.expand();}}c
 
    Только на body: он рисует по всей странице, а не по безопасной зоне. */
 html.doma .tabbar{padding-bottom:24px;}
-html.doma .screen{padding-bottom:88px;}
+html.doma .screen{padding-bottom:110px;}
 /* Вся вёрстка под экран «Домой» убрана 30.08.2026 — переделываем standalone
    заново. Здесь раньше были standalone-правила и разбор полосы внизу; их больше
    нет. Кнопки «вынести/связать» и связывание не трогаем. */
@@ -243,7 +243,7 @@ html.doma .screen{padding-bottom:88px;}
 
 /* screens */
 /* каждый экран скроллится ВНУТРИ себя (документ не скроллится) — поверх статичного фикс-фона, без пустот при оверскролле */
-.screen{display:none;position:fixed;inset:0;bottom:var(--kb,0px);overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding-bottom:calc(86px + var(--tg-cb, env(safe-area-inset-bottom)));}
+.screen{display:none;position:fixed;inset:0;bottom:var(--kb,0px);overflow:hidden auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding-bottom:calc(108px + var(--tg-cb, env(safe-area-inset-bottom)));}
 .screen.active{display:block;}
 
 /* home */
@@ -459,7 +459,7 @@ html.doma .screen{padding-bottom:88px;}
 /* --- «Поговорить»: переписка --- */
 /* 76px — высота таббара плюс воздух: при 60px нижняя граница поля ввода
    ложилась ровно на его верхнюю грань, и рамки сливались в одну линию */
-#s-talk{display:none;padding-bottom:calc(76px + var(--tg-cb, env(safe-area-inset-bottom)));overflow:hidden;}
+#s-talk{display:none;padding-bottom:calc(92px + var(--tg-cb, env(safe-area-inset-bottom)));overflow:hidden;}
 #s-talk.active{display:flex;flex-direction:column;}
 /* всё, кроме ленты, прибито (flex:none) — чтобы при клавиатуре бар ввода
    стоял мёртво над ней и не колбасился, как поле правки в дневнике */
@@ -782,6 +782,12 @@ html.doma .screen{padding-bottom:88px;}
 .ob-send{width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;flex:0 0 auto;background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 60%,#C89E4C);position:relative;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-appearance:none;appearance:none;box-shadow:0 0 12px rgba(243,220,160,.5);}
 .ob-send::after{content:"";position:absolute;left:14px;top:12px;border-left:13px solid #3E2918;border-top:8px solid transparent;border-bottom:8px solid transparent;}
 body.ob-open .tabbar{display:none;}
+/* Пока печатает (клавиатура открыта) — прячем нижний бар: при вводе он бесполезен
+   и втискивался между полем и айфоновской панелькой (с галочкой). Поле ввода тогда
+   опускается прямо над клавиатурой. Класс kb-open ставит apply() при --kb>0.
+   Айфоновская панель навигации по полям (стрелки/галочка) — системная, остаётся. */
+html.kb-open .tabbar{display:none;}
+html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bottom:calc(8px + var(--tg-cb, env(safe-area-inset-bottom)));}
 /* плавающий бар: оторван от краёв, скруглён, со своей рамкой и тенью (выбор Димы: №9 + разделители из №6) */
 .tabbar{position:fixed;left:12px;right:12px;bottom:calc(var(--kb,0px) + 10px + var(--tg-cb, env(safe-area-inset-bottom)));z-index:30;display:flex;justify-content:space-around;align-items:center;padding:9px 4px;background:rgba(30,19,11,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(233,201,131,.24);border-radius:24px;box-shadow:0 12px 30px -12px rgba(0,0,0,.85);}
 /* Панель прижата к низу окна. Как ведёт себя низ с домашнего экрана —
@@ -1568,8 +1574,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "03.09 21:20";
-const APP_VERSION = "03.09 21:20";
+const BUILD = "04.09 08:24";
+const APP_VERSION = "04.09 08:24";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1701,6 +1707,8 @@ const $ = s => document.getElementById(s);
     if(v === last) return;
     last = v;
     document.documentElement.style.setProperty("--kb", v + "px");
+    /* печатает → прячем нижний бар и опускаем поле ввода к клавиатуре (см. html.kb-open) */
+    document.documentElement.classList.toggle("kb-open", v > 0);
     if(v) setTimeout(intoView, 60);
     /* прокрутка после переразметки — ловим и мгновение, и конец анимации вьюпорта */
     requestAnimationFrame(pinChat);
