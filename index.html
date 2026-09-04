@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "04.09 14:09";
-const APP_VERSION = "04.09 14:09";
+const BUILD = "04.09 14:31";
+const APP_VERSION = "04.09 14:31";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1985,7 +1985,7 @@ function setTab(tab){
     if(tab==="talk"){ tkRender(); setTimeout(tkScroll,60); tkServerLoad(); }
     if(tab==="profile"){ renderProfile(); try{ progSvesti(true); }catch(e){} }
     if(tab==="vd") vdOpen();
-    if(tab==="dni") renderDni();
+    if(tab==="dni"){ renderDni(); try{ progSvesti(); }catch(e){} }
   }catch(e){}
 }
 
@@ -2105,7 +2105,7 @@ function progSnimok(){
   }));
   let profile=null;
   try{ profile=JSON.parse(localStorage.getItem(PROFKEY)||"null"); }catch(e){}
-  return {v:1, done, cred, lis, notes, favs:favs(), days:practiceDays(),
+  return {v:1, done, cred, lis, notes, favs:favs(), days:practiceDays(), dni:dniAll(),
           seconds:parseInt(localStorage.getItem("tishina_seconds")||"0",10)||0,
           since:localStorage.getItem("tishina_since")||"", profile};
 }
@@ -2141,6 +2141,10 @@ function progPrimenit(p){
   }
   if(p.profile && !localStorage.getItem(PROFKEY)){
     localStorage.setItem(PROFKEY, JSON.stringify(p.profile)); menyalos=true;
+  }
+  if(p.dni && typeof p.dni==="object"){
+    try{ const svod=mergeDni(dniAll(), p.dni); localStorage.setItem(DNIKEY, JSON.stringify(svod)); menyalos=true;
+      const dc=$("s-dni"); if(dc && dc.classList.contains("active")){ try{ renderDni(); }catch(_e){} } }catch(_e){}
   }
   return menyalos;
 }
@@ -3651,6 +3655,24 @@ const DNI_IC={
 const DNI_CROWN='<svg class="dni-cr" viewBox="0 0 24 18"><path class="ln" d="M3.6 15 L2.2 5.6 L7.2 10.2 L12 3.6 L16.8 10.2 L21.8 5.6 L20.4 15"/><path class="ln" d="M3.6 15.2 H20.4"/><circle class="dot" cx="2.2" cy="5.6" r="1.2"/><circle class="dot" cx="12" cy="3.6" r="1.4"/><circle class="dot" cx="21.8" cy="5.6" r="1.2"/></svg>';
 
 function dniAll(){ try{return JSON.parse(localStorage.getItem(DNIKEY)||"{}");}catch(e){return {};} }
+/* объединение двух календарей (своё + пришедшее с сервера) — чтобы ничего не терялось
+   ни со стола, ни из Телеграма. Та же логика, что в pulse/svestiDni на сервере. */
+function mergeDni(a,b){
+  a=a||{}; b=b||{}; const out={};
+  new Set([...Object.keys(a),...Object.keys(b)]).forEach(day=>{
+    const x=a[day]||{}, y=b[day]||{}, e={}, meds={};
+    [...(x.med||[]),...(y.med||[])].forEach(m=>{ if(!m||!m.id)return; const ex=meds[m.id];
+      if(!ex) meds[m.id]={id:m.id,name:m.name||"",min:m.min||0};
+      else{ ex.min=Math.max(ex.min||0,m.min||0); if(!ex.name&&m.name)ex.name=m.name; } });
+    const ma=Object.keys(meds).map(k=>meds[k]); if(ma.length)e.med=ma;
+    const card=x.card||y.card; if(card)e.card=card;
+    const talk=Math.max((+x.talk||0),(+y.talk||0)); if(talk)e.talk=talk;
+    const diary=x.diary||y.diary; if(diary)e.diary=diary;
+    if(x.timer||y.timer)e.timer={n:Math.max((x.timer&&x.timer.n)||0,(y.timer&&y.timer.n)||0),min:Math.max((x.timer&&x.timer.min)||0,(y.timer&&y.timer.min)||0)};
+    if(Object.keys(e).length)out[day]=e;
+  });
+  return out;
+}
 function dniLog(kind,meta,day){
   try{
     day=day||ymdOf(new Date()); const all=dniAll(); const e=all[day]||{};
@@ -3661,6 +3683,7 @@ function dniLog(kind,meta,day){
     else if(kind==="diary"){ e.diary=(meta&&meta.text)||"есть запись"; }
     else if(kind==="timer"){ e.timer=e.timer||{n:0,min:0}; e.timer.n++; e.timer.min+=(meta&&meta.min)||0; }
     all[day]=e; localStorage.setItem(DNIKEY,JSON.stringify(all));
+    try{ progSvesti(); }catch(_s){}          /* календарь уехал на сервер — второй телефон увидит */
   }catch(_e){}
 }
 function dniPractice(){ const s={}; try{ practiceDays().forEach(d=>s[d]=1); }catch(e){} return s; }
