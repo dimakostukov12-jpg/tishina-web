@@ -956,7 +956,9 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 .tm-snd .ic{width:34px;height:34px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(233,201,131,.1);border:1px solid rgba(233,201,131,.3);}
 .tm-snd .tx b{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;font-size:17px;color:#F7ECC6;display:block;}
 .tm-snd .tx span{font-size:12px;color:#B49F89;}
-.tm-start{margin-top:22px;width:100%;-webkit-appearance:none;appearance:none;font-family:'Baskerville','Forum',Georgia,serif;font-size:20px;letter-spacing:.02em;color:#F3DCA0;padding:15px 0;border:1.5px solid #E7C983;border-radius:16px;cursor:pointer;background:rgba(233,201,131,.06);box-shadow:0 0 22px -7px rgba(233,201,131,.45),inset 0 0 22px rgba(233,201,131,.06);}
+.tm-start{position:relative;margin-top:22px;width:100%;-webkit-appearance:none;appearance:none;padding:2px;border:0;border-radius:18px;cursor:pointer;background:transparent;overflow:hidden;isolation:isolate;transform:translateZ(0);box-shadow:0 0 20px -5px rgba(233,201,131,.55);}
+.tm-start .gsp{position:absolute;top:50%;left:50%;width:180%;aspect-ratio:1;margin:-90% 0 0 -90%;z-index:0;pointer-events:none;background:conic-gradient(#6f4f18,#E7C983,#FFF6D8,#E7C983,#B98F3C,#F3E1AC,#FFF6D8,#C9A24B,#6f4f18);animation:gspin 6s linear infinite;}
+.tm-start .tm-in{position:relative;z-index:1;display:block;border-radius:16px;background:rgba(18,11,7,.92);padding:15px 0;font-family:'Baskerville','Forum',Georgia,serif;font-size:20px;letter-spacing:.02em;color:#F3DCA0;text-align:center;}
 .tm-hint{text-align:center;color:#A8927C;font-size:11.5px;margin-top:11px;line-height:1.5;}
 .tm-run{display:none;gap:12px;margin-top:24px;}
 #s-timer.running .tm-run{display:flex;}
@@ -1370,7 +1372,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
       <div class="tm-lbl">Фон</div>
       <div class="tm-toggle" id="tm-mode"><button data-mode="silence" class="on">Тишина</button><button data-mode="sound">Звук</button></div>
       <div class="tm-sounds hide" id="tm-sounds"></div>
-      <button class="tm-start" id="tm-start">Начать</button>
+      <button class="tm-start" id="tm-start"><span class="gsp"></span><span class="tm-in">Начать</span></button>
       <div class="tm-hint">30 секунд на подготовку. Гонг: большой в начале, малый на середине, большой в конце.</div>
     </div>
     <div class="tm-run"><button class="tm-pause" id="tm-pause">Пауза</button><button class="tm-stop" id="tm-stop">Прервать</button></div>
@@ -1657,8 +1659,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "04.09 12:59";
-const APP_VERSION = "04.09 12:59";
+const BUILD = "04.09 13:53";
+const APP_VERSION = "04.09 13:53";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3757,7 +3759,7 @@ function tmBuild(){
   if(tmBuilt)return; tmBuilt=true;
   $("tm-ring").style.strokeDasharray=TMC;
   const ch=$("tm-chips");
-  TM_DUR.forEach(d=>{const b=document.createElement('button');b.className='tm-chip'+(d===tmMin?' on':'');b.innerHTML='<b>'+d+'</b><span>мин</span>';b.onclick=()=>{if(tmRun)return;tmMin=d;[...ch.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');$("tm-clock").textContent=tmFmt(d*60);};ch.appendChild(b);});
+  TM_DUR.forEach(d=>{const b=document.createElement('div');b.className='tm-chip'+(d===tmMin?' on':'');b.innerHTML='<b>'+d+'</b><span>мин</span>';b.onclick=()=>{if(tmRun)return;tmMin=d;[...ch.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');$("tm-clock").textContent=tmFmt(d*60);};ch.appendChild(b);});
   const sl=$("tm-sounds");
   TM_SND.forEach(s=>{const el=document.createElement('div');el.className='tm-snd';el.innerHTML='<span class="ic">'+s.i+'</span><span class="tx"><b>'+s.n+'</b><span>'+s.t+'</span></span>';el.onclick=()=>tmSelSound(s.id,el,sl);sl.appendChild(el);});
   $("tm-mode").addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tmMode=b.dataset.mode;[...$("tm-mode").children].forEach(c=>c.classList.remove('on'));b.classList.add('on');
