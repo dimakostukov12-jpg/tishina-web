@@ -941,11 +941,14 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 .tm-body{padding:0 18px;}
 .tm-lbl{font-family:'Baskerville','Forum',Georgia,serif;font-size:16px;color:#F3DCA0;margin:22px 2px 10px;}
 .tm-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
-.tm-chip{-webkit-appearance:none;appearance:none;font-family:inherit;color:#EFE3D4;padding:11px 0 9px;border-radius:15px;cursor:pointer;text-align:center;border:1px solid rgba(233,201,131,.3);background:linear-gradient(180deg,rgba(44,29,18,.86),rgba(20,13,8,.9));}
-.tm-chip b{font-family:'Baskerville','Forum',Georgia,serif;font-size:21px;font-weight:400;color:#F7ECC6;}
-.tm-chip span{display:block;font-size:10.5px;color:#A8927C;}
-.tm-chip.on{border-color:transparent;background:linear-gradient(180deg,#F6E7BE,#C9A24B);}
-.tm-chip.on b,.tm-chip.on span{color:#1B1108;}
+/* плитки длительности — та же крутящаяся золотая оправа, что у «Начать» */
+.tm-chip{position:relative;overflow:hidden;isolation:isolate;transform:translateZ(0);border-radius:15px;padding:2px;cursor:pointer;}
+.tm-chip .gsp{position:absolute;top:50%;left:50%;width:180%;aspect-ratio:1;margin:-90% 0 0 -90%;z-index:0;pointer-events:none;background:conic-gradient(#6f4f18,#E7C983,#FFF6D8,#E7C983,#B98F3C,#F3E1AC,#FFF6D8,#C9A24B,#6f4f18);animation:gspin 6s linear infinite;}
+.tm-ci{position:relative;z-index:1;border-radius:13px;background:rgba(18,11,7,.92);padding:10px 0 8px;text-align:center;}
+.tm-ci b{font-family:'Baskerville','Forum',Georgia,serif;font-size:21px;font-weight:400;color:#F7ECC6;display:block;}
+.tm-ci span{display:block;font-size:10.5px;color:#A8927C;}
+.tm-chip.on .tm-ci{background:linear-gradient(180deg,#F6E7BE,#C9A24B);}
+.tm-chip.on .tm-ci b,.tm-chip.on .tm-ci span{color:#1B1108;}
 .tm-toggle{display:flex;gap:6px;background:linear-gradient(180deg,rgba(44,29,18,.86),rgba(20,13,8,.9));border:1px solid rgba(233,201,131,.3);border-radius:16px;padding:5px;}
 .tm-toggle button{-webkit-appearance:none;appearance:none;flex:1;font-family:inherit;font-size:14px;color:#C7B49B;background:transparent;border:0;padding:10px 0;border-radius:12px;cursor:pointer;}
 .tm-toggle button.on{color:#1B1108;background:linear-gradient(180deg,#F6E7BE,#C9A24B);font-weight:600;}
@@ -1659,8 +1662,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "04.09 13:58";
-const APP_VERSION = "04.09 13:58";
+const BUILD = "04.09 14:02";
+const APP_VERSION = "04.09 14:02";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3759,7 +3762,7 @@ function tmBuild(){
   if(tmBuilt)return; tmBuilt=true;
   $("tm-ring").style.strokeDasharray=TMC;
   const ch=$("tm-chips");
-  TM_DUR.forEach(d=>{const b=document.createElement('div');b.className='tm-chip'+(d===tmMin?' on':'');b.innerHTML='<b>'+d+'</b><span>мин</span>';b.onclick=()=>{if(tmRun)return;tmMin=d;[...ch.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');$("tm-clock").textContent=tmFmt(d*60);};ch.appendChild(b);});
+  TM_DUR.forEach(d=>{const b=document.createElement('div');b.className='tm-chip'+(d===tmMin?' on':'');b.innerHTML='<span class="gsp"></span><div class="tm-ci"><b>'+d+'</b><span>мин</span></div>';b.onclick=()=>{if(tmRun)return;tmMin=d;[...ch.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');$("tm-clock").textContent=tmFmt(d*60);};ch.appendChild(b);});
   const sl=$("tm-sounds");
   TM_SND.forEach(s=>{const el=document.createElement('div');el.className='tm-snd';el.innerHTML='<span class="ic">'+s.i+'</span><span class="tx"><b>'+s.n+'</b><span>'+s.t+'</span></span>';el.onclick=()=>tmSelSound(s.id,el,sl);sl.appendChild(el);});
   $("tm-mode").addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tmMode=b.dataset.mode;[...$("tm-mode").children].forEach(c=>c.classList.remove('on'));b.classList.add('on');
