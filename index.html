@@ -828,7 +828,7 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 .dni-dn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;font-size:14px;line-height:1;}
 .dni-td{position:absolute;left:50%;bottom:15%;transform:translateX(-50%);z-index:3;display:flex;gap:3px;height:4px;align-items:center;}
 .dni-td i{width:4px;height:4px;border-radius:50%;display:block;}
-.dni-td .m{background:#E9C983;}.dni-td .d{background:#E0A66A;}.dni-td .c{background:#B49BD6;}.dni-td .t{background:#8FC0A9;}
+.dni-td .m{background:#E9C983;}.dni-td .d{background:#E0A66A;}.dni-td .c{background:#B49BD6;}.dni-td .t{background:#8FC0A9;}.dni-td .tm{background:#9FBAD4;}
 .dni-day.sel::before{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle,rgba(233,201,131,.24),rgba(233,201,131,.04));z-index:0;}
 .dni-day.sel .dni-dn{color:#FFF6D8;}
 .dni-day.sel .dni-ring.on{border-color:rgba(233,201,131,.85);box-shadow:inset 0 0 0 3px rgba(11,6,3,.92),0 0 0 4px rgba(233,201,131,.3);}
@@ -841,7 +841,7 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 .dni-row:last-child{border-bottom:0;}
 .dni-ic{flex:0 0 26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(233,201,131,.1);border:1px solid rgba(233,201,131,.16);}
 .dni-ic svg{width:15px;height:15px;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
-.dni-ic.m svg{stroke:#E9C983;}.dni-ic.d svg{stroke:#E0A66A;}.dni-ic.c svg{stroke:#B49BD6;}.dni-ic.t svg{stroke:#8FC0A9;}
+.dni-ic.m svg{stroke:#E9C983;}.dni-ic.d svg{stroke:#E0A66A;}.dni-ic.c svg{stroke:#B49BD6;}.dni-ic.t svg{stroke:#8FC0A9;}.dni-ic.tm svg{stroke:#9FBAD4;}
 .dni-tx{flex:1;min-width:0;}
 .dni-tx b{display:block;font-size:12.5px;color:#F2E9E0;font-weight:600;}
 .dni-tx span{display:block;font-size:11.5px;color:#C9AC98;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -941,27 +941,27 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 .tm-body{padding:0 18px;}
 .tm-lbl{font-family:'Baskerville','Forum',Georgia,serif;font-size:16px;color:#F3DCA0;margin:22px 2px 10px;}
 .tm-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
-.tm-chip{font-family:inherit;color:#EFE3D4;padding:11px 0 9px;border-radius:15px;cursor:pointer;text-align:center;border:1px solid rgba(233,201,131,.3);background:linear-gradient(180deg,rgba(44,29,18,.86),rgba(20,13,8,.9));}
+.tm-chip{-webkit-appearance:none;appearance:none;font-family:inherit;color:#EFE3D4;padding:11px 0 9px;border-radius:15px;cursor:pointer;text-align:center;border:1px solid rgba(233,201,131,.3);background:linear-gradient(180deg,rgba(44,29,18,.86),rgba(20,13,8,.9));}
 .tm-chip b{font-family:'Baskerville','Forum',Georgia,serif;font-size:21px;font-weight:400;color:#F7ECC6;}
 .tm-chip span{display:block;font-size:10.5px;color:#A8927C;}
 .tm-chip.on{border-color:transparent;background:linear-gradient(180deg,#F6E7BE,#C9A24B);box-shadow:0 0 16px rgba(233,201,131,.5);}
 .tm-chip.on b,.tm-chip.on span{color:#1B1108;}
 .tm-toggle{display:flex;gap:6px;background:linear-gradient(180deg,rgba(44,29,18,.86),rgba(20,13,8,.9));border:1px solid rgba(233,201,131,.3);border-radius:16px;padding:5px;}
-.tm-toggle button{flex:1;font-family:inherit;font-size:14px;color:#C7B49B;background:transparent;border:0;padding:10px 0;border-radius:12px;cursor:pointer;}
+.tm-toggle button{-webkit-appearance:none;appearance:none;flex:1;font-family:inherit;font-size:14px;color:#C7B49B;background:transparent;border:0;padding:10px 0;border-radius:12px;cursor:pointer;}
 .tm-toggle button.on{color:#1B1108;background:linear-gradient(180deg,#F6E7BE,#C9A24B);font-weight:600;}
 .tm-sounds{margin-top:10px;display:flex;flex-direction:column;gap:8px;overflow:hidden;transition:max-height .35s,opacity .3s;}
 .tm-sounds.hide{max-height:0;opacity:0;}
 .tm-snd{display:flex;align-items:center;gap:13px;padding:11px 14px;border-radius:15px;cursor:pointer;border:1px solid rgba(233,201,131,.3);background:linear-gradient(180deg,rgba(44,29,18,.8),rgba(20,13,8,.88));}
-.tm-snd.on{border-color:transparent;box-shadow:0 0 0 1.5px #E7C983,0 0 16px rgba(233,201,131,.4);}
+.tm-snd.on{border-color:#E7C983;box-shadow:inset 0 0 18px rgba(233,201,131,.22);}
 .tm-snd .ic{width:34px;height:34px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(233,201,131,.1);border:1px solid rgba(233,201,131,.3);}
 .tm-snd .tx b{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;font-size:17px;color:#F7ECC6;display:block;}
 .tm-snd .tx span{font-size:12px;color:#B49F89;}
-.tm-start{margin-top:22px;width:100%;font-family:'Baskerville','Forum',Georgia,serif;font-size:20px;color:#1B1108;padding:15px 0;border:0;border-radius:16px;cursor:pointer;background:linear-gradient(180deg,#F6E7BE,#D9B675 55%,#C9A24B);box-shadow:0 10px 26px -12px rgba(233,201,131,.7);}
+.tm-start{margin-top:22px;width:100%;-webkit-appearance:none;appearance:none;font-family:'Baskerville','Forum',Georgia,serif;font-size:20px;letter-spacing:.02em;color:#F3DCA0;padding:15px 0;border:1.5px solid #E7C983;border-radius:16px;cursor:pointer;background:rgba(233,201,131,.06);box-shadow:0 0 22px -7px rgba(233,201,131,.45),inset 0 0 22px rgba(233,201,131,.06);}
 .tm-hint{text-align:center;color:#A8927C;font-size:11.5px;margin-top:11px;line-height:1.5;}
 .tm-run{display:none;gap:12px;margin-top:24px;}
 #s-timer.running .tm-run{display:flex;}
 #s-timer.running .tm-setup{display:none;}
-.tm-run button{flex:1;font-family:inherit;font-size:15px;padding:14px 0;border-radius:15px;cursor:pointer;}
+.tm-run button{-webkit-appearance:none;appearance:none;flex:1;font-family:inherit;font-size:15px;padding:14px 0;border-radius:15px;cursor:pointer;}
 .tm-pause{color:#F3DCA0;background:rgba(233,201,131,.09);border:1px solid rgba(233,201,131,.5);}
 .tm-stop{color:#B49F89;background:transparent;border:1px solid rgba(233,201,131,.24);}
 .tm-done{position:fixed;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:40px;text-align:center;background:radial-gradient(120% 80% at 50% 32%,rgba(46,31,17,.95),rgba(14,9,5,.98));}
@@ -969,7 +969,7 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
 .tm-done .k{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#E9C983;}
 .tm-done h2{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;font-size:32px;margin:4px 0 2px;color:#FBF3DF;}
 .tm-done p{color:#C7B49B;font-size:14px;max-width:260px;line-height:1.5;margin:6px 0 22px;}
-.tm-done .ok{font-family:'Baskerville','Forum',Georgia,serif;font-size:18px;color:#1B1108;padding:13px 46px;border:0;border-radius:15px;cursor:pointer;background:linear-gradient(180deg,#F6E7BE,#C9A24B);}
+.tm-done .ok{-webkit-appearance:none;appearance:none;font-family:'Baskerville','Forum',Georgia,serif;font-size:18px;color:#1B1108;padding:13px 46px;border:0;border-radius:15px;cursor:pointer;background:linear-gradient(180deg,#F6E7BE,#C9A24B);}
 
 /* экран с видео */
 #s-start{display:none;} #s-start.active{display:block;}
@@ -1351,7 +1351,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 <section class="screen" id="s-timer">
   <div class="safetop"></div>
   <div class="topbar"><span class="back" data-back>‹</span>
-    <span class="pill"><span class="gsp"></span><span class="pin" style="font-size:17px;padding:5px 15px">Таймер</span></span></div>
+    <span class="pill"><span class="gsp"></span><span class="pin" style="font-size:15px;padding:6px 16px;white-space:nowrap">Медитация по таймеру</span></span></div>
   <div class="tm-sub" id="tm-sub">Побудь в тишине. Гонг откроет и закроет практику.</div>
   <div class="tm-ring">
     <svg viewBox="0 0 300 300">
@@ -1657,8 +1657,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "04.09 12:49";
-const APP_VERSION = "04.09 12:49";
+const BUILD = "04.09 12:59";
+const APP_VERSION = "04.09 12:59";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3638,7 +3638,8 @@ const DNI_IC={
  m:'<svg viewBox="0 0 24 24"><path d="M12 3C6 8 6 16 12 21 18 16 18 8 12 3Z"/><path d="M12 8V19"/></svg>',
  d:'<svg viewBox="0 0 24 24"><path d="M6 4H16A3 3 0 0 1 19 7V21H9A3 3 0 0 1 6 18Z"/><path d="M9 21A3 3 0 0 1 6 18A3 3 0 0 1 9 15H19"/></svg>',
  c:'<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2.4"/><circle cx="12" cy="9" r="1.5"/><path d="M9 14H15"/></svg>',
- t:'<svg viewBox="0 0 24 24"><path d="M5 5H19V15H10L5 19Z"/></svg>'};
+ t:'<svg viewBox="0 0 24 24"><path d="M5 5H19V15H10L5 19Z"/></svg>',
+ tm:'<svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V9.5"/><path d="M12 13.5l2.7 1.7"/><path d="M9.6 3.6h4.8"/><path d="M12 3.6V6.6"/></svg>'};
 /* корона контурная: тонкая золотая линия + камешки-точки на зубцах (выбор Димы, вариант 2).
    Заливки нет — только stroke, поэтому вопрос с градиентом на iOS здесь не стоит. */
 const DNI_CROWN='<svg class="dni-cr" viewBox="0 0 24 18"><path class="ln" d="M3.6 15 L2.2 5.6 L7.2 10.2 L12 3.6 L16.8 10.2 L21.8 5.6 L20.4 15"/><path class="ln" d="M3.6 15.2 H20.4"/><circle class="dot" cx="2.2" cy="5.6" r="1.2"/><circle class="dot" cx="12" cy="3.6" r="1.4"/><circle class="dot" cx="21.8" cy="5.6" r="1.2"/></svg>';
@@ -3652,6 +3653,7 @@ function dniLog(kind,meta,day){
     else if(kind==="card"){ e.card={id:meta.id,name:meta.name||""}; }
     else if(kind==="talk"){ e.talk=(e.talk||0)+1; }
     else if(kind==="diary"){ e.diary=(meta&&meta.text)||"есть запись"; }
+    else if(kind==="timer"){ e.timer=e.timer||{n:0,min:0}; e.timer.n++; e.timer.min+=(meta&&meta.min)||0; }
     all[day]=e; localStorage.setItem(DNIKEY,JSON.stringify(all));
   }catch(_e){}
 }
@@ -3663,10 +3665,11 @@ function dniDay(ymd,prac,dm,all){
   let card=e.card||null, talk=e.talk||0, diary=e.diary||(dm[ymd]||null);
   try{ if(!card && ymd===cdToday()){ const st=cdState(); if(st.d===cdToday() && st.open && st.id) card={id:st.id,name:cdCard(st.id).name}; } }catch(_e){}
   const practiced=!!prac[ymd];
-  const min=med.reduce((s,m)=>s+(m.min||0),0);
-  return {med,card,talk,diary,practiced,min,on:!!(med.length||card||talk||diary||practiced)};
+  const timer=e.timer||null;
+  const min=med.reduce((s,m)=>s+(m.min||0),0)+(timer?timer.min:0);
+  return {med,card,talk,diary,practiced,timer,min,on:!!(med.length||card||talk||diary||practiced||timer)};
 }
-function dniDots(a){ let s=""; if(a.med.length||a.practiced)s+='<i class="m"></i>'; if(a.diary)s+='<i class="d"></i>'; if(a.card)s+='<i class="c"></i>'; if(a.talk)s+='<i class="t"></i>'; return s?'<span class="dni-td">'+s+'</span>':""; }
+function dniDots(a){ let s=""; if(a.med.length||a.practiced)s+='<i class="m"></i>'; if(a.timer)s+='<i class="tm"></i>'; if(a.diary)s+='<i class="d"></i>'; if(a.card)s+='<i class="c"></i>'; if(a.talk)s+='<i class="t"></i>'; return s?'<span class="dni-td">'+s+'</span>':""; }
 
 let dniY, dniM, dniPick;
 function renderDni(){
@@ -3706,6 +3709,7 @@ function dniDetail(ymd){
   let rows="", cnt=0;
   if(a.med.length){ a.med.forEach(m=>{ rows+=dniRow("m","Медитация",m.name?("«"+m.name+"»"):"практика",m.min?m.min+" мин":""); cnt++; }); }
   else if(a.practiced){ rows+=dniRow("m","Медитация","практика была",""); cnt++; }
+  if(a.timer){ rows+=dniRow("tm","Медитация по таймеру",(a.timer.n>1?a.timer.n+" "+plural(a.timer.n,"сессия","сессии","сессий"):"тишина или звук"),(a.timer.min?a.timer.min+" мин":"")); cnt++; }
   if(a.diary){ rows+=dniRow("d","Запись в дневнике",(typeof a.diary==="string"?a.diary:"есть запись"),""); cnt++; }
   if(a.card){ rows+=dniRow("c","Карта дня",a.card.name||"",""); cnt++; }
   if(a.talk){ rows+=dniRow("t","Поговорили",(a.talk>1?a.talk+" "+plural(a.talk,"разговор","разговора","разговоров"):"разговор"),""); cnt++; }
@@ -3771,7 +3775,7 @@ function tmTick(t){
 }
 function tmBegin(){tmRun=true;tmPaused=false;$("s-timer").classList.add('running');tmTotal=tmMin*60;tmEl=0;tmMid=false;tmPhase='prep';$("tm-ring").style.strokeDashoffset=0;$("tm-note").textContent='приготовься';$("tm-pause").textContent='Пауза';const c=tmAC();if(c&&c.state==='suspended')c.resume();haptic('medium');tmLast=performance.now();tmRaf=requestAnimationFrame(tmTick);}
 function tmTogglePause(){tmPaused=!tmPaused;$("tm-pause").textContent=tmPaused?'Продолжить':'Пауза';$("tm-note").textContent=tmPaused?'пауза':(tmPhase==='prep'?'приготовься':'идёт практика');if(tmPaused)tmStopBed();else if(tmPhase==='run'&&tmMode==='sound'&&tmSound)tmBed(tmSound);}
-function tmFinish(){cancelAnimationFrame(tmRaf);tmRun=false;tmStopBed();tmGong(false);$("tm-done-t").textContent=tmMin+' '+tmPlural(tmMin)+' '+(tmMode==='sound'?'практики':'тишины');$("tm-done").classList.add('on');try{haptic('success');}catch(e){}}
+function tmFinish(){cancelAnimationFrame(tmRaf);tmRun=false;tmStopBed();tmGong(false);$("tm-done-t").textContent=tmMin+' '+tmPlural(tmMin)+' '+(tmMode==='sound'?'практики':'тишины');$("tm-done").classList.add('on');try{dniLog("timer",{min:tmMin});}catch(e){}try{haptic('success');}catch(e){}}
 function tmReset(){cancelAnimationFrame(tmRaf);tmRun=false;tmPaused=false;tmPhase='idle';tmMid=false;$("s-timer").classList.remove('running');tmStopBed();tmEl=0;tmTotal=0;$("tm-ring").style.strokeDashoffset=0;$("tm-clock").textContent=tmFmt(tmMin*60);$("tm-note").textContent='готов';$("tm-pause").textContent='Пауза';}
 function openTimer(){tmBuild();tmReset();go("s-timer",true);}
 
