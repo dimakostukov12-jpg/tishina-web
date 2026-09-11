@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "11.09 14:13";
-const APP_VERSION = "11.09 14:13";
+const BUILD = "11.09 14:17";
+const APP_VERSION = "11.09 14:17";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3800,7 +3800,7 @@ function tmBuild(){
   $("tm-mode").addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tmMode=b.dataset.mode;[...$("tm-mode").children].forEach(c=>c.classList.remove('on'));b.classList.add('on');
     if(tmMode==='sound'){sl.classList.remove('hide');sl.style.maxHeight='420px';if(!tmSound&&sl.children[0])tmSelSound(TM_SND[0].id,sl.children[0],sl);}
     else{sl.classList.add('hide');sl.style.maxHeight='0';tmSound=null;[...sl.children].forEach(c=>c.classList.remove('on'));tmStopBed();}});
-  $("tm-start").onclick=tmBegin; $("tm-pause").onclick=tmTogglePause; $("tm-stop").onclick=tmReset;
+  $("tm-start").onclick=tmBegin; $("tm-pause").onclick=tmTogglePause; $("tm-stop").onclick=tmStopAsk;
   $("tm-done-ok").onclick=()=>{$("tm-done").classList.remove('on');tmReset();};
 }
 function tmTick(t){
@@ -3814,6 +3814,20 @@ function tmBegin(){tmRun=true;tmPaused=false;$("s-timer").classList.add('running
 function tmTogglePause(){tmPaused=!tmPaused;$("tm-pause").textContent=tmPaused?'Продолжить':'Пауза';$("tm-note").textContent=tmPaused?'пауза':(tmPhase==='prep'?'приготовься':'идёт практика');if(tmPaused)tmStopBed();else if(tmPhase==='run'&&tmMode==='sound'&&tmSound)tmBed(tmSound);}
 function tmFinish(){cancelAnimationFrame(tmRaf);tmRun=false;tmStopBed();tmGong(false);$("tm-done-t").textContent=tmMin+' '+tmPlural(tmMin)+' '+(tmMode==='sound'?'практики':'тишины');$("tm-done").classList.add('on');try{dniLog("timer",{min:tmMin});}catch(e){}try{haptic('success');}catch(e){}}
 function tmReset(){cancelAnimationFrame(tmRaf);tmRun=false;tmPaused=false;tmPhase='idle';tmMid=false;$("s-timer").classList.remove('running');tmStopBed();tmEl=0;tmTotal=0;$("tm-ring").style.strokeDashoffset=0;$("tm-clock").textContent=tmFmt(tmMin*60);$("tm-note").textContent='готов';$("tm-pause").textContent='Пауза';}
+/* «Прервать» — сначала переспрос, потом прерываем. Идёт практика → спрашиваем;
+   не идёт (idle) → просто выходим без вопроса. */
+function tmStopAsk(){
+  if(!tmRun){tmReset();return;}
+  haptic('rigid');
+  const ask="Практика ещё идёт. Прервать её?";
+  const go=()=>tmReset();
+  try{
+    if(tg&&tg.showPopup){tg.showPopup({title:"Прервать?",message:ask,
+      buttons:[{id:"no",type:"cancel"},{id:"yes",type:"destructive",text:"Прервать"}]},
+      id=>{if(id==="yes")go();});}
+    else if(confirm(ask))go();
+  }catch(e){go();}
+}
 function openTimer(){tmBuild();tmReset();go("s-timer",true);}
 
 press($("tile-max"), ()=>{ hsNazhali(); });   /* плитка «Вынести на экран Домой» — та же кнопка, что была списком выше */
