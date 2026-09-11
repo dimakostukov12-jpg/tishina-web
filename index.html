@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "11.09 12:55";
-const APP_VERSION = "11.09 12:55";
+const BUILD = "11.09 14:13";
+const APP_VERSION = "11.09 14:13";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3778,7 +3778,12 @@ let tmMin=7,tmMode='silence',tmSound=null,tmRun=false,tmPaused=false,tmTotal=0,t
 function tmFmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
 function tmPlural(n){n=Math.abs(n)%100;if(n>=11&&n<=14)return'минут';const d=n%10;return d===1?'минута':(d>=2&&d<=4?'минуты':'минут');}
 function tmAC(){if(!tmCtx){try{tmCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return tmCtx;}
-function tmGong(small){const c=tmAC();if(!c)return;const t=c.currentTime,g=c.createGain();g.connect(c.destination);const peak=small?.3:.5,dur=small?3:5,base=small?196:138;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+.02);g.gain.exponentialRampToValueAtTime(.0008,t+dur);[1,2.02,2.78,3.9].forEach((r,i)=>{const o=c.createOscillator();o.type='sine';o.frequency.value=base*r;const og=c.createGain();og.gain.value=[1,.5,.32,.18][i];o.connect(og);og.connect(g);o.start(t);o.stop(t+dur+.2);});}
+/* Гонг начала/середины/конца — звуковой ФАЙЛ через <audio>, а не WebAudio:
+   тихий режим айфона глушит WebAudio, но НЕ медиа-элемент (как фоновые волны).
+   Тембр тот же, что синтезировали раньше. Разблокируется в жесте (tmBegin). */
+let tmGB=null,tmGH=null;
+function tmGongEl(small){if(small){if(!tmGH){tmGH=new Audio(TM_SND_BASE+"gong-mid.wav");tmGH.preload="auto";}return tmGH;}if(!tmGB){tmGB=new Audio(TM_SND_BASE+"gong.wav");tmGB.preload="auto";}return tmGB;}
+function tmGong(small){const el=tmGongEl(small);try{el.currentTime=0;}catch(e){}el.volume=small?.6:1;el.play().catch(()=>{});}
 function tmPlayer(){if(!tmAudio){tmAudio=new Audio();tmAudio.loop=false;tmAudio.preload='metadata';}return tmAudio;}
 function tmBed(id){const p=tmPlayer();const src=TM_SND_BASE+id+".m4a";try{if(!p.src||p.src.indexOf(src)<0)p.src=src;}catch(e){}p.volume=.85;p.play().catch(()=>{});}
 function tmStopBed(){clearTimeout(tmPv);if(tmAudio){try{tmAudio.pause();}catch(e){}}}
@@ -3805,7 +3810,7 @@ function tmTick(t){
     if(tmPhase==='run'){$("tm-clock").textContent=tmFmt(tmTotal-tmEl);tmDraw();if(!tmMid&&tmEl>=tmTotal/2){tmMid=true;tmGong(true);}if(tmEl>=tmTotal){tmFinish();return;}}}
   tmLast=t;tmRaf=requestAnimationFrame(tmTick);
 }
-function tmBegin(){tmRun=true;tmPaused=false;$("s-timer").classList.add('running');tmTotal=tmMin*60;tmEl=0;tmMid=false;tmPhase='prep';$("tm-ring").style.strokeDashoffset=0;$("tm-note").textContent='приготовься';$("tm-pause").textContent='Пауза';const c=tmAC();if(c&&c.state==='suspended')c.resume();haptic('medium');tmLast=performance.now();tmRaf=requestAnimationFrame(tmTick);}
+function tmBegin(){tmRun=true;tmPaused=false;$("s-timer").classList.add('running');tmTotal=tmMin*60;tmEl=0;tmMid=false;tmPhase='prep';$("tm-ring").style.strokeDashoffset=0;$("tm-note").textContent='приготовься';$("tm-pause").textContent='Пауза';const c=tmAC();if(c&&c.state==='suspended')c.resume();/* разблокируем гонг-файлы внутри жеста, беззвучно (тихий режим айфона иначе не даст сыграть их позже) */try{[tmGongEl(false),tmGongEl(true)].forEach(el=>{el.volume=0;el.play().then(()=>{el.pause();try{el.currentTime=0;}catch(_){}}).catch(()=>{});});}catch(e){}haptic('medium');tmLast=performance.now();tmRaf=requestAnimationFrame(tmTick);}
 function tmTogglePause(){tmPaused=!tmPaused;$("tm-pause").textContent=tmPaused?'Продолжить':'Пауза';$("tm-note").textContent=tmPaused?'пауза':(tmPhase==='prep'?'приготовься':'идёт практика');if(tmPaused)tmStopBed();else if(tmPhase==='run'&&tmMode==='sound'&&tmSound)tmBed(tmSound);}
 function tmFinish(){cancelAnimationFrame(tmRaf);tmRun=false;tmStopBed();tmGong(false);$("tm-done-t").textContent=tmMin+' '+tmPlural(tmMin)+' '+(tmMode==='sound'?'практики':'тишины');$("tm-done").classList.add('on');try{dniLog("timer",{min:tmMin});}catch(e){}try{haptic('success');}catch(e){}}
 function tmReset(){cancelAnimationFrame(tmRaf);tmRun=false;tmPaused=false;tmPhase='idle';tmMid=false;$("s-timer").classList.remove('running');tmStopBed();tmEl=0;tmTotal=0;$("tm-ring").style.strokeDashoffset=0;$("tm-clock").textContent=tmFmt(tmMin*60);$("tm-note").textContent='готов';$("tm-pause").textContent='Пауза';}
