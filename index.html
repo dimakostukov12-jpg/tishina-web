@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "11.09 14:17";
-const APP_VERSION = "11.09 14:17";
+const BUILD = "11.09 14:24";
+const APP_VERSION = "11.09 14:24";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3807,10 +3807,10 @@ function tmTick(t){
   if(!tmRun)return;
   if(!tmPaused){const dt=(t-tmLast)/1000;tmEl+=dt;
     if(tmPhase==='prep'){if(tmEl>=TM_PREP){tmPhase='run';tmEl=0;tmGong(false);if(tmMode==='sound'&&tmSound)tmBed(tmSound);$("tm-note").textContent='идёт практика';}else $("tm-clock").textContent=tmFmt(TM_PREP-tmEl);}
-    if(tmPhase==='run'){$("tm-clock").textContent=tmFmt(tmTotal-tmEl);tmDraw();if(!tmMid&&tmEl>=tmTotal/2){tmMid=true;tmGong(true);}if(tmEl>=tmTotal){tmFinish();return;}}}
+    if(tmPhase==='run'){$("tm-clock").textContent=tmFmt(tmTotal-tmEl);tmDraw();if(tmEl>=tmTotal){tmFinish();return;}}}
   tmLast=t;tmRaf=requestAnimationFrame(tmTick);
 }
-function tmBegin(){tmRun=true;tmPaused=false;$("s-timer").classList.add('running');tmTotal=tmMin*60;tmEl=0;tmMid=false;tmPhase='prep';$("tm-ring").style.strokeDashoffset=0;$("tm-note").textContent='приготовься';$("tm-pause").textContent='Пауза';const c=tmAC();if(c&&c.state==='suspended')c.resume();/* разблокируем гонг-файлы внутри жеста, беззвучно (тихий режим айфона иначе не даст сыграть их позже) */try{[tmGongEl(false),tmGongEl(true)].forEach(el=>{el.volume=0;el.play().then(()=>{el.pause();try{el.currentTime=0;}catch(_){}}).catch(()=>{});});}catch(e){}haptic('medium');tmLast=performance.now();tmRaf=requestAnimationFrame(tmTick);}
+function tmBegin(){tmRun=true;tmPaused=false;$("s-timer").classList.add('running');tmTotal=tmMin*60;tmEl=0;tmMid=false;tmPhase='prep';$("tm-ring").style.strokeDashoffset=0;$("tm-note").textContent='приготовься';$("tm-pause").textContent='Пауза';const c=tmAC();if(c&&c.state==='suspended')c.resume();/* разблокируем гонг-файлы внутри жеста, беззвучно (тихий режим айфона иначе не даст сыграть их позже) */try{[tmGongEl(false)].forEach(el=>{el.volume=0;el.play().then(()=>{el.pause();try{el.currentTime=0;}catch(_){}}).catch(()=>{});});}catch(e){}haptic('medium');tmLast=performance.now();tmRaf=requestAnimationFrame(tmTick);}
 function tmTogglePause(){tmPaused=!tmPaused;$("tm-pause").textContent=tmPaused?'Продолжить':'Пауза';$("tm-note").textContent=tmPaused?'пауза':(tmPhase==='prep'?'приготовься':'идёт практика');if(tmPaused)tmStopBed();else if(tmPhase==='run'&&tmMode==='sound'&&tmSound)tmBed(tmSound);}
 function tmFinish(){cancelAnimationFrame(tmRaf);tmRun=false;tmStopBed();tmGong(false);$("tm-done-t").textContent=tmMin+' '+tmPlural(tmMin)+' '+(tmMode==='sound'?'практики':'тишины');$("tm-done").classList.add('on');try{dniLog("timer",{min:tmMin});}catch(e){}try{haptic('success');}catch(e){}}
 function tmReset(){cancelAnimationFrame(tmRaf);tmRun=false;tmPaused=false;tmPhase='idle';tmMid=false;$("s-timer").classList.remove('running');tmStopBed();tmEl=0;tmTotal=0;$("tm-ring").style.strokeDashoffset=0;$("tm-clock").textContent=tmFmt(tmMin*60);$("tm-note").textContent='готов';$("tm-pause").textContent='Пауза';}
