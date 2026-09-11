@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "07.09 13:39";
-const APP_VERSION = "07.09 13:39";
+const BUILD = "11.09 12:55";
+const APP_VERSION = "11.09 12:55";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3772,7 +3772,7 @@ press($("mn-timer"), openTimer);
 /* ===== МЕДИТАЦИЯ ПО ТАЙМЕРУ ===== */
 const TM_DUR=[7,15,20,27,33,60];
 const TM_SND=[{id:'storm',n:'Гроза',t:'гром и дождь',i:'⛈️'},{id:'fire',n:'Костёр',t:'пляж, костёр, сверчки',i:'🔥'},{id:'bowls',n:'Чаши',t:'тибетские поющие чаши',i:'🕉️'},{id:'sea',n:'Море',t:'море, дельфины, киты',i:'🌊'}];
-const TM_SND_BASE="https://botrtmarhpvqdozhouli.supabase.co/storage/v1/object/public/media/timer/";  /* полные файлы ~88 мин (длиннее любой сессии — крутим БЕЗ петли, как в «Пацанах»), стрим по range */
+const TM_SND_BASE="https://s3.ru1.storage.beget.cloud/e3b8b9b2fb74-immersia-s3/media/timer/";  /* полные файлы ~88 мин (длиннее любой сессии — крутим БЕЗ петли, как в «Пацанах»), стрим по range */
 const TM_PREP=30, TMR=130, TMC=2*Math.PI*TMR;
 let tmMin=7,tmMode='silence',tmSound=null,tmRun=false,tmPaused=false,tmTotal=0,tmEl=0,tmRaf=0,tmLast=0,tmPhase='idle',tmMid=false,tmBuilt=false,tmAudio=null,tmCtx=null,tmPv=0;
 function tmFmt(s){s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
