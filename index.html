@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "13.09 13:42";
-const APP_VERSION = "13.09 13:42";
+const BUILD = "13.09 13:59";
+const APP_VERSION = "13.09 13:59";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3417,6 +3417,15 @@ $("ob-input").addEventListener("input",function(){ this.style.height="auto"; thi
    (fallback на expand). Из-под шапки контент уводит наша safe-area (--tg-ct).
    Работает ТОЛЬКО внутри Телеграма; на standalone (рабочий стол) не влияет. */
 function fsKick(t){ try{
+  /* Fullscreen просим ТОЛЬКО на телефоне: мобильная платформа + узкий экран.
+     Комп/планшет (iPad и пр.) — не зовём, Телеграм сам показывает аккуратное
+     окно, ничего не растягивается уродски. Телефон по узкой стороне экрана
+     (~375–430) невозможно спутать с планшетом (iPad ≥768) или монитором.
+     Если размеры не читаются — считаем «не телефон» (безопасно: окно). */
+  var p=String((t.platform||"")).toLowerCase();
+  var mob=(p==="ios"||p==="android"||p==="android_x");
+  var uzk=Math.min((screen&&screen.width)||9999,(screen&&screen.height)||9999)<=600;
+  if(!(mob&&uzk)) return;
   if(t.requestFullscreen && (!t.isVersionAtLeast || t.isVersionAtLeast('8.0'))){
     try{ t.disableVerticalSwipes && t.disableVerticalSwipes(); }catch(e){}
     var k=function(){ try{ t.requestFullscreen(); }catch(e){} };
