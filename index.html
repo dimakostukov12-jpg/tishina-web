@@ -1048,10 +1048,10 @@ html.narrow .mn-t{font-size:18px;} html.narrow .mn-s{max-width:70%;}
 .lk-ic svg{width:24px;height:24px;fill:none;stroke:#F3E1AC;stroke-width:1.5;
   stroke-linecap:round;stroke-linejoin:round;}
 .lk h3{font-family:'Baskerville','Forum',Georgia,serif;font-weight:400;font-size:23px;
-  color:#F4E7D6;margin:0 0 9px;line-height:1.2;}
-.lk p{font-size:13px;color:#C0A793;line-height:1.6;margin:0 0 6px;}
+  color:#F4E7D6;margin:0 0 9px;line-height:1.2;text-wrap:balance;}
+.lk p{font-size:13px;color:#C0A793;line-height:1.6;margin:0 0 6px;text-wrap:balance;}
 .lk .sb-btn{margin-top:15px;}
-.lk .again{margin-top:11px;font-size:12px;color:#8E7A67;cursor:pointer;}
+.lk .again{margin-top:11px;font-size:12px;color:#8E7A67;cursor:pointer;text-wrap:balance;}
 .lk .again u{color:#E9C983;text-decoration:none;}
 
 /* ---------- под разные телефоны ----------
@@ -1638,7 +1638,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
     <p>Дневник, инсайты и ступени сейчас закрыты вместе с приложением.</p>
     <div class="sb-btn" id="lk-extend">Продлить подписку</div>
     <div class="again" id="lk-again">Уже оплатила? <u>Проверить ещё раз</u></div>
-    <div class="again" id="lk-help">Подписка есть, а доступа нет? <u>Напиши в поддержку</u></div>
+    <div class="again" id="lk-help">Подписка есть, а доступа нет?<br><u>Напиши в поддержку</u></div>
   </div>
 </div>
 
@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "13.09 14:08";
-const APP_VERSION = "13.09 14:08";
+const BUILD = "13.09 14:15";
+const APP_VERSION = "13.09 14:15";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3028,7 +3028,7 @@ function subLock(){
     $("lk-text").textContent = v.inClub
       ? ("Твоя подписка закончилась" + (v.until ? " " + subFull(v.until) : "") +
          ". Продли — и практики, дневник и разговоры снова откроются.")
-      : "«Иммерсия» открыта участникам клуба «Заново сиять». Вступи в клуб — и практики, дневник и разговоры откроются сразу.";
+      : "«Иммерсия» открыта только участникам клуба. Вступи в клуб — и практики, дневник и разговоры откроются сразу.";
     $("lk-extend").textContent = v.inClub ? "Продлить подписку" : "Вступить в клуб";
   }
 }
