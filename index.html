@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "13.09 13:59";
-const APP_VERSION = "13.09 13:59";
+const BUILD = "13.09 14:08";
+const APP_VERSION = "13.09 14:08";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3024,10 +3024,12 @@ function subLock(){
   el.classList.toggle("on", locked);
   document.body.classList.toggle("locked", locked);
   if(locked){
-    $("lk-title").textContent = v.inClub ? "Подписка закончилась" : "Нужна подписка";
+    $("lk-title").textContent = v.inClub ? "Подписка закончилась" : "Только для участников клуба";
     $("lk-text").textContent = v.inClub
-      ? "Практики, дневник и разговоры сейчас закрыты. Чтобы продолжить, продли подписку."
-      : "Чтобы открыть практики, дневник и разговоры, оформи подписку.";
+      ? ("Твоя подписка закончилась" + (v.until ? " " + subFull(v.until) : "") +
+         ". Продли — и практики, дневник и разговоры снова откроются.")
+      : "«Иммерсия» открыта участникам клуба «Заново сиять». Вступи в клуб — и практики, дневник и разговоры откроются сразу.";
+    $("lk-extend").textContent = v.inClub ? "Продлить подписку" : "Вступить в клуб";
   }
 }
 async function subFetch(force){
