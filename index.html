@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "11.09 14:24";
-const APP_VERSION = "11.09 14:24";
+const BUILD = "13.09 13:33";
+const APP_VERSION = "13.09 13:33";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3771,7 +3771,8 @@ press($("mn-timer"), openTimer);
 
 /* ===== МЕДИТАЦИЯ ПО ТАЙМЕРУ ===== */
 const TM_DUR=[7,15,20,27,33,60];
-const TM_SND=[{id:'storm',n:'Гроза',t:'гром и дождь',i:'⛈️'},{id:'fire',n:'Костёр',t:'пляж, костёр, сверчки',i:'🔥'},{id:'bowls',n:'Чаши',t:'тибетские поющие чаши',i:'🕉️'},{id:'sea',n:'Море',t:'море, дельфины, киты',i:'🌊'}];
+const TM_SND=[{id:'storm',n:'Гроза',t:'гром и дождь',i:'⛈️'},{id:'fire',n:'Костёр',t:'пляж, костёр, сверчки',i:'🔥'},{id:'izobilie',n:'Изобилие',t:'музыка изобилия, 888 Гц',i:'✨'},{id:'sea',n:'Море',t:'море, дельфины, киты',i:'🌊'}];
+const TM_EXT={izobilie:"mp3"};  /* у кого расширение не .m4a */
 const TM_SND_BASE="https://s3.ru1.storage.beget.cloud/e3b8b9b2fb74-immersia-s3/media/timer/";  /* полные файлы ~88 мин (длиннее любой сессии — крутим БЕЗ петли, как в «Пацанах»), стрим по range */
 const TM_PREP=30, TMR=130, TMC=2*Math.PI*TMR;
 let tmMin=7,tmMode='silence',tmSound=null,tmRun=false,tmPaused=false,tmTotal=0,tmEl=0,tmRaf=0,tmLast=0,tmPhase='idle',tmMid=false,tmBuilt=false,tmAudio=null,tmCtx=null,tmPv=0;
@@ -3785,7 +3786,7 @@ let tmGB=null,tmGH=null;
 function tmGongEl(small){if(small){if(!tmGH){tmGH=new Audio(TM_SND_BASE+"gong-mid.wav");tmGH.preload="auto";}return tmGH;}if(!tmGB){tmGB=new Audio(TM_SND_BASE+"gong.wav");tmGB.preload="auto";}return tmGB;}
 function tmGong(small){const el=tmGongEl(small);try{el.currentTime=0;}catch(e){}el.volume=small?.6:1;el.play().catch(()=>{});}
 function tmPlayer(){if(!tmAudio){tmAudio=new Audio();tmAudio.loop=false;tmAudio.preload='metadata';}return tmAudio;}
-function tmBed(id){const p=tmPlayer();const src=TM_SND_BASE+id+".m4a";try{if(!p.src||p.src.indexOf(src)<0)p.src=src;}catch(e){}p.volume=.85;p.play().catch(()=>{});}
+function tmBed(id){const p=tmPlayer();const src=TM_SND_BASE+id+"."+(TM_EXT[id]||"m4a");try{if(!p.src||p.src.indexOf(src)<0)p.src=src;}catch(e){}p.volume=.85;p.play().catch(()=>{});}
 function tmStopBed(){clearTimeout(tmPv);if(tmAudio){try{tmAudio.pause();}catch(e){}}}
 function tmPreview(id){const c=tmAC();if(c&&c.state==='suspended')c.resume();clearTimeout(tmPv);tmBed(id);if(!tmRun)tmPv=setTimeout(()=>{if(!tmRun)tmStopBed();},12000);}
 function tmDraw(){const p=tmTotal?Math.min(1,tmEl/tmTotal):0;$("tm-ring").style.strokeDashoffset=(TMC*p).toFixed(1);}
