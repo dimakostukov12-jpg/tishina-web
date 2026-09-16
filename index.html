@@ -1051,6 +1051,11 @@ html.narrow .mn-t{font-size:18px;} html.narrow .mn-s{max-width:70%;}
 #s-lock{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
   padding:26px;background:rgba(10,6,4,.82);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);}
 #s-lock.on{display:flex;}
+.lk-back{position:absolute;left:14px;top:calc(var(--tg-ct, env(safe-area-inset-top)) + 14px);z-index:3;
+  display:flex;align-items:center;gap:4px;border:1px solid rgba(233,201,131,.28);background:rgba(24,15,9,.6);
+  color:#E9C983;font-family:'Baskerville','Forum',Georgia,serif;font-size:15px;padding:8px 14px 8px 11px;
+  border-radius:999px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.lk-back:active{transform:scale(.96);}
 .lk{max-width:330px;width:100%;text-align:center;border-radius:20px;padding:24px 20px 20px;
   border:1px solid rgba(233,201,131,.3);background:rgba(24,15,9,.96);
   box-shadow:0 20px 50px rgba(0,0,0,.6);}
@@ -1642,6 +1647,7 @@ html.narrow .d-pill .pin{font-size:14.5px;padding:5px 11px;}
 </section>
 
 <div id="s-lock">
+  <button class="lk-back" id="lk-back" style="display:none">‹ Назад</button>
   <div class="lk">
     <div class="lk-ic"><svg viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/><circle cx="12" cy="15.2" r="1.1"/></svg></div>
     <h3 id="lk-title">Подписка закончилась</h3>
@@ -1674,8 +1680,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "16.09 21:57";
-const APP_VERSION = "16.09 21:57";
+const BUILD = "16.09 22:14";
+const APP_VERSION = "16.09 22:14";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -3045,11 +3051,20 @@ function showJoin(closable){
   $("lk-title").textContent="Только участникам клуба";
   $("lk-text").textContent="Эта практика откроется, когда ты вступишь в клуб. Три экстренные и карта дня уже открыты — попробуй сейчас.";
   try{ $("lk-extend").textContent="Вступить в клуб"; }catch(e){}
+  try{ $("lk-back").style.display=""; }catch(e){}   /* гостю всегда даём выйти назад к бесплатному */
   el.classList.add("on"); document.body.classList.add("locked"); haptic("light");
+}
+/* «Назад» из гостевого окна: закрыть и вернуться к доступному.
+   Если сзади закрытая вкладка («Поговорить»/дневник) — уводим на Главную. */
+function joinBack(){
+  hideJoin();
+  const act=document.querySelector(".screen.active");
+  if(act && (act.id==="s-talk" || act.id==="s-vd")) setTab("main");
 }
 function hideJoin(){
   const el=$("s-lock"); if(!el || !el._join) return;
   el._join=false; el.classList.remove("on"); document.body.classList.remove("locked");
+  try{ $("lk-back").style.display="none"; }catch(e){}
 }
 function subLock(){
   const el=$("s-lock"); if(!el) return;
@@ -3909,6 +3924,7 @@ press($("sb-cancel"), ()=>{
 press($("lk-extend"), ()=>{ haptic("medium"); subOpenBot(); });
 /* гостевое окошко закрывается тапом по затемнению вокруг карточки */
 try{ $("s-lock").addEventListener("click", e=>{ if(e.target && e.target.id==="s-lock" && $("s-lock")._closable) hideJoin(); }); }catch(e){}
+try{ press($("lk-back"), joinBack); }catch(e){}
 press($("lk-help"),   openHelp);
 press($("lk-again"),  ()=>{ haptic("light"); $("lk-again").innerHTML="проверяю…"; subFetch(true)
   .then(()=>setTimeout(()=>{ $("lk-again").innerHTML='Уже оплатила? <u>Проверить ещё раз</u>'; },900)); });
