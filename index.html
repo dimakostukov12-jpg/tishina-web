@@ -1680,8 +1680,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "16.09 22:14";
-const APP_VERSION = "16.09 22:14";
+const BUILD = "16.09 22:32";
+const APP_VERSION = "16.09 22:32";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1998,7 +1998,7 @@ function setTab(tab){
   showScreen(TAB_SCREEN[tab]);                 /* экран открываем ПЕРВЫМ */
   try{ hideJoin(); }catch(e){}                  /* сменили вкладку — гостевое окошко закрываем */
   try{                                          /* сбой отрисовки больше не блокирует переход */
-    if(GUEST && (tab==="talk" || tab==="vd")){ showJoin(false); return; }  /* гость: «Поговорить» и дневник закрыты наглухо (уйти можно другой вкладкой) */
+    if(guestNow() && (tab==="talk" || tab==="vd")){ showJoin(false); return; }  /* не-подписчик: «Поговорить» и дневник закрыты (уйти можно другой вкладкой) */
     if(tab==="main") renderMain();
     if(tab==="fav") renderFav();
     if(tab==="talk"){ tkRender(); setTimeout(tkScroll,60); tkServerLoad(); }
@@ -2433,9 +2433,14 @@ const LOCK_ON=false;          /* замок включается только к
 /* Гостевой режим (превью фримиума): ?guest=1 в адресе → закрытые практики под
    замком, «Поговорить» и дневник закрыты, открыты 3 экстренные + карта дня.
    Реальных пользователей НЕ трогает (только по флагу). */
-const GUEST=/[?&]guest=1/.test(location.search);
+const GUEST=/[?&]guest=1/.test(location.search);   /* ?guest=1 — принудительно гость (для теста) */
 const FREE_IDS={"em-dialog":1,"em-ya-otpuskayu":1,"em-samotsennost":1};
-function isLocked(id){ return GUEST && !FREE_IDS[id]; }
+/* Не-подписчик ПРЯМО СЕЙЧАС: клуб ответил «подписки нет», и защита не держит.
+   Та же логика, что у замка (subLock): «неизвестно»/сбой/сутки после «активна»
+   НЕ считаем гостем — чтобы не запереть оплатившую при сбое клуба. */
+function notSub(){ const v=(subLoad()||{}).v; return !!(v && v.state==="none") && !subMorgnul(); }
+function guestNow(){ return GUEST || notSub(); }
+function isLocked(id){ return guestNow() && !FREE_IDS[id]; }
 const START_VIDEO="";
 const STARTKEY="tishina_start";
 function startSeen(){ return localStorage.getItem(STARTKEY)==="1"; }
@@ -2558,11 +2563,8 @@ function rowHTML(it){
     '<div class="rt"><div class="rdesc">'+it.desc+'</div>'+
     '<div class="rbot"><span class="dur">'+it.dur+'</span>'+(lk?'<span class="plc lockc">'+LKSVG+'</span>':'<span class="plc"></span>')+'</div></div>';
 }
-function openSection(id){
-  const sec=ALL_SECS.find(s=>s.id===id);
-  $("sec-title").textContent=sec.title;
-  $("sec-sub").textContent=sec.intro||sec.sub;
-  const _sb=SECBG[sec.id]; $("sec-bg").style.backgroundImage=_sb?("url("+_sb+")"):"none";
+let curSec=null;
+function fillSec(sec){
   const list=$("sec-list"); list.innerHTML="";
   if(!sec.items.length){
     list.innerHTML='<div class="soon"><div class="big">Скоро</div>Медитации этого раздела уже записываются. Совсем скоро они появятся здесь.</div>';
@@ -2573,7 +2575,21 @@ function openSection(id){
       list.appendChild(r);
     });
   }
+}
+function openSection(id){
+  const sec=ALL_SECS.find(s=>s.id===id); if(!sec) return; curSec=id;
+  $("sec-title").textContent=sec.title;
+  $("sec-sub").textContent=sec.intro||sec.sub;
+  const _sb=SECBG[sec.id]; $("sec-bg").style.backgroundImage=_sb?("url("+_sb+")"):"none";
+  fillSec(sec);
   go("s-section",true);
+}
+/* статус подписки пришёл/сменился — применяем замки к открытому разделу и
+   закрытым вкладкам, чтобы не было «отрисовали без статуса → потом замки». */
+function guestSync(){
+  const act=document.querySelector(".screen.active"); if(!act) return;
+  if(act.id==="s-section" && curSec){ const s=ALL_SECS.find(x=>x.id===curSec); if(s) fillSec(s); }
+  if(act.id==="s-talk" || act.id==="s-vd"){ if(guestNow()) showJoin(false); else hideJoin(); }
 }
 
 /* ---------- player ---------- */
@@ -2954,7 +2970,7 @@ function subLink(){
 function subPaint(){
   const e=$("tv-sub"), c=subLoad();
   if(e) e.textContent=subText(c && c.v);
-  try{ subScreen(); subLock(); }catch(_){}
+  try{ subScreen(); subLock(); guestSync(); }catch(_){}
 }
 /* полные даты для экрана подписки: «3 сентября 2026» */
 function subFull(s){
