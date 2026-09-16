@@ -641,6 +641,14 @@ html.doma .screen{padding-bottom:var(--barpad, 110px);}
 .dur{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(246,238,221,.6);}
 .plc{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#FBEBBE,#E7C983 55%,#C89E4C);position:relative;flex:0 0 auto;box-shadow:0 0 10px rgba(243,220,160,.4);}
 .plc::after{content:"";position:absolute;left:15px;top:11px;border-left:12px solid #503621;border-top:8px solid transparent;border-bottom:8px solid transparent;}
+/* гостевой замок на закрытой практике (превью фримиума) */
+.cframe .cov{position:relative;}
+.cframe.lkd .cov{filter:grayscale(.34) brightness(.55);}
+.lkchip{position:absolute;right:6px;top:6px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:rgba(16,10,5,.62);border:1px solid rgba(233,201,131,.55);z-index:2;}
+.lkchip svg{width:13px;height:13px;}
+.plc.lockc{background:rgba(16,10,5,.5);border:1px solid rgba(233,201,131,.5);box-shadow:none;display:grid;place-items:center;}
+.plc.lockc::after{display:none;}
+.plc.lockc svg{width:16px;height:16px;}
 .soon{padding:40px 24px;text-align:center;color:#B9B3AE;}
 .soon .big{font-family:'Baskerville','Forum',Georgia,serif;font-size:22px;color:#F3DCA0;margin-bottom:8px;}
 .empty{padding:56px 30px;text-align:center;color:#B9B3AE;}
@@ -1663,8 +1671,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "16.09 16:02";
-const APP_VERSION = "16.09 16:02";
+const BUILD = "16.09 16:33";
+const APP_VERSION = "16.09 16:33";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -1979,7 +1987,9 @@ function setTab(tab){
   curTab=tab; stack=[TAB_SCREEN[tab]];
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.tab===tab));
   showScreen(TAB_SCREEN[tab]);                 /* экран открываем ПЕРВЫМ */
+  try{ hideJoin(); }catch(e){}                  /* сменили вкладку — гостевое окошко закрываем */
   try{                                          /* сбой отрисовки больше не блокирует переход */
+    if(GUEST && (tab==="talk" || tab==="vd")){ showJoin(); return; }  /* гость: «Поговорить» и дневник закрыты */
     if(tab==="main") renderMain();
     if(tab==="fav") renderFav();
     if(tab==="talk"){ tkRender(); setTimeout(tkScroll,60); tkServerLoad(); }
@@ -2411,6 +2421,12 @@ async function vdDone(){
    и ничего не загораживает. Как только файл появится, раздел сам становится
    первым шагом плана — до просмотра практика в плане не показывается. */
 const LOCK_ON=false;          /* замок включается только когда база готова */
+/* Гостевой режим (превью фримиума): ?guest=1 в адресе → закрытые практики под
+   замком, «Поговорить» и дневник закрыты, открыты 3 экстренные + карта дня.
+   Реальных пользователей НЕ трогает (только по флагу). */
+const GUEST=/[?&]guest=1/.test(location.search);
+const FREE_IDS={"em-dialog":1,"em-ya-otpuskayu":1,"em-samotsennost":1};
+function isLocked(id){ return GUEST && !FREE_IDS[id]; }
 const START_VIDEO="";
 const STARTKEY="tishina_start";
 function startSeen(){ return localStorage.getItem(STARTKEY)==="1"; }
@@ -2526,10 +2542,12 @@ function renderHome(){
 }
 
 /* ---------- render section ---------- */
+const LKSVG='<svg viewBox="0 0 24 24" fill="none" stroke="#F3E1AC" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></svg>';
 function rowHTML(it){
-  return '<div class="frame cframe"><div class="cov cov-'+it.cover+'"></div></div>'+
+  const lk=isLocked(it.id);
+  return '<div class="frame cframe'+(lk?' lkd':'')+'"><div class="cov cov-'+it.cover+'">'+(lk?'<span class="lkchip">'+LKSVG+'</span>':'')+'</div></div>'+
     '<div class="rt"><div class="rdesc">'+it.desc+'</div>'+
-    '<div class="rbot"><span class="dur">'+it.dur+'</span><span class="plc"></span></div></div>';
+    '<div class="rbot"><span class="dur">'+it.dur+'</span>'+(lk?'<span class="plc lockc">'+LKSVG+'</span>':'<span class="plc"></span>')+'</div></div>';
 }
 function openSection(id){
   const sec=ALL_SECS.find(s=>s.id===id);
@@ -2542,7 +2560,7 @@ function openSection(id){
   } else {
     sec.items.forEach(it=>{
       const r=document.createElement("div"); r.className="lrow"; r.innerHTML=rowHTML(it);
-      press(r,()=>openDetail(it.id));
+      press(r,()=> isLocked(it.id) ? showJoin() : openDetail(it.id));
       list.appendChild(r);
     });
   }
@@ -3017,6 +3035,19 @@ function subMorgnul(){
   return !!(z.until && z.until >= segodnya);         /* оплаченный срок ещё не вышел */
 }
 
+/* Гостевое окошко «Вступить в клуб» по тапу на закрытое (превью фримиума).
+   В отличие от настоящего замка — закрывается тапом по фону. */
+function showJoin(){
+  const el=$("s-lock"); if(!el) return; el._join=true;
+  $("lk-title").textContent="Только участникам клуба";
+  $("lk-text").textContent="Эта практика откроется, когда ты вступишь в клуб. Три экстренные и карта дня уже открыты — попробуй сейчас.";
+  try{ $("lk-extend").textContent="Вступить в клуб"; }catch(e){}
+  el.classList.add("on"); document.body.classList.add("locked"); haptic("light");
+}
+function hideJoin(){
+  const el=$("s-lock"); if(!el || !el._join) return;
+  el._join=false; el.classList.remove("on"); document.body.classList.remove("locked");
+}
 function subLock(){
   const el=$("s-lock"); if(!el) return;
   const v=(subLoad()||{}).v;
@@ -3872,6 +3903,8 @@ press($("sb-cancel"), ()=>{
   }catch(e){ go(); }
 });
 press($("lk-extend"), ()=>{ haptic("medium"); subOpenBot(); });
+/* гостевое окошко закрывается тапом по затемнению вокруг карточки */
+try{ $("s-lock").addEventListener("click", e=>{ if(e.target && e.target.id==="s-lock") hideJoin(); }); }catch(e){}
 press($("lk-help"),   openHelp);
 press($("lk-again"),  ()=>{ haptic("light"); $("lk-again").innerHTML="проверяю…"; subFetch(true)
   .then(()=>setTimeout(()=>{ $("lk-again").innerHTML='Уже оплатила? <u>Проверить ещё раз</u>'; },900)); });
