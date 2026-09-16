@@ -863,6 +863,9 @@ html.kb-open #s-talk,html.kb-open #s-svyaz,html.kb-open #s-vd.editing{padding-bo
    строка css — background-image на файл. */
 #s-main{display:none;} #s-main.active{display:block;}
 .mn{padding:6px 16px calc(84px + var(--tg-cb, env(safe-area-inset-bottom)));}
+/* ВРЕМЕННО скрыто (16.09.2026, по просьбе): напоминания-план сверху и «С чего
+   начать» — пока пусто. Вернуть — удалить эту строку. */
+#mn-lbl,#mn-plan,#mn-start{display:none;}
 .mn-hi{font-family:'Baskerville','Forum',Georgia,serif;font-size:25px;color:#F4E7D6;line-height:1.12;}
 .mn-hi span{display:block;font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   font-size:11px;letter-spacing:.02em;color:#B49F89;margin-top:4px;}
@@ -1671,8 +1674,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "16.09 16:51";
-const APP_VERSION = "16.09 16:51";
+const BUILD = "16.09 21:51";
+const APP_VERSION = "16.09 21:51";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
