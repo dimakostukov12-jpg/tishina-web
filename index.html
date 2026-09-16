@@ -1663,8 +1663,8 @@ const DECK = [{"id": 1, "name": "Зерно", "img": "01-zerno.jpg", "title": "�
 const CARD_BASE = "https://dimakostukov12-jpg.github.io/tishina-web/cards/";
 const ALL_SECS = SECTIONS.concat([EMERGENCY]);
 const FAVKEY = "tishina_favs";
-const BUILD = "13.09 14:24";
-const APP_VERSION = "13.09 14:24";
+const BUILD = "16.09 16:02";
+const APP_VERSION = "16.09 16:02";
 const NA_EKRAN = true;   /* «Вынести на экран» — временно выключено */
 
 /* ---------- копия на экране не должна застревать на старой сборке ----------
@@ -4346,21 +4346,10 @@ addEventListener("orientationchange", () => setTimeout(domaOtmetit, 300));
 
 /* ---------- заставка при запуске ---------- */
 function afterSplash(){
-  if(localStorage.getItem(PROFKEY)) return;
-  /* Анкеты нет. Но если серверу есть чем нас назвать — подпись Телеграма или
-     ключ устройства, — он вот-вот пришлёт её анкету, заполненную на другом
-     телефоне. Спрашивать заново незачем: ждём ответа секунды три, и только
-     если не пришло, знакомимся. Без этого копия на домашнем экране встречала
-     бы её онбордингом, хотя она в клубе третий месяц. */
-  if(komuMy()){
-    let zhdyom = 0;
-    const t = setInterval(() => {
-      if(localStorage.getItem(PROFKEY)){ clearInterval(t); try{ renderProfile(); }catch(e){} return; }
-      if(++zhdyom > 12){ clearInterval(t); startOnboarding(); }
-    }, 250);
-    return;
-  }
-  startOnboarding();
+  /* Онбординг убран 16.09.2026 (Дима: «сейчас смысла не имеет, потом может вернём»).
+     Приложение открывается сразу на «Главной». Аппарат онбординга (startOnboarding,
+     OB_STEPS, #s-onboard) оставлен дремать — чтобы вернуть, снова вызвать
+     startOnboarding() отсюда при пустом PROFKEY. */
 }
 let spTimer=null, spHeld=0; const SP_HOLD=700;
 function spReset(){
